@@ -1,5 +1,4 @@
 import { Box, Grid, Typography, Button } from "@mui/material";
-import Web3 from "web3";
 import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom'
 import "react-toggle/style.css";
@@ -25,8 +24,8 @@ import blackOnshoppingImage from "../../assets/image/shopping_cart (2).png"
 import whiteOffShoppingImage from "../../assets/image/remove_shopping_cart (2).png"
 import blackOffshoppingImage from "../../assets/image/remove_shopping_cart.png"
 
-const web3 = new Web3(window.ethereum);
-const contractABI = require('../../assets/abi/contract-abi.json');
+// const web3 = new Web3(window.ethereum);
+// const contractABI = require('../../assets/abi/contract-abi.json');
 
 const SearchResult = () => {
     const {
@@ -123,111 +122,120 @@ const SearchResult = () => {
     return (
         <Box
             pt={20}
-            px={'40px'}
+            px={{ xs: '30px', sm: '40px' }}
             sx={{
                 backgroundColor: theme == 'dark-theme' ? '#2A2A2A' : 'white',
                 minHeight: 'calc(100vh - 328px)'
             }}
         >
             <Box
-                display="flex"
+                display={{ xs: 'block', sm: "flex" }}
                 alignItems={'center'}
             >
-                <img
-                    src={theme == 'dark-theme' ? whiteVectorImage : blackVectorImage}
-                    width={'15.5px'}
-                    height={'31px'}
-                    style={{ cursor: 'pointer' }}
-                    onClick={backHome}
-                />
-                <Typography
-                    fontSize={{
-                        md: "24px",
-                        xs: "18px"
-                    }}
-                    fontWeight={700}
-                    top={{
-                        md: 30,
-                        xs: 70
-                    }}
-                    ml={'34.5px'}
-                    left={{
-                        md: 200,
-                        xs: 20
-                    }}
-                    sx={{
-                        fontFamily: "Inter",
-                        fontWeight: '600',
-                        color: theme == 'dark-theme' ? 'white' : 'black',
-                        fontSize: '40px',
-                        lineHeight: '48px',
-                        letterSpacing: '-0.01rem'
+                <Box
+                    display={'flex'}
+                    alignItems={'center'}
+                >
+                    <img
+                        src={theme == 'dark-theme' ? whiteVectorImage : blackVectorImage}
+                        width={'15.5px'}
+                        height={'31px'}
+                        style={{ cursor: 'pointer' }}
+                        onClick={backHome}
+                    />
+                    <Typography
+                        fontSize={{
+                            md: "24px",
+                            xs: "18px"
+                        }}
+                        fontWeight={700}
+                        top={{
+                            md: 30,
+                            xs: 70
+                        }}
+                        ml={{ xs: '20px', sm: '34.5px' }}
+                        left={{
+                            md: 200,
+                            xs: 20
+                        }}
+                        sx={{
+                            fontFamily: "Inter",
+                            fontWeight: '600',
+                            color: theme == 'dark-theme' ? 'white' : 'black',
+                            fontSize: '40px',
+                            lineHeight: '48px',
+                            letterSpacing: '-0.01rem'
 
-                    }}
-                    onClick={backHome}
-                >
-                    Search Result
-                </Typography>
+                        }}
+                        onClick={backHome}
+                    >
+                        Search Result
+                    </Typography>
+                </Box>
 
-                <Typography
-                    fontSize={{
-                        md: "24px",
-                        xs: "18px"
-                    }}
-                    fontWeight={700}
-                    top={{
-                        md: 30,
-                        xs: 70
-                    }}
-                    left={{
-                        md: 200,
-                        xs: 20
-                    }}
-                    sx={{
-                        fontSize: '14px',
-                        lineHeight: '17px',
-                        color: theme == 'dark-theme' ? 'white' : '#7A7A7A',
-                        marginLeft: '20px'
-                    }}
-                    onClick={gotoCartPage}
+                <Box
+                    display={'flex'}
+                    mt={{ xs: '10px', sm: '0' }}
                 >
-                    {`Domain Labs  > `}
-                </Typography>
-                <Typography
-                    ml={'5px'}
-                    sx={{
-                        fontWeight: '700',
-                        fontSize: '14px',
-                        lineHeight: '17px',
-                        paddngRight: '5px',
-                        textDecoration: 'underline',
-                        background: 'linear-gradient(87.95deg, #4BD8D8 -3.28%, #146EB4 106.25%)',
-                        '-webkit-background-clip': 'text',
-                        'text-decoration-line': 'underline',
-                        '-webkit-text-fill-color': 'transparent',
-                        'background-clip': 'text',
-                        'text-fill-color': 'transparent',
-                    }}
-                >
-                    {` Search results`}
-                </Typography>
+                    <Typography
+                        fontSize={{
+                            md: "24px",
+                            xs: "18px"
+                        }}
+                        fontWeight={700}
+                        top={{
+                            md: 30,
+                            xs: 70
+                        }}
+                        left={{
+                            md: 200,
+                            xs: 20
+                        }}
+                        sx={{
+                            fontSize: '14px',
+                            lineHeight: '17px',
+                            color: theme == 'dark-theme' ? 'white' : '#7A7A7A',
+                            marginLeft: '20px'
+                        }}
+                        onClick={gotoCartPage}
+                    >
+                        {`Domain Labs  > `}
+                    </Typography>
+                    <Typography
+                        ml={'5px'}
+                        sx={{
+                            fontWeight: '700',
+                            fontSize: '14px',
+                            lineHeight: '17px',
+                            paddngRight: '5px',
+                            textDecoration: 'underline',
+                            background: 'linear-gradient(87.95deg, #4BD8D8 -3.28%, #146EB4 106.25%)',
+                            '-webkit-background-clip': 'text',
+                            'text-decoration-line': 'underline',
+                            '-webkit-text-fill-color': 'transparent',
+                            'background-clip': 'text',
+                            'text-fill-color': 'transparent',
+                        }}
+                    >
+                        {` Search results`}
+                    </Typography>
+                </Box>
             </Box>
             <Box
-                display={{
-                    md: "flex",
-                    xs: 'block'
-                }}
+                display={'flex'}
                 mt={'60px'}
                 sx={{ flexDirection: 'row' }}
             >
                 <Box
                     sx={{
-                        m: 1, p: 1, width: '100%',
+                        m: 1,
+                        p: 1,
+                        width: '100%',
                         gridTemplateColumns: {
                             lg: 'repeat(4, 1fr)',
                             md: 'repeat(3, 1fr)',
-                            sm: 'repeat(2,1fr)',
-                            xs: 'repeat(1,1fr)'
+                            sm: 'repeat(2, 1fr)',
+                            xs: 'repeat(1, 1fr)',
                         },
                     }}
                     gap={'20px'}
@@ -523,7 +531,7 @@ const SearchResult = () => {
                     )
                 }
             </Box>
-        </Box>
+        </Box >
     )
 }
 export default SearchResult

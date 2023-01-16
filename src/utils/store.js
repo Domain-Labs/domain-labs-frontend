@@ -11,7 +11,7 @@ export const CounterProvider = props => {
 };
 
 export const ThemeProvider = props => {
-    const [theme, setTheme] = useState('dark-theme');
+    const [theme, setTheme] = useState('day-theme');
     return <ThemeContext.Provider value={[theme, setTheme]} {...props} />
 }
 

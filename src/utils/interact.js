@@ -1,6 +1,4 @@
 
-import Web3 from "web3";
-
 const contractABI = require('../assets/abi/contract-abi.json')
 const secondsInDay = 24 * 60 * 60 * 1000;
 

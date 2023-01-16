@@ -6,13 +6,12 @@ import {
   Toolbar,
   useScrollTrigger,
   Box,
+  Typography,
 } from "@mui/material";
 import "react-toggle/style.css";
 import Toggle from "react-toggle";
-import WalletConnectProvider from "@walletconnect/web3-provider";
 import { providers, ethers } from "ethers";
-import Web3 from "web3";
-import Web3Modal from 'web3modal'
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import axios from 'axios';
 import { /*NavLink,*/ useNavigate } from "react-router-dom";
 import useWindowDimensions from "../../hooks/useDimension";
@@ -22,14 +21,15 @@ import {
   rpcUrls,
   chainIdHexes,
 } from '../../config';
-import whiteLogoImage from '../../assets/image/whitelogo.png';
-import blackLogoImage from '../../assets/image/blacklogo.png';
+import whiteLogoImage from '../../assets/image/logo-white.png';
+import darkLogoImage from '../../assets/image/logo-dark.png';
 import yellowSunImage from '../../assets/image/light_mode.png'
 import darkSunImage from '../../assets/image/light_mode (1).png'
 import whiteMoonImage from '../../assets/image/clear_night.png'
 import darkMoonImage from '../../assets/image/clear_night (1).png'
 import whiteCartImage from '../../assets/image/shopping_cart.png'
 import darkCartImage from '../../assets/image/shopping_cart (1).png'
+import "./index.scss";
 
 let web3Modal;
 let provider;
@@ -52,7 +52,7 @@ const ElevationScroll = (props) => {
       color: theme == 'dark-theme' ? "white" : "#2A2A2A",
       transition: trigger ? "0.3s" : "0.5s",
       boxShadow: "none",
-      padding: width > 500 ? "15px 50px" : "0",
+      padding: width > 500 ? "15px 20px" : "0",
     },
   });
 }
@@ -84,151 +84,28 @@ const Header = (props) => {
   const [theme, setTheme] = useThemeStore();
   const toBuyPage = () => {
 
-    navigate('/cart')
+    // navigate('/cart')
   }
 
-  const init = () => {
-    console.log("init: current chainId decimal: ", currentChainIdDecimal);
-
-    const providerOptions = {
-      walletconnect: {
-        package: WalletConnectProvider,
-        options: {
-          // Mikko's test key - don't copy as your mileage may vary
-          // infuraId: "27e484dcd9e3efcfd25a83a78777cdf1",
-          rpc: {
-            currentChainIdDecimal: rpcUrls[currentChainIdDecimal]
-          },
-          chainId: currentChainIdDecimal
-        }
-      },
-    };
-
-    web3Modal = new Web3Modal({
-      network: "mainnet", // optional
-      cacheProvider: true, // optional
-      providerOptions // required
-    });
-
-    // window.w3m = web3Modal;
-  }
-
-  const fetchAccountData = async () => {
-    const web3Provider = new ethers.providers.Web3Provider(provider);
-    const signer = web3Provider.getSigner();
-    selectedAccount = await signer.getAddress();
-    console.log(selectedAccount);
-    return selectedAccount;
-  }
-
-  const refreshAccountData = async () => {
-    await fetchAccountData(provider);
-  }
-
-  const onConnect = async () => {
-    console.log("Opening a dialog", web3Modal);
-    try {
-      let newProvider = await web3Modal.connect({ cacheProvider: true });
-      setProvider(newProvider);
-      const web3 = new Web3(newProvider);
-      const accounts = await web3.eth.getAccounts();
-
-      try {
-        await axios.get(`${process.env.REACT_APP_BACKEND_URL}/accesses/write-log/${accounts[0]}`);
-      } catch (e) {
-        console.log("error occured: ", e);
-      }
-
-      // window.location.reload();
-    } catch (e) {
-      console.log("Could not get a wallet connection", e);
-      return;
-    }
-
-    provider?.on("accountsChanged", (accounts) => {
-      console.log('chainchan', accounts)
-      fetchAccountData();
-      // window.location.reload()
-    });
-
-    provider?.on("chainChanged", (chainId) => {
-      fetchAccountData();
-      // window.location.reload()
-    });
-
-    provider?.on("networkChanged", (networkId) => {
-      fetchAccountData();
-    });
-    window.location.reload()
-
-  }
-
-  const disconnet = async () => {
-    console.log("Opening a dialog", web3Modal);
-    try {
-      await web3Modal.clearCachedProvider();
-      window.location.reload()
-    } catch (e) {
-      console.log("Could not get a wallet connection", e);
-      return;
-    }
-  }
-  const switch_onChange_handle = () => {
+  const switchTheme = () => {
     setIsSwitchOn(!isSwitchOn);
     theme == 'dark-theme' ? setTheme('day-theme') : setTheme('dark-theme')
   }
 
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
-  };
-
-  useEffect(async () => {
-    if (walletLoggedIn) {
-      let provider1 = await web3Modal?.connect();
-      if (provider1) {
-        const web3 = new Web3(provider1);
-        const accounts = await web3.eth.getAccounts();
-        setWeb3Main(web3);
-        setProvider(provider1)
-        setWallet(accounts[0])
-      }
-    }
-  }, [walletLoggedIn]);
-
-  useEffect(() => {
-    init();
-    if (web3Modal.cachedProvider) {
-      // is wallet is connected
-      console.log('provider: ', web3Modal.cachedProvider, " connected");
-      setWalletLoggedIn(true)
-    }
-  }, [currentChainIdDecimal]);
-
-  useEffect(async () => {
-    if (walletLoggedIn && provider) {
-      const chainId = await provider.request({ method: 'eth_chainId' });
-      console.log("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-      console.log("header: chainid: ", chainId);
-      console.log("current chainIdDecimal: ", chainIdHexes[currentChainIdDecimal]);
-
-      if (chainId != chainIdHexes[currentChainIdDecimal]) {
-        await provider.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: chainIdHexes[currentChainIdDecimal] }], // chainId must be in hexadecimal numbers
-        });
-      }
-
-      await provider.on('chainChanged', (chainId) => {
-        // window.location.reload();
-      });
-    }
-  }, [walletLoggedIn, provider, currentChainIdDecimal]);
-
   return (
-    <React.Fragment>
-      <ElevationScroll {...props}>
-        <AppBar>
-          <Toolbar>
+    <React.Fragment
+    >
+      <ElevationScroll {...props}
+        px={'10px !important'}
+        class
+      >
+        <AppBar
+          height={{ xs: '100px', sm: '60px' }}
+        >
+          <Toolbar
+            px={'0px'}
+            height={{ xs: '100px', sm: '60px' }}
+          >
             <Box
               position={`fixed`}
               style={{
@@ -237,45 +114,57 @@ const Header = (props) => {
                 backgroundSize: "contain",
                 backgroundImage: whiteLogoImage,
               }}
+              sx={{ display: 'flex' }}
+              mr={'17px'}
+              alignItems={'center'}
             >
               <img
-                src={theme == 'dark-theme' ? whiteLogoImage : blackLogoImage}
+                src={theme == 'dark-theme' ? darkLogoImage : whiteLogoImage}
                 style={{
-                  width: '232px'
+                  height: '41px'
                 }}
               />
+              <Typography
+                color={theme == 'dark-theme' ? 'white' : 'black'}
+                fontSize={"32px"}
+                ml={'17px'}
+                display={{ xs: 'none', md: 'flex' }}
+              >
+                Domain Labs
+              </Typography>
             </Box>
-
 
             <Box
               position={'fixed'}
               sx={{
                 right: { md: "10px", xs: "10px" },
-                top: { md: "30px", xs: "10px" },
               }}
               style={{
                 zIndex: '10000'
               }}
+              display={'flex'}
             >
               <Box
-                display={'flex'}
+                mr={'10.93px'}
+                display={{ xs: "block", sm: 'flex' }}
                 sx={{
-
+                  alignItems: 'center',
+                  position: 'relative',
+                  justifyContent: 'center',
                 }}
+                gap={'20px'}
               >
                 <Box
-                  mr={'40.93px'}
-                  display="flex"
-                  sx={{
-                    alignItems: 'center',
-                    position: 'relative',
-                    justifyContent: 'center',
-                  }}
+                  flexDirection={'row'}
+                  display={'flex'}
+                  justifyContent={'center'}
                 >
                   <Box
                     sx={{
                       padding: '4px 5px'
                     }}
+                    alignItems='center'
+                    display={'flex'}
                   >
                     <img
                       src={theme == 'dark-theme' ? darkSunImage : yellowSunImage}
@@ -287,17 +176,21 @@ const Header = (props) => {
                     sx={{
                       padding: '4px 10px'
                     }}
+                    alignItems='center'
+                    display={'flex'}
                   >
                     <Toggle
                       defaultChecked={isSwitchOn}
                       icons={false}
-                      onChange={() => switch_onChange_handle()}
+                      onChange={() => switchTheme()}
                     />
                   </Box>
                   <Box
                     sx={{
                       padding: '4px 5px 3px 10px'
                     }}
+                    alignItems='center'
+                    display={'flex'}
                   >
                     <img
                       src={
@@ -313,6 +206,7 @@ const Header = (props) => {
                       cursor: 'pointer'
                     }}
                     onClick={toBuyPage}
+                    display={'flex'}
                   >
                     {
                       count.cart && count.cart > 0 ? (
@@ -371,48 +265,23 @@ const Header = (props) => {
                       )
                     }
                   </Box>
-                  <Box
-                    display="flex"
-                    sx={{
-                      ml: 2,
-                      flexDirection: 'row-reverse',
-                      whiteSpace: 'nowrap'
+                </Box>
+
+                <Box>
+                  <ConnectButton
+                    showBalance={{
+                      smallScreen: false,
+                      largeScreen: false,
                     }}
-                  >
-                    {
-                      walletLoggedIn ? (
-                        <Box
-                          sx={{
-                            px: '43px',
-                            py: '5px',
-                            background: 'linear-gradient(86.23deg, #4BD8D8 -48.31%, #146EB4 114.96%)',
-                            color: 'white',
-                            borderRadius: '12px',
-                            cursor: 'pointer',
-                            fontFamily: 'Inter',
-                          }}
-                          onClick={() => disconnet()}
-                        >
-                          {wallet?.slice(0, 5)}.....{wallet?.slice(-3)}
-                        </Box>
-                      ) : (
-                        <Box
-                          sx={{
-                            px: '43px',
-                            py: '5px',
-                            background: 'linear-gradient(86.23deg, #4BD8D8 -48.31%, #146EB4 114.96%)',
-                            color: 'white',
-                            borderRadius: '12px',
-                            cursor: 'pointer',
-                            fontFamily: 'Inter',
-                          }}
-                          onClick={() => onConnect()}
-                        >
-                          Connect Wallet
-                        </Box>
-                      )
-                    }
-                  </Box>
+                    accountStatus={{
+                      smallScreen: 'avatar',
+                      largeScreen: 'full',
+                    }}
+                    chainStatus={{
+                      smallScreen: 'icon',
+                      largeScreen: 'full',
+                    }}
+                  />
                 </Box>
               </Box>
             </Box>

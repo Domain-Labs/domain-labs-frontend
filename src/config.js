@@ -9,8 +9,8 @@ export const bscChain = "97";
  * "97": bsc chain 
  *  */
 export const contractAddresses = {
-    "5": "0x4f11832Fac8A0E0C11cd8FC33B2F43CfED3388eC",
-    "97": "0x15393Ea572fFE1b8DB3B80f353d99F87cefBF807"
+    "5": "0x377935c0C202f7f6C944176Cbc46e2EE23e4285F",
+    "97": "0x55189eE743c50fBf357A2A49e24577Fdf8D22D54"
 }
 
 export const chainNames = {
