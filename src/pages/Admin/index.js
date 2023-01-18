@@ -7,7 +7,7 @@ import axios from 'axios';
 import { useThemeStore } from "../../utils/store";
 import CanvasJSReact from '../../assets/js/canvasjs.react';
 import './index.scss';
-require('dotenv').config();
+// require('dotenv').config();
 
 var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 

@@ -4,7 +4,6 @@ import { CounterProvider, ThemeProvider } from "./utils/store";
 import { DappContext } from "./utils/context";
 import ContextProvider from "./utils/ContextProvider";
 
-
 const App = () => {
   return (
     <ContextProvider>

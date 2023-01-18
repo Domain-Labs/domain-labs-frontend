@@ -1,6 +1,7 @@
 import { Box, Grid, Typography, Button } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from 'react-router-dom'
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import "react-toggle/style.css";
 import { useDappContext } from "../../utils/context";
 import { useCounterStore, useThemeStore } from '../../utils/store'
@@ -100,101 +101,107 @@ const SearchDetail = () => {
     return (
         <Box
             pt={20}
-            px={'40px'}
+            px={{ xs: '30px', sm: '40px' }}
             sx={{
                 backgroundColor: theme == 'dark-theme' ? '#2A2A2A' : 'white',
                 minHeight: 'calc(100vh - 328px)'
             }}
         >
             <Box
-                display="flex"
+                display={{ xs: 'block', sm: "flex" }}
                 alignItems={'center'}
             >
-                <img
-                    src={
-                        theme == 'dark-theme' ? whiteVectorImage : blackVectorImage
-                    }
-                    width={'15.5px'}
-                    height={'31px'}
-                    style={{ cursor: 'pointer' }}
-                    onClick={backHome}
-                />
-                <Typography
-                    fontSize={{
-                        md: "24px",
-                        xs: "18px"
-                    }}
-                    fontWeight={700}
-                    top={{
-                        md: 30,
-                        xs: 70
-                    }}
-                    ml={'34.5px'}
-                    left={{
-                        md: 200,
-                        xs: 20
-                    }}
-                    sx={{
-                        fontFamily: "Inter",
-                        fontWeight: '600',
-                        color: theme == 'dark-theme' ? 'white' : 'black',
-                        fontSize: '40px',
-                        lineHeight: '48px',
-                        letterSpacing: '-0.01rem'
+                <Box
+                    display={'flex'}
+                    alignItems={'center'}
+                >
+                    <img
+                        src={theme == 'dark-theme' ? whiteVectorImage : blackVectorImage}
+                        width={'15.5px'}
+                        height={'31px'}
+                        style={{ cursor: 'pointer' }}
+                        onClick={backHome}
+                    />
+                    <Typography
+                        fontSize={{
+                            md: "24px",
+                            xs: "18px"
+                        }}
+                        fontWeight={700}
+                        top={{
+                            md: 30,
+                            xs: 70
+                        }}
+                        ml={{ xs: '20px', sm: '34.5px' }}
+                        left={{
+                            md: 200,
+                            xs: 20
+                        }}
+                        sx={{
+                            fontFamily: "Inter",
+                            fontWeight: '600',
+                            color: theme == 'dark-theme' ? 'white' : 'black',
+                            fontSize: '40px',
+                            lineHeight: '48px',
+                            letterSpacing: '-0.01rem'
 
-                    }}
-                    onClick={backHome}
+                        }}
+                        onClick={backHome}
+                    >
+                        Search Result
+                    </Typography>
+                </Box>
+
+                <Box
+                    display={'flex'}
+                    mt={{ xs: '10px', sm: '0' }}
                 >
-                    Search Result
-                </Typography>
-                <Typography
-                    fontSize={{
-                        md: "24px",
-                        xs: "18px"
-                    }}
-                    fontWeight={700}
-                    top={{
-                        md: 30,
-                        xs: 70
-                    }}
-                    left={{
-                        md: 200,
-                        xs: 20
-                    }}
-                    sx={{
-                        fontSize: '14px',
-                        lineHeight: '17px',
-                        color: theme == 'dark-theme' ? 'white' : '#7A7A7A',
-                        marginLeft: '20px'
-                    }}
-                    onClick={gotoCartPage}
-                >
-                    {`Domain Labs  > `}
-                </Typography>
-                <Typography
-                    ml={'5px'}
-                    sx={{
-                        fontWeight: '700',
-                        fontSize: '14px',
-                        lineHeight: '17px',
-                        paddngRight: '5px',
-                        textDecoration: 'underline',
-                        background: 'linear-gradient(87.95deg, #4BD8D8 -3.28%, #146EB4 106.25%)',
-                        '-webkit-background-clip': 'text',
-                        'text-decoration-line': 'underline',
-                        '-webkit-text-fill-color': 'transparent',
-                        'background-clip': 'text',
-                        'text-fill-color': 'transparent',
-                    }}
-                >
-                    {` Search results`}
-                </Typography>
+                    <Typography
+                        fontSize={{
+                            md: "24px",
+                            xs: "18px"
+                        }}
+                        fontWeight={700}
+                        top={{
+                            md: 30,
+                            xs: 70
+                        }}
+                        left={{
+                            md: 200,
+                            xs: 20
+                        }}
+                        sx={{
+                            fontSize: '14px',
+                            lineHeight: '17px',
+                            color: theme == 'dark-theme' ? 'white' : '#7A7A7A',
+                            marginLeft: '20px'
+                        }}
+                        onClick={gotoCartPage}
+                    >
+                        {`Domain Labs  > `}
+                    </Typography>
+                    <Typography
+                        ml={'5px'}
+                        sx={{
+                            fontWeight: '700',
+                            fontSize: '14px',
+                            lineHeight: '17px',
+                            paddngRight: '5px',
+                            textDecoration: 'underline',
+                            background: 'linear-gradient(87.95deg, #4BD8D8 -3.28%, #146EB4 106.25%)',
+                            '-webkit-background-clip': 'text',
+                            'text-decoration-line': 'underline',
+                            '-webkit-text-fill-color': 'transparent',
+                            'background-clip': 'text',
+                            'text-fill-color': 'transparent',
+                        }}
+                    >
+                        {` Search results`}
+                    </Typography>
+                </Box>
             </Box>
             <Box
-                display={{
-                    md: "flex",
-                    xs: 'block'
-                }}
+                display={'flex'}
                 mt={'60px'}
                 sx={{ flexDirection: 'row' }}
             >
@@ -205,7 +212,7 @@ const SearchDetail = () => {
                         width: '100%',
                     }}
                     gap={'20px'}
-                    display="flex;"
+                    display="flex"
                 >
                     <Box
                         sx={{
@@ -234,10 +241,7 @@ const SearchDetail = () => {
                                 domainInfo?.status ? (
                                     <Typography
                                         sx={{ opacity: '0.5' }}
-                                        fontSize={{
-                                            md: '1.8vw',
-                                            sm: '25px'
-                                        }}
+                                        fontSize={{ xs: '15px', md: '20px' }}
                                         fontWeight={'700'}
                                         variant="h5"
                                     >
@@ -246,10 +250,7 @@ const SearchDetail = () => {
                                 ) : (
                                     <Typography
                                         sx={{ opacity: '1' }}
-                                        fontSize={{
-                                            md: '1.8vw',
-                                            sm: '25px'
-                                        }}
+                                        fontSize={{ xs: '15px', md: '20px' }}
                                         fontWeight={'700'}
                                         variant="h5"
                                     >
@@ -268,10 +269,7 @@ const SearchDetail = () => {
                                     domainInfo?.status ? (
                                         <Typography
                                             sx={{ ml: '30px' }}
-                                            fontSize={{
-                                                md: '1.3vw',
-                                                sm: '18px'
-                                            }}
+                                            fontSize={{ xs: '13px', md: '20px' }}
                                             color={'#868686'}
                                         >
                                             {'ENS Domain is registered already.'}
@@ -279,10 +277,7 @@ const SearchDetail = () => {
                                     ) : (
                                         < Typography
                                             sx={{ ml: '30px' }}
-                                            fontSize={{
-                                                md: '1.3vw',
-                                                sm: '18px'
-                                            }}
+                                            fontSize={{ xs: '15px', md: '20px' }}
                                         >
                                             {'ENS Domain is available.'}
                                         </Typography>
@@ -301,22 +296,19 @@ const SearchDetail = () => {
                                         }}
                                     >
                                         <Typography
-                                            fontSize={{
-                                                md: '1.2vw',
-                                                sm: '25px'
-                                            }}
+                                            fontSize={{ xs: '15px', md: '20px' }}
                                         >
                                             owner:
                                         </Typography>
-                                        <Typography
-                                            fontSize={{
-                                                md: '1.2vw',
-                                                sm: '25px'
-                                            }}
-                                            sx={{ ml: '10px' }}
-                                        >
-                                            {detailInfo.owner}
-                                        </Typography>
+                                        <CopyToClipboard text={detailInfo.owner}
+                                            onCopy={() => window.alert("copied")}>
+                                            <Typography
+                                                fontSize={{ xs: '15px', md: '20px' }}
+                                                sx={{ ml: '10px' }}
+                                            >
+                                                {detailInfo.owner?.slice(0, 5) + "..." + detailInfo.owner?.slice(-5, -1)}
+                                            </Typography>
+                                        </CopyToClipboard>
                                     </Box>
                                     <Box
                                         display="flex"
@@ -326,18 +318,12 @@ const SearchDetail = () => {
                                         }}
                                     >
                                         <Typography
-                                            fontSize={{
-                                                md: '1.2vw',
-                                                sm: '25px'
-                                            }}
+                                            fontSize={{ xs: '15px', md: '20px' }}
                                         >
                                             time:
                                         </Typography>
                                         <Typography
-                                            fontSize={{
-                                                md: '1.2vw',
-                                                sm: '25px'
-                                            }}
+                                            fontSize={{ xs: '15px', md: '20px' }}
                                             sx={{ ml: '10px' }}
                                         >
                                             {
@@ -353,18 +339,14 @@ const SearchDetail = () => {
                                         }}
                                     >
                                         <Typography
-                                            fontSize={{
-                                                md: '1.2vw',
-                                                sm: '25px'
-                                            }}
+                                            fontSize={{ xs: '15px', md: '20px' }}
+
                                         >
                                             expire time:
                                         </Typography>
                                         <Typography
-                                            fontSize={{
-                                                md: '1.2vw',
-                                                sm: '25px'
-                                            }}
+                                            fontSize={{ xs: '15px', md: '20px' }}
+
                                             sx={{ ml: '10px' }}
                                         >
                                             {detailInfo.durationTime / (1000 * 24 * 60 * 60)}days

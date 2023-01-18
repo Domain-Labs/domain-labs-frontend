@@ -24,6 +24,7 @@ import ensLogo from '../../assets/image/svgs/ens-logo.svg';
 import binanceLogo from '../../assets/image/svgs/binance-logo.svg';
 import searchImage from '../../assets/image/search.png';
 import { useDappContext } from "../../utils/context";
+import './index.scss';
 
 const Home = () => {
   const {
@@ -113,16 +114,27 @@ const Home = () => {
           px={{ md: 10, xs: 5 }}
           py={25}
         >
-          <Grid container display='flex' alignItems="center" justifyContent="center">
-            <Grid item xs={12} sm={12}>
-              <Box style={{
-                display: 'center',
-                paddingLeft: '0px',
-                borderRadius: '12px',
-                textAlign: 'center',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
+          <Grid
+            container
+            display='flex'
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Grid
+              item
+              xs={12}
+              sm={12}
+            >
+              <Box
+                style={{
+                  display: 'center',
+                  paddingLeft: '0px',
+                  borderRadius: '12px',
+                  textAlign: 'center',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
 
                 {/* title of main page*/}
                 <Box
@@ -130,13 +142,12 @@ const Home = () => {
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    maxHeight: '2.9991vw'
-
+                    maxHeight: '40px',
                   }}
                 >
                   <Typography
-                    fontSize={{ md: "2.999vw", xs: "2.5707vw" }}
-                    mr={'5px'}
+                    fontSize={{ xs: '25px', md: '33px' }}
+                    mr={{ xs: '2px', sm: '5px' }}
                     py='5px'
                     style={{
                       borderRadius: '12px',
@@ -154,8 +165,8 @@ const Home = () => {
                     {'Search For '}
                   </Typography>
                   <Typography
-                    fontSize={{ md: "2.9991vw", xs: "2.5707vw" }}
-                    mr={2}
+                    fontSize={{ xs: '25px', md: '33px' }}
+                    mx={{ xs: '2px', sm: '10px' }}
                     style={{
                       textTransform: 'uppercase',
                       color: "#513eff",
@@ -171,7 +182,7 @@ const Home = () => {
                     {'  Web3'}
                   </Typography>
                   <Typography
-                    fontSize={{ md: "2.999vw", xs: "2.5707vw" }}
+                    fontSize={{ xs: '25px', md: '33px' }}
                     py='5px'
                     style={{
                       borderRadius: '12px',
@@ -192,18 +203,14 @@ const Home = () => {
 
                 {/* description of main page*/}
                 <Typography
-                  fontSize={{ md: "1.4991vw", xs: "3.5707vw" }}
+                  fontSize={{ xs: '14px', md: '18px' }}
                   px={1}
                   fontFamily={'Inter'}
                   py='5px'
                   style={{
                     borderRadius: '12px',
                     textAlign: 'center',
-
                     color: theme == 'dark-theme' ? 'white' : 'black',
-
-                    //WebkitTextFillColor: "transparent",
-                    //background:'linear-gradient(30deg, #9F1FED, #645FF2, #38BDD1)'  
                   }}
                   fontWeight={400}
                   align="center"
@@ -219,7 +226,6 @@ const Home = () => {
                 justifyContent="center"
                 alignItems="center">
                 <Paper
-                  px={3}
                   style={{
                     maxWidth: '960px',
                     display: 'flex',
@@ -230,6 +236,7 @@ const Home = () => {
                     alignItems: 'center',
                     justify: 'center',
                     paddingLeft: '24px',
+                    paddingRight: '10px',
                     borderRadius: '16px',
                     boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)'
                   }}
@@ -246,42 +253,54 @@ const Home = () => {
                   >
                   </TextField >
                   <Typography
-                    mr={2}
+                    mr={{ xs: 0, sm: 2 }}
                     sx={{
                       color: '#3498db',
                       whiteSpace: 'nowrap',
                       cursor: 'pointer'
                     }}
+                    fontSize={{ xs: '12px', sm: ' 14px', md: '16px' }}
                     className="custom-font"
                     onClick={advancedSearch}
                   >
                     Advanced Search
                   </Typography>
                   <Button
-                    style={{
-                      height: '52px',
-                      width: '52px',
-                      fontSize: '18px',
-                      paddingLeft: '32px',
-                      borderRadius: '16px',
-                      paddingRight: '32px',
-                      backgroundColor: 'white',
-                      "&:hover": {
-                        backgroundColor: "#001cc3"
-                      },
-                    }}
                     onClick={searchClicked}
+                    style={{
+                      minWidth: '40px'
+                    }}
                   >
-                    <img src={searchImage} />
+                    <Box
+                      display={{ xs: 'flex', sm: 'none' }}
+                      alignItems={'center'}
+                    >
+                      <img
+                        style={{ width: '16px', height: '16px' }}
+                        src={searchImage}
+                      />
+                    </Box>
+                    <Box
+                      display={{ xs: 'none', sm: 'flex' }}
+                      alignItems={'center'}
+                    >
+                      <img
+                        style={{ width: '24', height: '24px' }}
+                        src={searchImage}
+                      />
+                    </Box>
+
                   </Button>
                 </Paper>
               </Box>
 
               {/* chain selection*/}
               <Box
-                display="flex"
+                display={{ xs: 'block', sm: 'flex' }}
                 justifyContent="center"
                 alignItems="center"
+                // width={'max-content'}
+                pt={{ xs: '30px', sm: '0px' }}
               >
                 <Typography
                   fontSize={{ md: "2.999vw", xs: "2.5707vw" }}
@@ -300,41 +319,46 @@ const Home = () => {
                 >
                   Search for:
                 </Typography>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={chainId}
-                  label="Current Chain"
-                  onChange={handleChainChange}
-                  className="chain-select-menu"
-                  style={{
-                    width: '300px',
-                    height: '34px',
-                    borderRadius: '16px',
-                    background: '#F7F7F7',
-                    boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
-                  }}
+                <Box
+                  textAlign={{ xs: 'center' }}
                 >
-                  <MenuItem
-                    value={ethereumChain}
-                    style={{ display: 'flex' }}
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={chainId}
+                    label="Current Chain"
+                    onChange={handleChainChange}
+                    className="chain-select-menu"
+                    style={{
+                      width: '300px',
+                      height: '34px',
+                      borderRadius: '16px',
+                      background: '#F7F7F7',
+                      boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+                    }}
                   >
-                    <img
-                      src={ensLogo}
-                      style={{ marginRight: '10px' }}
-                    />
-                    ENS - Ethereum Name Service
-                  </MenuItem>
-                  <MenuItem
-                    value={bscChain}
-                  >
-                    <img
-                      src={binanceLogo}
-                      style={{ marginRight: '10px' }}
-                    />
-                    BNS - Binance Name Service
-                  </MenuItem>
-                </Select>
+                    <MenuItem
+                      value={ethereumChain}
+                      style={{ display: 'flex' }}
+                    >
+                      <img
+                        src={ensLogo}
+                        style={{ marginRight: '10px' }}
+                      />
+                      ENS - Ethereum Name Service
+                    </MenuItem>
+                    <MenuItem
+                      value={bscChain}
+                    >
+                      <img
+                        src={binanceLogo}
+                        style={{ marginRight: '10px' }}
+                      />
+                      BNS - Binance Name Service
+                    </MenuItem>
+                  </Select>
+                </Box>
+
               </Box>
 
               {

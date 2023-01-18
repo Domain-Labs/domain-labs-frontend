@@ -77,7 +77,7 @@ function DialogModal(props) {
         id="alert-dialog-title"
         sx={{
           fontWeight: '600',
-          fontSize: '32px',
+          fontSize: '28px',
           lineHeight: '39px'
         }}>
         {"Advanced Search"}

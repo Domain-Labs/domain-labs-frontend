@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react"
-import Web3 from "web3";
 import { Box, Grid, Typography, Button, Divider, TextField, MenuItem } from "@mui/material";
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useDappContext } from "../../utils/context";
 import { useCounterStore, useThemeStore } from "../../utils/store";
 import {
@@ -22,8 +22,8 @@ import whiteOffShoppingImage from "../../assets/image/remove_shopping_cart (2).p
 import picImage from '../../assets/image/ethereum-name-service-ens-logo-B6AE963A1D-seeklogo 1.png';
 import timerImage from "../../assets/image/timer.png"
 
-const web3 = new Web3(window.ethereum);
-const contractABI = require('../../assets/abi/contract-abi.json');
+// const web3 = new Web3(window.ethereum);
+// const contractABI = require('../../assets/abi/contract-abi.json');
 
 const Cart = () => {
     const {
@@ -209,84 +209,113 @@ const Cart = () => {
     return (
         <Box
             pt={20}
-            px={'40px'}
+            px={{ xs: '30px', sm: '40px' }}
             sx={{
                 backgroundColor: theme == 'dark-theme' ? '#2A2A2A' : 'white',
                 minHeight: 'calc(100vh - 328px)'
             }}
         >
-            <Box sx={{
-                display: 'flex',
-                justifyContent: "space-between"
-            }}>
+            <Box
+                display={{ xs: 'block', md: 'flex' }}
+                sx={{
+                    justifyContent: "space-between"
+                }}
+            >
                 <Box
-                    display="flex"
+                    display={{ md: 'block', lg: "flex" }}
                     alignItems={'center'}
                 >
-                    <img src={theme == 'dark-theme' ? whiteVectorImage : blackVectorImage} width={'15.5px'} height={'31px'} style={{ cursor: 'pointer' }} onClick={backHome} />
-                    <Typography
-                        fontSize={{ md: "24px", xs: "18px" }}
-                        fontWeight={700}
-                        top={{ md: 30, xs: 70 }}
-                        ml={'34.5px'}
-                        left={{ md: 200, xs: 20 }}
-                        sx={{
-                            fontFamily: "Inter",
-                            fontWeight: '600',
-                            color: theme == 'dark-theme' ? 'white' : 'black',
-                            fontSize: '40px',
-                            lineHeight: '48px',
-                            letterSpacing: '-0.01rem'
+                    <Box
+                        display={'flex'}
+                        alignItems={'center'}
+                    >
+                        <img
+                            src={theme == 'dark-theme' ? whiteVectorImage : blackVectorImage}
+                            width={'15.5px'}
+                            height={'31px'}
+                            style={{ cursor: 'pointer' }}
+                            onClick={backHome}
+                        />
+                        <Typography
+                            fontSize={{
+                                md: "24px",
+                                xs: "18px"
+                            }}
+                            fontWeight={700}
+                            top={{
+                                md: 30,
+                                xs: 70
+                            }}
+                            ml={{ xs: '20px', sm: '34.5px' }}
+                            left={{
+                                md: 200,
+                                xs: 20
+                            }}
+                            sx={{
+                                fontFamily: "Inter",
+                                fontWeight: '600',
+                                color: theme == 'dark-theme' ? 'white' : 'black',
+                                fontSize: '40px',
+                                lineHeight: '48px',
+                                letterSpacing: '-0.01rem'
 
-                        }}
-                        onClick={backHome}
-                    >
-                        Search Result
-                    </Typography>
-                    <Typography
-                        fontSize={{
-                            md: "24px",
-                            xs: "18px"
-                        }}
-                        fontWeight={700}
-                        top={{
-                            md: 30,
-                            xs: 70
-                        }}
-                        left={{
-                            md: 200,
-                            xs: 20
-                        }}
-                        sx={{
-                            fontSize: '14px',
-                            lineHeight: '17px',
-                            color: theme == 'dark-theme' ? 'white' : '#7A7A7A',
-                            marginLeft: '20px'
-                        }}
-                    >
-                        {`Domain Labs  > `}
-                    </Typography>
-                    <Typography
-                        ml={'5px'}
-                        sx={{
-                            fontWeight: '700',
-                            fontSize: '14px',
-                            lineHeight: '17px',
-                            paddngRight: '5px',
-                            textDecoration: 'underline',
-                            background: 'linear-gradient(87.95deg, #4BD8D8 -3.28%, #146EB4 106.25%)',
-                            '-webkit-background-clip': 'text',
-                            'text-decoration-line': 'underline',
-                            '-webkit-text-fill-color': 'transparent',
-                            'background-clip': 'text',
-                            'text-fill-color': 'transparent',
+                            }}
+                            onClick={backHome}
+                        >
+                            Search Result
+                        </Typography>
+                    </Box>
 
-                        }}
+                    <Box
+                        display={'flex'}
+                        mt={{ xs: '10px', lg: '0' }}
                     >
-                        {` Shopping Cart`}
-                    </Typography>
+                        <Typography
+                            fontSize={{
+                                md: "24px",
+                                xs: "18px"
+                            }}
+                            fontWeight={700}
+                            top={{
+                                md: 30,
+                                xs: 70
+                            }}
+                            left={{
+                                md: 200,
+                                xs: 20
+                            }}
+                            sx={{
+                                fontSize: '14px',
+                                lineHeight: '17px',
+                                color: theme == 'dark-theme' ? 'white' : '#7A7A7A',
+                                marginLeft: '20px'
+                            }}
+                        >
+                            {`Domain Labs  > `}
+                        </Typography>
+                        <Typography
+                            ml={'5px'}
+                            sx={{
+                                fontWeight: '700',
+                                fontSize: '14px',
+                                lineHeight: '17px',
+                                paddngRight: '5px',
+                                textDecoration: 'underline',
+                                background: 'linear-gradient(87.95deg, #4BD8D8 -3.28%, #146EB4 106.25%)',
+                                '-webkit-background-clip': 'text',
+                                'text-decoration-line': 'underline',
+                                '-webkit-text-fill-color': 'transparent',
+                                'background-clip': 'text',
+                                'text-fill-color': 'transparent',
+                            }}
+                        >
+                            {` Shopping Cart`}
+                        </Typography>
+                    </Box>
                 </Box>
-                <Box>
+                <Box
+                    mt={{ xs: '40px', md: '0px' }}
+                >
                     <Typography
                         color={theme == 'dark-theme' ? 'white' : 'black'}
                         sx={{
@@ -384,19 +413,21 @@ const Cart = () => {
                             {totalValue * 1221}
                         </Typography>
                     </Box>
-                    <Button
-                        sx={{
-                            background: 'linear-gradient(86.23deg, #4BD8D8 -48.31%, #146EB4 114.96%)',
-                            borderRadius: '12px',
-                            marginTop: '12px',
-                            color: 'white',
-                            float: 'right',
-                            px: '40px',
-                        }}
-                        onClick={() => buyDomain()}
-                    >
-                        Proceed To Registration
-                    </Button>
+                    <Box>
+                        <Button
+                            sx={{
+                                background: 'linear-gradient(86.23deg, #4BD8D8 -48.31%, #146EB4 114.96%)',
+                                borderRadius: '12px',
+                                marginTop: '12px',
+                                color: 'white',
+                                // float: 'right',
+                                px: '40px',
+                            }}
+                            onClick={() => buyDomain()}
+                        >
+                            Proceed To Registration
+                        </Button>
+                    </Box>
                 </Box>
             </Box>
             <Box
@@ -435,19 +466,35 @@ const Cart = () => {
                         lineHeight={'24px'}
                         fontWeight={'600'}
                         color={'black'}
+                        display={{ xs: 'none', md: 'flex', }}
                     >
                         Le8429482ldjfie82048fjw8jfue8492j204kd0282jdurks
                     </Typography>
 
+
+                    <CopyToClipboard text={'Le8429482ldjfie82048fjw8jfue8492j204kd0282jdurks'}
+                        onCopy={() => window.alert("copied")}>
+                        <Typography
+                            fontSize={'20px'}
+                            lineHeight={'24px'}
+                            fontWeight={'600'}
+                            color={'black'}
+                            display={{ xs: 'flex', md: 'none', }}
+                        >
+                            {'Le8429482ldjfie82048fjw8jfue8492j204kd0282jdurks'.slice(0, 10) + "..." + 'Le8429482ldjfie82048fjw8jfue8492j204kd0282jdurks'.slice(-10, -1)}
+                        </Typography>
+                    </CopyToClipboard>
+
                 </Box>
                 <Box
+                    my={'40px'}
                     sx={{
-                        m: 1, p: 1, width: '100%', marginTop: '40px',
+                        width: '100%',
                         gridTemplateColumns: {
                             lg: 'repeat(4, 1fr)',
                             md: 'repeat(3, 1fr)',
-                            sm: 'repeat(2,1fr)',
-                            xs: 'repeat(1,1fr)'
+                            sm: 'repeat(2, 1fr)',
+                            xs: 'repeat(1, 1fr)'
                         },
                     }}
                     gap={'20px'}
@@ -644,7 +691,7 @@ const Cart = () => {
                     }
                 </Box>
             </Box>
-        </Box>
+        </Box >
     )
 }
 
