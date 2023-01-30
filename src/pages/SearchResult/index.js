@@ -1,40 +1,32 @@
-import { Box, Grid, Typography, Button } from "@mui/material";
+import { Box, Typography, Button } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom'
 import "react-toggle/style.css";
-import { useDappContext } from "../../utils/context";
+import { useNetwork, } from "wagmi";
 import { useCounterStore, useThemeStore } from '../../utils/store'
 import {
-    contractAddresses,
     domainSuffixes,
     domainLogoImages,
     domainNames,
 } from "../../config";
 import {
-    bulkSearch
+    useBulkIsDomain,
 } from '../../utils/interact';
-import ensImage from '../../assets/image/ethereum-name-service-ens-logo-B6AE963A1D-seeklogo 1.png';
-import binanceImage from '../../assets/image/svgs/binance-logo.svg';
+
 import blackVectorImage from "../../assets/image/Vector 1.png";
 import whiteVectorImage from "../../assets/image/Vector 1 (2).png";
 import whiteBookmarkImage from "../../assets/image/bookmark (1).png";
 import blackBookmarkImage from "../../assets/image/bookmark.png";
-import whiteOnShoppingImage from "../../assets/image/shopping_cart (1).png";
 import blackOnshoppingImage from "../../assets/image/shopping_cart (2).png"
 import whiteOffShoppingImage from "../../assets/image/remove_shopping_cart (2).png"
 import blackOffshoppingImage from "../../assets/image/remove_shopping_cart.png"
 
-// const web3 = new Web3(window.ethereum);
-// const contractABI = require('../../assets/abi/contract-abi.json');
-
 const SearchResult = () => {
-    const {
-        currentChainIdDecimal,
-        web3Main,
-    } = useDappContext();
+    const bulkIsDomain = useBulkIsDomain();
+    const { chain, } = useNetwork();
     const navigate = useNavigate()
     const [results, setResults] = useState([])
-    const [result, setResult] = useState([]);
+
     const [count, setCount] = useCounterStore();
     const [detailInfo, setDetailInfo] = useState([])
     const [theme, setTheme] = useThemeStore();
@@ -49,21 +41,7 @@ const SearchResult = () => {
         tempArray1.push({ id: id, name: results[id].name })
         setCount({ ...count, cart: cart * 1 + 1, cartNames: tempArray1 })
     }
-    const getBulkIsDomain = async () => {
-        // window.contract =  await new web3.eth.Contract(contractABI, contractAddresses[currentChainIdDecimal]);
 
-
-        try {
-            const result = await bulkSearch(web3Main, contractAddresses[currentChainIdDecimal], count.names);
-            // const result = await window.contract.methods.bulkIsdomain(count.names).call()
-            console.log("=============================================");
-            console.log("bulk search result: ", result);
-            setResult(result);
-        }
-        catch (e) {
-            console.log("error: ", e);
-        }
-    }
     const removeFromCart = (id) => {
         let tempArray = Array.from(sale)
         tempArray[id] = false;
@@ -89,35 +67,22 @@ const SearchResult = () => {
     const gotoCartPage = () => {
         navigate('/cart')
     }
+
     useEffect(() => {
-        if (result) {
+        if (bulkIsDomain.isLoading) return;
+        console.log("bulk is dmomain", bulkIsDomain.result);
+        if (bulkIsDomain.status) {
             let tempArray = []
             {
-                result.result && count.names?.map((name, id) => {
+                bulkIsDomain.status && count.names?.map((name, id) => {
                     tempArray[id] = {};
-                    tempArray[id].status = result.result[id];
+                    tempArray[id].status = bulkIsDomain?.result[id];
                     tempArray[id].name = name;
                 })
                 setResults(tempArray);
             }
         }
-    }, [result])
-    useEffect(() => {
-        getBulkIsDomain();
-    }, [count])
-    useEffect(() => {
-        console.log("okay1");
-        let temp_array = [];
-
-        // should be deleted
-        if (count && count.cartNames) {
-            console.log("okay2");
-            count.cartNames.map((val, id) => {
-                temp_array[val.id] = true;
-            })
-            setSale(temp_array)
-        }
-    }, [])
+    }, [count, bulkIsDomain.isLoading])
 
     return (
         <Box
@@ -197,7 +162,6 @@ const SearchResult = () => {
                             color: theme == 'dark-theme' ? 'white' : '#7A7A7A',
                             marginLeft: '20px'
                         }}
-                        onClick={gotoCartPage}
                     >
                         {`Domain Labs  > `}
                     </Typography>
@@ -264,7 +228,7 @@ const SearchResult = () => {
                                         textAlign={'left'}
                                     >
                                         <img
-                                            src={domainLogoImages[currentChainIdDecimal]}
+                                            src={domainLogoImages[chain.id]}
                                             width={'21px'}
                                             height={'24px'}
                                             style={{
@@ -282,7 +246,7 @@ const SearchResult = () => {
                                             variant="h5"
                                             color="white"
                                         >
-                                            {result.name}.{domainSuffixes[currentChainIdDecimal]}
+                                            {result.name}.{domainSuffixes[chain.id]}
                                         </Typography>
                                     </Box>
                                     <Box>
@@ -299,7 +263,7 @@ const SearchResult = () => {
                                                 }}
                                                 color="white"
                                             >
-                                                {`${domainNames[currentChainIdDecimal]} Domain is available.`}
+                                                {`${domainNames[chain.id]} Domain is available.`}
                                             </Typography>
                                         </Box>
                                     </Box>
@@ -351,7 +315,7 @@ const SearchResult = () => {
                                         textAlign={'left'}
                                     >
                                         <img
-                                            src={domainLogoImages[currentChainIdDecimal]}
+                                            src={domainLogoImages[chain.id]}
                                             width={'21px'}
                                             height={'24px'}
                                             style={{ marginLeft: '5px' }}
@@ -364,7 +328,7 @@ const SearchResult = () => {
                                                     fontWeight={'700'}
                                                     variant="h5"
                                                 >
-                                                    {result.name}.{domainSuffixes[currentChainIdDecimal]}
+                                                    {result.name}.{domainSuffixes[chain.id]}
                                                 </Typography>
                                             ) : (
                                                 <Typography
@@ -373,7 +337,7 @@ const SearchResult = () => {
                                                     fontWeight={'700'}
                                                     variant="h5"
                                                 >
-                                                    {result.name}.{domainSuffixes[currentChainIdDecimal]}
+                                                    {result.name}.{domainSuffixes[chain.id]}
                                                 </Typography>
                                             )
                                         }

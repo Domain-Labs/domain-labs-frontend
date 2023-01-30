@@ -1,44 +1,34 @@
 import { Box, Grid, Typography, Button } from "@mui/material";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from 'react-router-dom'
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import "react-toggle/style.css";
-import { useDappContext } from "../../utils/context";
+import { useNetwork, } from "wagmi";
 import { useCounterStore, useThemeStore } from '../../utils/store'
 import {
-    bulkSearch,
-    domainByname,
+    useBulkIsDomain,
+    useReadDomainByName,
 } from '../../utils/interact';
 import {
-    contractAddresses,
     domainSuffixes,
 } from "../../config";
 import picImage from '../../assets/image/ethereum-name-service-ens-logo-B6AE963A1D-seeklogo 1.png';
 import blackVectorImage from "../../assets/image/Vector 1.png";
 import whiteVectorImage from "../../assets/image/Vector 1 (2).png";
-import whiteBookmarkImage from "../../assets/image/bookmark (1).png";
 import blackBookmarkImage from "../../assets/image/bookmark.png";
-import whiteOnShoppingImage from "../../assets/image/shopping_cart (1).png";
-import blackOnshoppingImage from "../../assets/image/shopping_cart (2).png"
-import whiteOffShoppingImage from "../../assets/image/remove_shopping_cart (2).png"
 import blackOffshoppingImage from "../../assets/image/remove_shopping_cart.png"
 
 const SearchDetail = () => {
-    const {
-        provider,
-        setProvider,
-        currentChainIdDecimal,
-        web3Main,
-    } = useDappContext();
+    const bulkIsDomain = useBulkIsDomain();
     const navigate = useNavigate()
+    const { chain, } = useNetwork();
     const [results, setResults] = useState([])
     const [count, setCount] = useCounterStore();
-    const [added, setAdded] = useState([])
     const [detailInfo, setDetailInfo] = useState([])
     const [theme, setTheme] = useThemeStore();
     const [detailName, setDetailName] = useState('')
-    const [sale, setSale] = useState([]);
     const [domainInfo, setDomainInfo] = useState({});
+    const readDomainByName = useReadDomainByName(detailName);
     const { id } = useParams()
     const backHome = () => {
         navigate('/')
@@ -46,43 +36,27 @@ const SearchDetail = () => {
     const gotoCartPage = () => {
         navigate('/cart')
     }
-    const getBulkIsDomain = async () => {
-        try {
-            const result = await bulkSearch(web3Main, contractAddresses[currentChainIdDecimal], count.names);
-            if (result) {
-                let tempArray = []
-                {
-                    console.log("result: ", result);
-                    console.log("count.names: ", count.names);
-                    count.names?.map((name, id) => {
-                        tempArray[id] = {};
-                        tempArray[id].status = result.result[id];
-                        tempArray[id].name = name;
-                    })
-                    console.log("tempArray: ", tempArray)
-                    setResults(tempArray);
-                }
-            }
-        }
-        catch (e) {
-            console.log("error: ", e);
-        }
-    }
     const getReadDomainByName = async () => {
-        try {
-            console.log("detailName: ", detailName);
-            const detailFromContract = await domainByname(web3Main, contractAddresses[currentChainIdDecimal], detailName);
-            console.log("detailFrom contract\: ", detailFromContract);
-            setDetailInfo(detailFromContract.res);
-        }
-        catch (e) {
-            console.log("error: ", e);
-        }
+        if (readDomainByName.isLoading) return;
+        console.log("read domain by name", readDomainByName.result);
+        setDetailInfo(readDomainByName.result);
     }
 
     useEffect(() => {
-        getBulkIsDomain();
-    }, [count])
+        if (bulkIsDomain.isLoading) return;
+        console.log("bulk is dmomain", bulkIsDomain.result);
+        if (bulkIsDomain.status) {
+            let tempArray = []
+            {
+                bulkIsDomain.status && count.names?.map((name, id) => {
+                    tempArray[id] = {};
+                    tempArray[id].status = bulkIsDomain?.result[id];
+                    tempArray[id].name = name;
+                })
+                setResults(tempArray);
+            }
+        }
+    }, [count, bulkIsDomain.isLoading])
 
     useEffect(() => {
         console.log("id: ", id);
@@ -245,7 +219,7 @@ const SearchDetail = () => {
                                         fontWeight={'700'}
                                         variant="h5"
                                     >
-                                        {domainInfo?.name}.{domainSuffixes[currentChainIdDecimal]}
+                                        {domainInfo?.name}.{domainSuffixes[chain.id]}
                                     </Typography>
                                 ) : (
                                     <Typography
@@ -254,7 +228,7 @@ const SearchDetail = () => {
                                         fontWeight={'700'}
                                         variant="h5"
                                     >
-                                        {domainInfo?.name}.{domainSuffixes[currentChainIdDecimal]}
+                                        {domainInfo?.name}.{domainSuffixes[chain.id]}
                                     </Typography>
                                 )
                             }

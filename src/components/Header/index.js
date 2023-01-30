@@ -10,17 +10,10 @@ import {
 } from "@mui/material";
 import "react-toggle/style.css";
 import Toggle from "react-toggle";
-import { providers, ethers } from "ethers";
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import axios from 'axios';
 import { /*NavLink,*/ useNavigate } from "react-router-dom";
 import useWindowDimensions from "../../hooks/useDimension";
 import { useThemeStore, useCounterStore } from "../../utils/store";
-import { useDappContext } from '../../utils/context';
-import {
-  rpcUrls,
-  chainIdHexes,
-} from '../../config';
 import whiteLogoImage from '../../assets/image/logo-white.png';
 import darkLogoImage from '../../assets/image/logo-dark.png';
 import yellowSunImage from '../../assets/image/light_mode.png'
@@ -30,10 +23,6 @@ import darkMoonImage from '../../assets/image/clear_night (1).png'
 import whiteCartImage from '../../assets/image/shopping_cart.png'
 import darkCartImage from '../../assets/image/shopping_cart (1).png'
 import "./index.scss";
-
-let web3Modal;
-let provider;
-let selectedAccount;
 
 const ElevationScroll = (props) => {
   const { width } = useWindowDimensions();
@@ -62,29 +51,13 @@ ElevationScroll.propTypes = {
 };
 
 const Header = (props) => {
-  const {
-    provider,
-    setProvider,
-    currentChainIdDecimal,
-    setCurrentChainIdDecimal,
-    walletLoginStatus,
-    setWalletLoginStatus,
-    web3Main,
-    setWeb3Main,
-  } = useDappContext();
-  const [walletLoggedIn, setWalletLoggedIn] = useState()
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
-  const handleOpenNavMenu = (event) => {
-    setAnchorElNav(event.currentTarget);
-  };
-  const [wallet, setWallet] = useState()
   const navigate = useNavigate();
   const [count, setCount] = useCounterStore();
   const [isSwitchOn, setIsSwitchOn] = useState(true);
   const [theme, setTheme] = useThemeStore();
   const toBuyPage = () => {
 
-    // navigate('/cart')
+    navigate('/cart')
   }
 
   const switchTheme = () => {
@@ -98,13 +71,19 @@ const Header = (props) => {
       <ElevationScroll {...props}
         px={'10px !important'}
         class
+
       >
         <AppBar
           height={{ xs: '100px', sm: '60px' }}
+          style={{
+            padding: '0 20px !important',
+          }}
+          className='background-transparent'
         >
           <Toolbar
-            px={'0px'}
+            p={'0px !important'}
             height={{ xs: '100px', sm: '60px' }}
+            className='toolbar-container'
           >
             <Box
               position={`fixed`}
@@ -113,10 +92,12 @@ const Header = (props) => {
                 zIndex: "9999",
                 backgroundSize: "contain",
                 backgroundImage: whiteLogoImage,
+                cursor: 'pointer',
               }}
               sx={{ display: 'flex' }}
               mr={'17px'}
               alignItems={'center'}
+              onClick={() => navigate('/')}
             >
               <img
                 src={theme == 'dark-theme' ? darkLogoImage : whiteLogoImage}
@@ -129,6 +110,7 @@ const Header = (props) => {
                 fontSize={"32px"}
                 ml={'17px'}
                 display={{ xs: 'none', md: 'flex' }}
+                fontFamily={'Inter'}
               >
                 Domain Labs
               </Typography>
@@ -143,6 +125,7 @@ const Header = (props) => {
                 zIndex: '10000'
               }}
               display={'flex'}
+            // maxWidth='250px'
             >
               <Box
                 mr={'10.93px'}
@@ -269,10 +252,7 @@ const Header = (props) => {
 
                 <Box>
                   <ConnectButton
-                    showBalance={{
-                      smallScreen: false,
-                      largeScreen: false,
-                    }}
+                    showBalance={false}
                     accountStatus={{
                       smallScreen: 'avatar',
                       largeScreen: 'full',

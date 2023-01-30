@@ -7,4 +7,14 @@
 header {
 	height: 100px;
 	justify-content: center;
+
+	.toolbar-container {
+		@media (min-width: 484px) {
+			padding: 0 !important;
+		}
+	}
+}
+
+.background-transparent {
+	background-color: transparent !important;
 }
