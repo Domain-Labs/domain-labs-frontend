@@ -11,7 +11,8 @@ import axios from 'axios';
 import {
     useAccount,
 } from 'wagmi';
-import comingSoonPageBg from '../../assets/image/coming-soon-bg.png';
+import comingSoonPageBgDesktop from '../../assets/image/coming-soon-bg-desktop.png';
+import comingSoonPageBgMobile from '../../assets/image/coming-soon-bg-mobile.png';
 import twitterLogoComingSoon from '../../assets/image/twitter-logo-coming-soon.svg';
 import discordLogoComingSoon from '../../assets/image/discord-logo-coming-soon.svg';
 import './index.scss';
@@ -19,6 +20,11 @@ import './index.scss';
 const SearchResult = () => {
     const [theme, setTheme] = useThemeStore();
     const { address, } = useAccount();
+    const [width, setWidth] = useState(0);
+
+    useEffect(() => {
+        setWidth(window.innerWidth);
+    }, []);
 
     const registerWhitelist = async () => {
         try {
@@ -56,16 +62,17 @@ const SearchResult = () => {
 
     return (
         <Box
-            mt={'0px'}
+            mt={'100px'}
             px={{ xs: '30px', sm: '40px' }}
             sx={{
                 backgroundColor: theme == 'dark-theme' ? '#2A2A2A' : 'white',
             }}
             style={{
-                backgroundImage: `url(${comingSoonPageBg})`,
-                backgroundPosition: 'center',
-                backgroundSize: "cover",
-                height: '100vh',
+                backgroundImage: width >= 600 ?
+                    `url(${comingSoonPageBgDesktop})` : `url(${comingSoonPageBgMobile})`,
+                backgroundPosition: 'left',
+                backgroundSize: width >= 600 ? "cover" : '100% 150%',
+                backgroundRepeat: 'none'
             }}
             justifyContent={'center'}
             className='coming-soon-component'
@@ -75,7 +82,7 @@ const SearchResult = () => {
                 justifyContent={'center'}
             >
                 <Box
-                    marginTop={'300px'}
+                    marginTop={width >= 600 ? '300px' : '150px'}
                 >
                     <Box
                         justifyContent={'center'}
@@ -207,7 +214,7 @@ const SearchResult = () => {
                         </Box>
                     </Box>
                     <Box
-                        mt={'32px'}
+                        my={'32px'}
                     >
                         <Box
                             display={'flex'}

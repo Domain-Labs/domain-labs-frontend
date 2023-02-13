@@ -12,11 +12,11 @@ import {
 import {
     domainSuffixes,
 } from "../../config";
-import picImage from '../../assets/image/ethereum-name-service-ens-logo-B6AE963A1D-seeklogo 1.png';
-import blackVectorImage from "../../assets/image/Vector 1.png";
-import whiteVectorImage from "../../assets/image/Vector 1 (2).png";
-import blackBookmarkImage from "../../assets/image/bookmark.png";
-import blackOffshoppingImage from "../../assets/image/remove_shopping_cart.png"
+import picImage from '../../assets/image/svgs/ens-logo.svg';
+import blackVectorImage from "../../assets/image/vector_white_mode.png";
+import whiteVectorImage from "../../assets/image/vector_dark_mode.png";
+import blackBookmarkImage from "../../assets/image/bookmark_white_mode.png";
+import blackOffshoppingImage from "../../assets/image/remove_shopping_cart_white_mode.png"
 
 const SearchDetail = () => {
     const bulkIsDomain = useBulkIsDomain();
@@ -41,7 +41,6 @@ const SearchDetail = () => {
         console.log("read domain by name", readDomainByName.result);
         setDetailInfo(readDomainByName.result);
     }
-
     useEffect(() => {
         if (bulkIsDomain.isLoading) return;
         console.log("bulk is dmomain", bulkIsDomain.result);
@@ -204,6 +203,7 @@ const SearchDetail = () => {
                             gap={'5px'}
                             alignItems={'center'}
                             textAlign={'left'}
+                            className='aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
                         >
                             <img
                                 src={picImage}

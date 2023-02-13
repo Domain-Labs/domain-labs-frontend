@@ -15,11 +15,11 @@ import {
 import {
     domainSuffixes,
 } from '../../config';
-import blackVectorImage from "../../assets/image/Vector 1.png";
-import whiteVectorImage from "../../assets/image/Vector 1 (2).png";
-import whiteBookmarkImage from "../../assets/image/bookmark (1).png";
-import whiteOffShoppingImage from "../../assets/image/remove_shopping_cart (2).png"
-import picImage from '../../assets/image/ethereum-name-service-ens-logo-B6AE963A1D-seeklogo 1.png';
+import blackVectorImage from "../../assets/image/vector_white_mode.png";
+import whiteVectorImage from "../../assets/image/vector_dark_mode.png";
+import whiteBookmarkImage from "../../assets/image/bookmark_dark_mode.png";
+import whiteOffShoppingImage from "../../assets/image/remove_shopping_cart_black_mode.png"
+import picImage from '../../assets/image/svgs/ens-logo.svg';
 import timerImage from "../../assets/image/timer.png"
 const secondsInDay = 24 * 60 * 60 * 1000;
 
@@ -194,6 +194,8 @@ const Cart = () => {
                     currentTime[id] = options[4].label;
                     tempArray[id].name = name.name;
                     tempDuration[id] = options[4].value;
+                    console.log(name.name, options[4].value)
+
                     tempPrice[id] = calculatePrice(name.name, options[4].value);
                     initialCost += calculatePrice(name.name, options[4].value);
                 })

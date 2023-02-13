@@ -13,13 +13,13 @@ import {
     useBulkIsDomain,
 } from '../../utils/interact';
 
-import blackVectorImage from "../../assets/image/Vector 1.png";
-import whiteVectorImage from "../../assets/image/Vector 1 (2).png";
-import whiteBookmarkImage from "../../assets/image/bookmark (1).png";
-import blackBookmarkImage from "../../assets/image/bookmark.png";
-import blackOnshoppingImage from "../../assets/image/shopping_cart (2).png"
-import whiteOffShoppingImage from "../../assets/image/remove_shopping_cart (2).png"
-import blackOffshoppingImage from "../../assets/image/remove_shopping_cart.png"
+import blackVectorImage from "../../assets/image/vector_white_mode.png";
+import whiteVectorImage from "../../assets/image/vector_dark_mode.png";
+import whiteBookmarkImage from "../../assets/image/bookmark_dark_mode.png";
+import blackBookmarkImage from "../../assets/image/bookmark_white_mode.png";
+import blackOnshoppingImage from "../../assets/image/shopping_cart_white_mode.png"
+import whiteOffShoppingImage from "../../assets/image/remove_shopping_cart_black_mode.png"
+import blackOffshoppingImage from "../../assets/image/remove_shopping_cart_white_mode.png"
 
 const SearchResult = () => {
     const bulkIsDomain = useBulkIsDomain();
@@ -31,15 +31,31 @@ const SearchResult = () => {
     const [detailInfo, setDetailInfo] = useState([])
     const [theme, setTheme] = useThemeStore();
     const [sale, setSale] = useState([]);
+    const [isSelectedAll, setIsSelectedAll] = useState(false);
     const addToCart = (id) => {
+        console.log("id: ", id);
+
         let tempArray = Array.from(sale)
+        console.log("temp array: ", tempArray);
+
+
         tempArray[id] = true;
+
         setSale(tempArray);
         let cart = count.cart;
         !cart ? cart = 0 : cart = cart;
+
+        console.log("count: ", count);
+        console.log("cart: ", cart);
+
+
         let tempArray1 = count.cartNames ? count.cartNames.slice() : []
+        console.log("tempArray1: ", tempArray1);
+        console.log({ id: id, name: results[id].name })
+        console.log("current cart:   ", { ...count, cart: cart * 1 + 1, cartNames: tempArray1 })
+
         tempArray1.push({ id: id, name: results[id].name })
-        setCount({ ...count, cart: cart * 1 + 1, cartNames: tempArray1 })
+        setCount({ ...count, cart: cart + 1, cartNames: tempArray1 })
     }
 
     const removeFromCart = (id) => {
@@ -64,11 +80,38 @@ const SearchResult = () => {
     const backHome = () => {
         navigate('/')
     }
-    const gotoCartPage = () => {
-        navigate('/cart')
+
+    const handleSelectOrDeselectAll = () => {
+        // setIsSelectedAll(!isSelectedAll);
+
+        console.log("results: ", results);
+        let tempArray = Array.from(sale)
+
+        let cartNames = [];
+        results?.map((result, index) => {
+            if (!result.status) {
+                cartNames.push({id: index, name: result.name});
+                tempArray[index] = true;
+
+            }
+        });
+
+        setSale(tempArray);
+        console.log("cart names: ", cartNames);
+        console.log({
+            ...count,
+            cart: cartNames.length,
+            cartNames: cartNames,
+        });
+        setCount({
+            ...count,
+            cart: cartNames.length,
+            cartNames: cartNames,
+        })
     }
 
     useEffect(() => {
+        console.log("called")
         if (bulkIsDomain.isLoading) return;
         console.log("bulk is dmomain", bulkIsDomain.result);
         if (bulkIsDomain.status) {
@@ -186,15 +229,36 @@ const SearchResult = () => {
                 </Box>
             </Box>
             <Box
-                display={'flex'}
                 mt={'60px'}
                 sx={{ flexDirection: 'row' }}
             >
+                {
+                    (results.length > 0) && (
+                        <Box
+                            display={'flex'}
+                            justifyContent={'right'}
+                        >
+                            <Button
+                                sx={{
+                                    color: 'white',
+                                    px: '20px',
+                                    py: '10px',
+                                    background: 'linear-gradient(79.42deg, #4BD8D8 -28.43%, #146EB4 125.83%)',
+                                    borderRadius: '8px',
+                                    width: '150px',
+                                }}
+                                onClick={() => handleSelectOrDeselectAll()}
+                            >
+                                {
+                                    !isSelectedAll ? `Select All` : `UnSelect All`
+                                }
+                            </Button>
+                        </Box>
+                    )
+                }
                 <Box
                     sx={{
-                        m: 1,
-                        p: 1,
-                        width: '100%',
+                        marginTop: '20px',
                         gridTemplateColumns: {
                             lg: 'repeat(4, 1fr)',
                             md: 'repeat(3, 1fr)',
@@ -214,7 +278,6 @@ const SearchResult = () => {
                                         padding: '25px 20px 10px 20px',
                                         boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
                                         borderRadius: '16px',
-                                        width: 'calc(100%-60px)/3',
                                         marginBottom: '8px',
                                         background: 'linear-gradient(79.42deg, #4BD8D8 -28.43%, #146EB4 125.83%)'
                                     }}
@@ -301,7 +364,6 @@ const SearchResult = () => {
                                         padding: '25px 20px 10px 20px',
                                         boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
                                         borderRadius: '16px',
-                                        width: 'calc(100%-60px)/3',
                                         marginBottom: '8px',
                                     }}
                                     onClick={() => onClickToDetail(id)}

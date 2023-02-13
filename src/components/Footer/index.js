@@ -33,58 +33,20 @@ function Footer() {
     <Box
       display="flex"
       flexDirection={'column'}
+      className='left-component'
     >
       <Typography
         color="white"
         sx={{
           fontFamily: 'Inter',
-          fontWeight: '700',
+          fontWeight: '900',
           fontSize: '18px',
-          lineHeight: '22px',
-          padding: '20px 0',
-          cursor: 'pointer'
-        }}
-      >
-        Terms of Service
-      </Typography>
-      <Typography
-        color="white"
-        sx={{
-          fontFamily: 'Inter',
-          fontWeight: '700',
-          fontSize: '18px',
-          lineHeight: '22px',
-          padding: '20px 0',
-          cursor: 'pointer'
-        }}
-      >
-        Contacts
-      </Typography>
-      <Typography
-        color="white"
-        sx={{
-          fontFamily: 'Inter',
-          fontWeight: '700',
-          fontSize: '18px',
-          lineHeight: '22px',
-          padding: '20px 0',
-          cursor: 'pointer'
-        }}
-      >
-        FAQs
-      </Typography>
-      <Typography
-        color="white"
-        sx={{
-          fontFamily: 'Inter',
-          fontWeight: '700',
-          fontSize: '14px',
           lineHeight: '22px',
           paddingTop: '20px',
           cursor: 'pointer'
         }}
       >
-        Domain labs all rights reserved 2022
+        Domain Labs all rights reserved 2023
       </Typography>
     </Box>
   )
@@ -97,6 +59,7 @@ function Footer() {
       alignItems={'start'}
       pt={'40px'}
       width={'max-content'}
+      className='center-component'
     >
       <Box
         display="flex"
@@ -135,6 +98,7 @@ function Footer() {
       justifyContent={{ xs: 'start', md: 'flex-end' }}
       alignItems={'end'}
       pt={'40px'}
+      className='right-component'
     >
       <Box
         textAlign={'right'}
@@ -186,7 +150,11 @@ function Footer() {
           width={{ xs: 'max-content', sm: 'unset' }}
           flexDirection={{ xs: 'column', sm: 'row' }}
         >
-          <Box>
+          <Box
+            display={'flex'}
+            alignItems={{xs:'start', md:'end'}}
+            pt={'80px'}
+          >
             <LeftComponent />
           </Box>
 

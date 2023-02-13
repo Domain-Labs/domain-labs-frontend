@@ -116,6 +116,7 @@ function DialogModal(props) {
           rows={10}
           onKeyDown={keyDown}
           onChange={change}
+          className='advanced-search-field'
         />
       </DialogContent>
       <DialogActions>
