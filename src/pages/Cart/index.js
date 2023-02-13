@@ -2,36 +2,31 @@ import React, { useEffect, useState } from "react"
 import { Box, Grid, Typography, Button, Divider, TextField, MenuItem } from "@mui/material";
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { useDappContext } from "../../utils/context";
+import {
+    useNetwork,
+    useAccount,
+} from 'wagmi';
 import { useCounterStore, useThemeStore } from "../../utils/store";
 import {
-    buyBulkDomain,
-    bulkSearch,
+    useBulkBuyDomain,
+    useBulkIsDomain,
 } from '../../utils/interact'
 import {
-    contractAddresses,
     domainSuffixes,
 } from '../../config';
-import blackVectorImage from "../../assets/image/Vector 1.png";
-import whiteVectorImage from "../../assets/image/Vector 1 (2).png";
-import whiteBookmarkImage from "../../assets/image/bookmark (1).png";
-import whiteOffShoppingImage from "../../assets/image/remove_shopping_cart (2).png"
-import picImage from '../../assets/image/ethereum-name-service-ens-logo-B6AE963A1D-seeklogo 1.png';
+import blackVectorImage from "../../assets/image/vector_white_mode.png";
+import whiteVectorImage from "../../assets/image/vector_dark_mode.png";
+import whiteBookmarkImage from "../../assets/image/bookmark_dark_mode.png";
+import whiteOffShoppingImage from "../../assets/image/remove_shopping_cart_black_mode.png"
+import picImage from '../../assets/image/svgs/ens-logo.svg';
 import timerImage from "../../assets/image/timer.png"
-
-// const web3 = new Web3(window.ethereum);
-// const contractABI = require('../../assets/abi/contract-abi.json');
+const secondsInDay = 24 * 60 * 60 * 1000;
 
 const Cart = () => {
-    const {
-        provider,
-        setProvider,
-        currentChainIdDecimal,
-        web3Main,
-    } = useDappContext();
+    const bulkIsDomain = useBulkIsDomain();
+    const { chain, } = useNetwork();
+    const { address, } = useAccount();
     const [results, setResults] = useState();
     const [count, setCount] = useCounterStore();
     const [price, setPrice] = useState([]);
@@ -42,8 +37,13 @@ const Cart = () => {
     const [duration, setDuration] = React.useState([]);
     const [discount, setDiscount] = React.useState()
     const [currentTime, setCurrentTime] = React.useState()
-    const [errors, setErrors] = useState([]);
     const [result, setResult] = useState([]);
+    const bulkBuyDomain = useBulkBuyDomain(
+        results?.map(item => item.name),
+        duration.map(item => item * secondsInDay),
+        totalValue
+    );
+
     const options = [
         { label: '1 Month', value: 30 },
         { label: '2 Month', value: 60 },
@@ -53,15 +53,7 @@ const Cart = () => {
         { label: '3 Years', value: 1095 },
         { label: '5 Years', value: 1825 }
     ]
-    const getBulkIsDomain = async () => {
-        try {
-            const result = await bulkSearch(web3Main, contractAddresses[currentChainIdDecimal], count.names);
-            setResult(result);
-        }
-        catch (e) {
-            console.log("error: ", e);
-        }
-    }
+
     const backHome = () => {
         navigate('/search-result')
     }
@@ -97,33 +89,28 @@ const Cart = () => {
         return priceTemp;
     }
     const buyDomain = async () => {
-        let temp_array = []; let temp_error_array = []; let error_count = 0;
-        // if (!totalValue) {
-        //     debugger
-        // }
-        results.map((result, i) => {
-            temp_array.push(result.name);
-            if (duration[i])
-                temp_error_array.push(false)
-            else {
-                temp_error_array.push(true);
-                error_count += 1;
-            }
-        })
-        setErrors(temp_error_array);
-        if (error_count == 0) {
-            const buyResult = await buyBulkDomain(web3Main, contractAddresses[currentChainIdDecimal], temp_array, duration, totalValue);
+        if (bulkBuyDomain.isLoading) return;
 
-            const accounts = await await web3Main.eth.getAccounts();
+        try {
+            bulkBuyDomain.buyFunction?.();
+        } catch (err) {
+            console.log("error in write: ", err);
+        }
+
+        if (bulkIsDomain.isSuccess) {
             const postObject = {
-                wallet: accounts[0],
-                buyCount: temp_array.length,
+                wallet: address,
+                buyCount: results.length,
                 buyMoney: totalValue,
             }
-            await axios.post(`${process.env.REACT_APP_BACKEND_URL}/buys/write-log/`, postObject);
 
+            if (bulkBuyDomain.isSuccess) {
+                console.log("post object: ", postObject)
+                await axios.post(`${process.env.REACT_APP_BACKEND_URL}/buys/write-log/`, postObject);
+            }
         }
     }
+
     const timeSelect = (id, idx) => {
         let tempArray = Array.from(duration)
         tempArray[idx] = options[id].value;
@@ -173,15 +160,32 @@ const Cart = () => {
     }
 
     useEffect(() => {
-        getBulkIsDomain();
-    }, [count])
+        if (bulkIsDomain.isLoading) return;
+        console.log("bulk is dmomain", bulkIsDomain.result);
+        setResult(bulkIsDomain.result);
+        if (bulkIsDomain.status) {
+            let tempArray = []
+            {
+                bulkIsDomain.status && count.names?.map((name, id) => {
+                    tempArray[id] = {};
+                    tempArray[id].status = bulkIsDomain?.result[id];
+                    tempArray[id].name = name;
+                })
+                setResults(tempArray);
+            }
+        }
+    }, [count, bulkIsDomain.isLoading])
+
     useEffect(() => {
+        console.log("cart page result: ", result);
         if (result) {
             let tempArray = [];
             let currentTime = [];
             let tempDuration = [];
             let initialCost = 0;
             let tempPrice = [];
+            console.log("count.cartNames: ", count);
+
             {
                 count.cartNames?.map((name, id) => {
                     console.log("name", name)
@@ -190,10 +194,12 @@ const Cart = () => {
                     currentTime[id] = options[4].label;
                     tempArray[id].name = name.name;
                     tempDuration[id] = options[4].value;
+                    console.log(name.name, options[4].value)
+
                     tempPrice[id] = calculatePrice(name.name, options[4].value);
                     initialCost += calculatePrice(name.name, options[4].value);
-
                 })
+
                 let nameLength = count.cartNames ? count.cartNames.length : 0;
                 initialCost = applyDiscount(initialCost, nameLength);
                 setTotalValue(initialCost)
@@ -204,7 +210,6 @@ const Cart = () => {
             }
         }
     }, [result])
-
 
     return (
         <Box
@@ -541,7 +546,7 @@ const Cart = () => {
                                             variant="h5"
                                             color="white"
                                         >
-                                            {val.name}.{domainSuffixes[currentChainIdDecimal]}
+                                            {val.name}.{domainSuffixes[chain.id]}
                                         </Typography>
                                     </Box>
                                     <Box>

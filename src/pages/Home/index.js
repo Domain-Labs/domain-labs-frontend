@@ -9,44 +9,31 @@ import {
   MenuItem,
   Select,
 } from "@mui/material";
+import { useSwitchNetwork, useNetwork, } from "wagmi";
 import {
   ethereumChain,
   bscChain,
-  contractAddresses,
-  chainNames,
-  rpcUrls,
 } from '../../config';
-import { search, domaininfo, buyDomain } from '../../utils/interact'
 import DialogModal from './DialogModal'
 import { useCounterStore, useThemeStore } from '../../utils/store'
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, } from "react-router-dom";
 import ensLogo from '../../assets/image/svgs/ens-logo.svg';
 import binanceLogo from '../../assets/image/svgs/binance-logo.svg';
 import searchImage from '../../assets/image/search.png';
-import { useDappContext } from "../../utils/context";
 import './index.scss';
+import MarqueeComponent from "../../components/MarqueeComponent";
 
 const Home = () => {
-  const {
-    currentChainIdDecimal,
-    setCurrentChainIdDecimal,
-    web3Main,
-  } = useDappContext();
-  const [searchResult, setSearchResult] = useState({ status: true });
-  const [domainInfo, setDomainInfo] = useState();
+  const { switchNetwork, } = useSwitchNetwork();
+  const { chain, } = useNetwork();
   const [str, setStr] = useState();
   const [count, setCount] = useCounterStore();
   const [theme, setTheme] = useThemeStore();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const [top, setTop] = useState(0);
-  const [transition, setTransition] = useState('0.2')
-  const [chainId, setChainId] = useState(currentChainIdDecimal);
   const handleChainChange = (event) => {
-    console.log("chain id changed: new chain id: ", event.target.value);
-    console.log("new smart contract address: ", contractAddresses[event.target.value]);
-    setChainId(event.target.value);
-    setCurrentChainIdDecimal(event.target.value);
+    switchNetwork?.(event.target.value);
   };
   const handleClose = () => {
     setOpen(false);
@@ -70,16 +57,9 @@ const Home = () => {
   const advancedSearch = () => {
     setOpen(true);
   }
-  const buyClicked = async () => {
-    const { buystatus } = await buyDomain(web3Main, contractAddresses[currentChainIdDecimal], str);
-    if (buystatus) {
-      const { status } = await search(web3Main, contractAddresses[currentChainIdDecimal], str);
-      setDomainInfo(status)
-    }
-  }
+
   const keyPressed = (e) => {
     if (e.code == 'Enter') {
-      console.log("current chain id when pressed enter: ", currentChainIdDecimal);
       searchClicked()
     }
   }
@@ -88,11 +68,9 @@ const Home = () => {
     let timerId = setInterval(() => {
       var w = window.innerWidth * (-2.7 / 100);
       if (top < w * 3) {
-        // setTransition(0)
         setTop(0)
       }
       else {
-        //setTransition('0.2')
         setTop(top + w)
       }
     }, 2500)
@@ -325,7 +303,7 @@ const Home = () => {
                   <Select
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
-                    value={chainId}
+                    value={chain ? chain.id : ethereumChain}
                     label="Current Chain"
                     onChange={handleChainChange}
                     className="chain-select-menu"
@@ -361,44 +339,11 @@ const Home = () => {
 
               </Box>
 
-              {
-                !searchResult?.status ? (
-                  <Box display="block" textAlign="center" mt={7} alignItems="center">
-                    <Typography
-                      fontSize={{ md: "2.9rem", xs: '2.3rem' }}
-                      style={{
-                        borderRadius: '12px',
-                        textAlign: 'center',
-                        alignItems: 'center',
-                        marginTop: '30px',
-                        justifyContent: 'center',
-                        color: 'black',
-                        lineHeight: '1'
-                      }}
-                    >
-                      ENS domain available
-                    </Typography>
-                    <Button style={{
-                      height: '78px',
-                      fontSize: '18px',
-                      paddingLeft: '32px',
-                      marginTop: '30px',
-                      borderRadius: '4px',
-                      paddingRight: '32px',
-                      backgroundColor: 'green',
-                      "&:hover": {
-                        backgroundColor: "#001cc3"
-                      },
-                    }}
-                      onClick={buyClicked}
-                    >
-                      Request to register
-                    </Button>
-                  </Box>
-                ) : (
-                  ''
-                )
-              }
+              <Box
+                marginTop={{ xs: '100px', lg: '200px' }}
+              >
+                <MarqueeComponent />
+              </Box>
             </Grid>
           </Grid>
         </Box>
