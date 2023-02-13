@@ -226,7 +226,7 @@ const SearchResult = () => {
                                 <img src={twitterLogoComingSoon} />
                             </a>
 
-                            <a href='https://discord.gg/rhuUqFHU'>
+                            <a href='https://discord.gg/7xuBdwkc'>
                                 <img src={discordLogoComingSoon} />
                             </a>
                         </Box>
