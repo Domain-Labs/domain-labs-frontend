@@ -72,7 +72,8 @@ const SearchResult = () => {
                     `url(${comingSoonPageBgDesktop})` : `url(${comingSoonPageBgMobile})`,
                 backgroundPosition: 'left',
                 backgroundSize: width >= 600 ? "cover" : '100% 150%',
-                backgroundRepeat: 'none'
+                backgroundRepeat: 'none',
+                minHeight: 'calc(100vh - 302px)',
             }}
             justifyContent={'center'}
             className='coming-soon-component'

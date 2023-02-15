@@ -15,6 +15,7 @@ const Layout = ({ children }) => {
         className="main-component"
         style={{
           backgroundColor: theme == 'dark-theme' ? '#2A2A2A' : 'white',
+          minHeight: 'calc(100vh - 302px)',
         }}
       >
         {children}
