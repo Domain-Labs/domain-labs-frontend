@@ -1,166 +1,100 @@
-
-const contractABI = require('../assets/abi/contract-abi.json')
+import {
+  useContractRead,
+  useContractWrite,
+  useNetwork,
+  usePrepareContractWrite,
+  useAccount,
+  useWaitForTransaction,
+} from 'wagmi';
+import { ethers } from 'ethers';
+import axios from 'axios';
+import { useCounterStore } from './store';
+import { contractAddresses, } from '../config';
+import contractABI from '../assets/abi/contract-abi.json';
 const secondsInDay = 24 * 60 * 60 * 1000;
 
-export const buyDomain = async (
-  web3Main,
-  contractAddress,
-  tld,
-  time,
-  address
-) => {
-  const contract = new web3Main.eth.Contract(contractABI, contractAddress)
-  console.log('buying=', tld)
-  const valueN = web3Main.utils.toBN(parseInt(10 ** 18 * 0.001))
-  try {
-    await web3Main.eth
-      .sendTransaction({
-        from: address,
-        to: contractAddress,
-        value: valueN,
-        data: contract.methods
-          .buyDomain(
-            tld,
-            time
-          )
-          .encodeABI(),
-      })
-      .then((res) => {
-        console.log('res=', res);
-        return {
-          status: res
-        }
-      })
-  }
-  catch (error) {
-    console.log('something went wrong=', error);
-    return {
-      status: false
+export const useBulkIsDomain = () => {
+  const [count, setCount] = useCounterStore();
+  const { chain } = useNetwork();
+
+  const { data: bulkIsdomain, error, isLoading } = useContractRead({
+    address: contractAddresses[chain.id],
+    abi: contractABI,
+    functionName: "bulkIsdomain",
+    args: [count.names],
+    onSuccess() {
+      console.log("bulk is domain success")
+    },
+    onError(error) {
+      console.log("error occured in use bulk is domain: ", error);
     }
+  });
+
+  return {
+    status: error == undefined ? true : false,
+    result: bulkIsdomain,
+    isLoading,
   }
 }
 
-export const domainByname = async (
-  web3Main,
-  contractAddress,
-  name,
-) => {
-  console.log("domain by name: ", name)
-  const contract = new web3Main.eth.Contract(contractABI, contractAddress)
-  try {
-    const status = await contract?.methods.readDomainByName(name).call()
-    return {
-      res: status
+export const useReadDomainByName = (detailName) => {
+  const { chain } = useNetwork();
+  console.log("detail name: ", detailName);
+
+  const { data: readDomainByName, error, isLoading } = useContractRead({
+    address: contractAddresses[chain.id],
+    abi: contractABI,
+    functionName: "readDomainByName",
+    args: [detailName],
+    onSuccess() {
+      console.log("read domain by name success")
+    },
+    onError(error) {
+      console.log("error occured in read domain by name: ", error);
     }
-  }
-  catch (err) {
-    console.log(err)
+  });
+
+  return {
+    status: error == undefined ? true : false,
+    result: readDomainByName,
+    isLoading,
   }
 }
 
-export const buyBulkDomain = async (
-  web3Main,
-  contractAddress,
-  names,
-  times,
-  price
-) => {
-  const accounts = await web3Main.eth.getAccounts();
-  const account = accounts[0];
-  const contract = await new web3Main.eth.Contract(contractABI, contractAddress)
-  const valueN = web3Main.utils.toBN(parseInt(10 ** 18 * price))
-  let temp_array = [];
-  times.map((time) => {
-    temp_array.push(time * secondsInDay);
+export const useBulkBuyDomain = (names, deadlines, totalValue) => {
+  const { chain } = useNetwork();
+  const { address, } = useAccount();
+
+  const { config, error: prepareError } = usePrepareContractWrite({
+    address: contractAddresses[chain.id],
+    abi: contractABI,
+    functionName: 'bulkBuyDomain',
+    args: [names, deadlines],
+    overrides: {
+      value: ethers.utils.parseEther(totalValue?.toString()),
+    },
+    onSuccess(data) {
+      console.log('prepare contract write Success', data)
+    },
+    onError(prepareError) {
+      console.log('prepare contract write Error', prepareError)
+    },
   })
-  try {
-    await web3Main.eth
-      .sendTransaction({
-        from: account,
-        to: contractAddress,
-        value: valueN,
-        data: contract.methods
-          .bulkBuyDomain(
-            names, temp_array
-          )
-          .encodeABI(),
-      })
-      .then((res) => {
-        console.log('res=', res);
-        window.alert("Domain Registered Successfully!");
+  const { write: buyFunction, data } = useContractWrite(config)
+  const { isLoading, isSuccess, isError, error, } = useWaitForTransaction({
+    hash: data?.hash,
+    onSuccess(data) {
+      window.alert("wait for transaction success: ", data);
+    },
+    onError(error) {
+      window.alert('wait for transaction result error: ', error);
+    },
+  })
 
-        return {
-          status: 'success'
-        }
-      })
-  }
-  catch (error) {
-    console.log('something went wrong=', error);
-    window.alert("Failed");
-    return {
-      status: false
-    }
-  }
-}
-
-export const search = async (
-  web3Main,
-  contractAddress,
-  tld,
-) => {
-  const contract = await new web3Main.eth.Contract(contractABI, contractAddress)
-  console.log('searching=', tld)
-  try {
-    await contract?.methods.isDomain(tld).call()
-    return;
-  }
-  catch (err) {
-    console.log(err)
-  }
-}
-
-// export const domaininfo = async (
-  // web3Main,
-//   contractAddress,
-//   domain,
-// ) => {
-//   const contract = await new web3Main.eth.Contract(contractABI, contractAddress)
-//   try {
-//     await contract.methods.reawdSubdomains(domain)
-//       .then((res) => {
-//         return {
-//           searchResult: res
-//         }
-//       })
-//   }
-//   catch {
-//     return {
-//       searchResult: ''
-//     }
-//   }
-// }
-
-export const bulkSearch = async (
-  web3Main,
-  contractAddress,
-  names,
-) => {
-  console.log("contract address: ", contractAddress);
-  const contract = await new web3Main.eth.Contract(contractABI, contractAddress)
-  try {
-    console.log("names: ", names);
-    const result = await contract.methods.bulkIsdomain(names).call()
-    console.log("<<<<<<<<<<<<<<<<<<<<<<result: ", result);
-
-    return {
-      status: true,
-      result: result
-    }
-  }
-  catch (err) {
-    console.log(err)
-    return {
-      status: false
-    }
+  return {
+    status: error == undefined ? true : false,
+    isLoading,
+    buyFunction,
+    isSuccess,
   }
 }

@@ -1,69 +1,63 @@
-import { Box, Grid, Typography, Button } from "@mui/material";
+import { Box, Typography, Button } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom'
 import "react-toggle/style.css";
-import { useDappContext } from "../../utils/context";
+import { useNetwork, } from "wagmi";
 import { useCounterStore, useThemeStore } from '../../utils/store'
 import {
-    contractAddresses,
     domainSuffixes,
     domainLogoImages,
     domainNames,
 } from "../../config";
 import {
-    bulkSearch
+    useBulkIsDomain,
 } from '../../utils/interact';
-import ensImage from '../../assets/image/ethereum-name-service-ens-logo-B6AE963A1D-seeklogo 1.png';
-import binanceImage from '../../assets/image/svgs/binance-logo.svg';
-import blackVectorImage from "../../assets/image/Vector 1.png";
-import whiteVectorImage from "../../assets/image/Vector 1 (2).png";
-import whiteBookmarkImage from "../../assets/image/bookmark (1).png";
-import blackBookmarkImage from "../../assets/image/bookmark.png";
-import whiteOnShoppingImage from "../../assets/image/shopping_cart (1).png";
-import blackOnshoppingImage from "../../assets/image/shopping_cart (2).png"
-import whiteOffShoppingImage from "../../assets/image/remove_shopping_cart (2).png"
-import blackOffshoppingImage from "../../assets/image/remove_shopping_cart.png"
 
-// const web3 = new Web3(window.ethereum);
-// const contractABI = require('../../assets/abi/contract-abi.json');
+import blackVectorImage from "../../assets/image/vector_white_mode.png";
+import whiteVectorImage from "../../assets/image/vector_dark_mode.png";
+import whiteBookmarkImage from "../../assets/image/bookmark_dark_mode.png";
+import blackBookmarkImage from "../../assets/image/bookmark_white_mode.png";
+import blackOnshoppingImage from "../../assets/image/shopping_cart_white_mode.png"
+import whiteOffShoppingImage from "../../assets/image/remove_shopping_cart_black_mode.png"
+import blackOffshoppingImage from "../../assets/image/remove_shopping_cart_white_mode.png"
 
 const SearchResult = () => {
-    const {
-        currentChainIdDecimal,
-        web3Main,
-    } = useDappContext();
+    const bulkIsDomain = useBulkIsDomain();
+    const { chain, } = useNetwork();
     const navigate = useNavigate()
     const [results, setResults] = useState([])
-    const [result, setResult] = useState([]);
+
     const [count, setCount] = useCounterStore();
     const [detailInfo, setDetailInfo] = useState([])
     const [theme, setTheme] = useThemeStore();
     const [sale, setSale] = useState([]);
+    const [isSelectedAll, setIsSelectedAll] = useState(false);
     const addToCart = (id) => {
+        console.log("id: ", id);
+
         let tempArray = Array.from(sale)
+        console.log("temp array: ", tempArray);
+
+
         tempArray[id] = true;
+
         setSale(tempArray);
         let cart = count.cart;
         !cart ? cart = 0 : cart = cart;
+
+        console.log("count: ", count);
+        console.log("cart: ", cart);
+
+
         let tempArray1 = count.cartNames ? count.cartNames.slice() : []
+        console.log("tempArray1: ", tempArray1);
+        console.log({ id: id, name: results[id].name })
+        console.log("current cart:   ", { ...count, cart: cart * 1 + 1, cartNames: tempArray1 })
+
         tempArray1.push({ id: id, name: results[id].name })
-        setCount({ ...count, cart: cart * 1 + 1, cartNames: tempArray1 })
+        setCount({ ...count, cart: cart + 1, cartNames: tempArray1 })
     }
-    const getBulkIsDomain = async () => {
-        // window.contract =  await new web3.eth.Contract(contractABI, contractAddresses[currentChainIdDecimal]);
 
-
-        try {
-            const result = await bulkSearch(web3Main, contractAddresses[currentChainIdDecimal], count.names);
-            // const result = await window.contract.methods.bulkIsdomain(count.names).call()
-            console.log("=============================================");
-            console.log("bulk search result: ", result);
-            setResult(result);
-        }
-        catch (e) {
-            console.log("error: ", e);
-        }
-    }
     const removeFromCart = (id) => {
         let tempArray = Array.from(sale)
         tempArray[id] = false;
@@ -86,38 +80,52 @@ const SearchResult = () => {
     const backHome = () => {
         navigate('/')
     }
-    const gotoCartPage = () => {
-        navigate('/cart')
+
+    const handleSelectOrDeselectAll = () => {
+        // setIsSelectedAll(!isSelectedAll);
+
+        console.log("results: ", results);
+        let tempArray = Array.from(sale)
+
+        let cartNames = [];
+        results?.map((result, index) => {
+            if (!result.status) {
+                cartNames.push({id: index, name: result.name});
+                tempArray[index] = true;
+
+            }
+        });
+
+        setSale(tempArray);
+        console.log("cart names: ", cartNames);
+        console.log({
+            ...count,
+            cart: cartNames.length,
+            cartNames: cartNames,
+        });
+        setCount({
+            ...count,
+            cart: cartNames.length,
+            cartNames: cartNames,
+        })
     }
+
     useEffect(() => {
-        if (result) {
+        console.log("called")
+        if (bulkIsDomain.isLoading) return;
+        console.log("bulk is dmomain", bulkIsDomain.result);
+        if (bulkIsDomain.status) {
             let tempArray = []
             {
-                result.result && count.names?.map((name, id) => {
+                bulkIsDomain.status && count.names?.map((name, id) => {
                     tempArray[id] = {};
-                    tempArray[id].status = result.result[id];
+                    tempArray[id].status = bulkIsDomain?.result[id];
                     tempArray[id].name = name;
                 })
                 setResults(tempArray);
             }
         }
-    }, [result])
-    useEffect(() => {
-        getBulkIsDomain();
-    }, [count])
-    useEffect(() => {
-        console.log("okay1");
-        let temp_array = [];
-
-        // should be deleted
-        if (count && count.cartNames) {
-            console.log("okay2");
-            count.cartNames.map((val, id) => {
-                temp_array[val.id] = true;
-            })
-            setSale(temp_array)
-        }
-    }, [])
+    }, [count, bulkIsDomain.isLoading])
 
     return (
         <Box
@@ -197,7 +205,6 @@ const SearchResult = () => {
                             color: theme == 'dark-theme' ? 'white' : '#7A7A7A',
                             marginLeft: '20px'
                         }}
-                        onClick={gotoCartPage}
                     >
                         {`Domain Labs  > `}
                     </Typography>
@@ -222,15 +229,36 @@ const SearchResult = () => {
                 </Box>
             </Box>
             <Box
-                display={'flex'}
                 mt={'60px'}
                 sx={{ flexDirection: 'row' }}
             >
+                {
+                    (results.length > 0) && (
+                        <Box
+                            display={'flex'}
+                            justifyContent={'right'}
+                        >
+                            <Button
+                                sx={{
+                                    color: 'white',
+                                    px: '20px',
+                                    py: '10px',
+                                    background: 'linear-gradient(79.42deg, #4BD8D8 -28.43%, #146EB4 125.83%)',
+                                    borderRadius: '8px',
+                                    width: '150px',
+                                }}
+                                onClick={() => handleSelectOrDeselectAll()}
+                            >
+                                {
+                                    !isSelectedAll ? `Select All` : `UnSelect All`
+                                }
+                            </Button>
+                        </Box>
+                    )
+                }
                 <Box
                     sx={{
-                        m: 1,
-                        p: 1,
-                        width: '100%',
+                        marginTop: '20px',
                         gridTemplateColumns: {
                             lg: 'repeat(4, 1fr)',
                             md: 'repeat(3, 1fr)',
@@ -250,7 +278,6 @@ const SearchResult = () => {
                                         padding: '25px 20px 10px 20px',
                                         boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
                                         borderRadius: '16px',
-                                        width: 'calc(100%-60px)/3',
                                         marginBottom: '8px',
                                         background: 'linear-gradient(79.42deg, #4BD8D8 -28.43%, #146EB4 125.83%)'
                                     }}
@@ -264,7 +291,7 @@ const SearchResult = () => {
                                         textAlign={'left'}
                                     >
                                         <img
-                                            src={domainLogoImages[currentChainIdDecimal]}
+                                            src={domainLogoImages[chain.id]}
                                             width={'21px'}
                                             height={'24px'}
                                             style={{
@@ -282,7 +309,7 @@ const SearchResult = () => {
                                             variant="h5"
                                             color="white"
                                         >
-                                            {result.name}.{domainSuffixes[currentChainIdDecimal]}
+                                            {result.name}.{domainSuffixes[chain.id]}
                                         </Typography>
                                     </Box>
                                     <Box>
@@ -299,7 +326,7 @@ const SearchResult = () => {
                                                 }}
                                                 color="white"
                                             >
-                                                {`${domainNames[currentChainIdDecimal]} Domain is available.`}
+                                                {`${domainNames[chain.id]} Domain is available.`}
                                             </Typography>
                                         </Box>
                                     </Box>
@@ -337,7 +364,6 @@ const SearchResult = () => {
                                         padding: '25px 20px 10px 20px',
                                         boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
                                         borderRadius: '16px',
-                                        width: 'calc(100%-60px)/3',
                                         marginBottom: '8px',
                                     }}
                                     onClick={() => onClickToDetail(id)}
@@ -351,7 +377,7 @@ const SearchResult = () => {
                                         textAlign={'left'}
                                     >
                                         <img
-                                            src={domainLogoImages[currentChainIdDecimal]}
+                                            src={domainLogoImages[chain.id]}
                                             width={'21px'}
                                             height={'24px'}
                                             style={{ marginLeft: '5px' }}
@@ -364,7 +390,7 @@ const SearchResult = () => {
                                                     fontWeight={'700'}
                                                     variant="h5"
                                                 >
-                                                    {result.name}.{domainSuffixes[currentChainIdDecimal]}
+                                                    {result.name}.{domainSuffixes[chain.id]}
                                                 </Typography>
                                             ) : (
                                                 <Typography
@@ -373,7 +399,7 @@ const SearchResult = () => {
                                                     fontWeight={'700'}
                                                     variant="h5"
                                                 >
-                                                    {result.name}.{domainSuffixes[currentChainIdDecimal]}
+                                                    {result.name}.{domainSuffixes[chain.id]}
                                                 </Typography>
                                             )
                                         }
