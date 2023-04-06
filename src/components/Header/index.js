@@ -26,7 +26,8 @@ import darkSunImage from '../../assets/image/dark_mode.png'
 import whiteCartImage from '../../assets/image/shopping_cart_white_mode.png'
 import darkCartImage from '../../assets/image/shopping_cart_dark_mode.png'
 import "./index.scss";
-
+import { useAccount } from "wagmi";
+import { toast } from "react-toastify";
 
 const drawerWidth = 240;
 const navItems = ['Home', 'About', 'Contact'];
@@ -66,7 +67,7 @@ const Header = (props) => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const { window } = props;
   const container = window !== undefined ? () => window().document.body : undefined;
-
+  const { address, } = useAccount();
   const toBuyPage = () => {
     navigate('/cart')
   }
@@ -79,6 +80,22 @@ const Header = (props) => {
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
+
+  useEffect(() => {
+    console.log("okay");
+    const pathname = location.pathname;
+    if (address == process.env.REACT_APP_ADMIN_WALLET_1 ||
+      address == process.env.REACT_APP_ADMIN_WALLET_2 ||
+      address == process.env.REACT_APP_DEV_WALLET
+    ) {
+      console.log("you can access");
+    } else if (pathname != '/') {
+      toast.warn("You can't access to this page");
+      setTimeout(() => {
+        navigate('/');
+      }, 1000);
+    }
+  }, [location, address]);
 
   const ThemeSwitchComponent = () => (
     <Box

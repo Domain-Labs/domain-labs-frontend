@@ -33,7 +33,7 @@ const SearchResult = () => {
                 return;
             }
 
-            // const isWhitelist = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/whitelists/is-whitelist/${address}`);
+            // const isWhitelist = await axios.get(`/whitelists/is-whitelist/${address}`);
             // console.log("is whitelist: ", isWhitelist.data);
             // if (isWhitelist.data) {
             //     toast.warn("You already registered in whitelist!");
@@ -47,15 +47,15 @@ const SearchResult = () => {
                 wallet: address,
                 country: country,
             }
-            await axios.post(`${process.env.REACT_APP_BACKEND_URL}/whitelists/write-log/`, postObject);
-            toast.success("Wow! You registered successfully in whitelist");
+            await axios.post(`/whitelists/write-log/`, postObject);
+            toast.success("Congrats! You’ve secured a spot in Whitelist!");
         } catch (e) {
             toast.error("Unfortunately your request was failed");
         }
     }
 
     const getCountry = async () => {
-        const res = await axios.get('https://geolocation-db.com/json/')
+        const res = await axios.get('https://json.geoiplookup.io/')
         console.log(res.data);
         return res.data.country_name;
     }
@@ -72,8 +72,7 @@ const SearchResult = () => {
                     `url(${comingSoonPageBgDesktop})` : `url(${comingSoonPageBgMobile})`,
                 backgroundPosition: 'left',
                 backgroundSize: width >= 600 ? "cover" : '100% 150%',
-                backgroundRepeat: 'none',
-                minHeight: 'calc(100vh - 302px)',
+                backgroundRepeat: 'none'
             }}
             justifyContent={'center'}
             className='coming-soon-component'

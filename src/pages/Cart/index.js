@@ -106,7 +106,7 @@ const Cart = () => {
 
             if (bulkBuyDomain.isSuccess) {
                 console.log("post object: ", postObject)
-                await axios.post(`${process.env.REACT_APP_BACKEND_URL}/buys/write-log/`, postObject);
+                await axios.post(`/buys/write-log/`, postObject);
             }
         }
     }

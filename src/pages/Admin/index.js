@@ -94,17 +94,17 @@ const Admin = () => {
   useEffect(() => {
     (async () => {
       console.log("timePeriod: ", timePeriod);
-      const accessCountData = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/accesses/get-counts/${timePeriod}`);
+      const accessCountData = await axios.get(`/accesses/get-counts/${timePeriod}`);
       let dataPoints = getDataPoints(accessCountData.data);
       const accessChartOptions = getOptions("Number of Access", dataPoints);
       setAccessChartOptions(accessChartOptions);
 
-      const purchaseCountData = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/buys/get-sold-counts/${timePeriod}`);
+      const purchaseCountData = await axios.get(`/buys/get-sold-counts/${timePeriod}`);
       dataPoints = getDataPoints(purchaseCountData.data);
       const purchasedChartOptions = getOptions("Number of Domains Purchased", dataPoints);
       setPurchasedChartOptions(purchasedChartOptions);
 
-      const revenueData = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/buys/get-revenue/${timePeriod}`);
+      const revenueData = await axios.get(`/buys/get-revenue/${timePeriod}`);
       dataPoints = getDataPoints(revenueData.data)
       const reveuneChartOptions = getOptions("Revenue", dataPoints);
       setReveuneChartOptions(reveuneChartOptions);
