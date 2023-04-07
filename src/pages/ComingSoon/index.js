@@ -47,7 +47,7 @@ const SearchResult = () => {
                 wallet: address,
                 country: country,
             }
-            await axios.post(`/whitelists/write-log/`, postObject);
+            await axios.post(`${process.env.REACT_APP_BACKEND_URL}/whitelists/write-log/`, postObject);
             toast.success("Congrats! You’ve secured a spot in Whitelist!");
         } catch (e) {
             toast.error("Unfortunately your request was failed");
