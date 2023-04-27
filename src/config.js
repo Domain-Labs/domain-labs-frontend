@@ -42,3 +42,35 @@ export const domainNames = {
     [ethereumChain]: "ENS",
     [bscChain]: "BNB"
 }
+
+export const linkArray = [
+    {
+        name: 'Home',
+        link: '/home',
+    },
+    {
+        name: 'Pricing',
+        link: '/pricing',
+    },
+    {
+        name: 'Clio',
+        link: '/clio',
+    },
+    {
+        name: 'Profile',
+        link: '/profile',
+    },
+]
+
+export const secondsInDay = 24 * 60 * 60 * 1000;
+
+export const ethereumChainId = 1;
+export const bscChainId = 56;
+
+export const goerliChainId = 5;
+export const bscTestnetChainId = 97;
+
+export const chainIds = {
+    "mainnet": [ethereumChainId, bscChainId],
+    "testnet": [goerliChainId, bscTestnetChainId],
+}

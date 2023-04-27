@@ -8,22 +8,23 @@ import {
 } from 'wagmi';
 import { ethers } from 'ethers';
 import axios from 'axios';
-import { useCounterStore } from './store';
-import { contractAddresses, } from '../config';
+import { bscChainId, bscTestnetChainId, contractAddresses, } from '../config';
 import contractABI from '../assets/abi/contract-abi.json';
-const secondsInDay = 24 * 60 * 60 * 1000;
+import { useDappContext } from './context';
 
 export const useBulkIsDomain = () => {
-  const [count, setCount] = useCounterStore();
+  const { cartStatus, } = useDappContext();
   const { chain } = useNetwork();
+  const chainId = chain?.id != undefined ? chain.id :
+    process.env.NEXT_PUBLIC_MAINNET_OR_TESTNET == "mainnet" ? bscChainId : bscTestnetChainId;
 
   const { data: bulkIsdomain, error, isLoading } = useContractRead({
-    address: contractAddresses[chain.id],
+    address: contractAddresses[chainId],
     abi: contractABI,
     functionName: "bulkIsdomain",
-    args: [count.names],
+    args: [cartStatus.names ?? ['example']],
     onSuccess() {
-      console.log("bulk is domain success")
+      console.log("bulk is domain success: ", bulkIsdomain);
     },
     onError(error) {
       console.log("error occured in use bulk is domain: ", error);
@@ -39,15 +40,16 @@ export const useBulkIsDomain = () => {
 
 export const useReadDomainByName = (detailName) => {
   const { chain } = useNetwork();
-  console.log("detail name: ", detailName);
+  const chainId = chain?.id != undefined ? chain.id :
+    process.env.NEXT_PUBLIC_MAINNET_OR_TESTNET == "mainnet" ? bscChainId : bscTestnetChainId;
 
   const { data: readDomainByName, error, isLoading } = useContractRead({
-    address: contractAddresses[chain.id],
+    address: contractAddresses[chainId],
     abi: contractABI,
     functionName: "readDomainByName",
     args: [detailName],
     onSuccess() {
-      console.log("read domain by name success")
+      console.log("read domain by name success: ", readDomainByName);
     },
     onError(error) {
       console.log("error occured in read domain by name: ", error);
@@ -64,9 +66,11 @@ export const useReadDomainByName = (detailName) => {
 export const useBulkBuyDomain = (names, deadlines, totalValue) => {
   const { chain } = useNetwork();
   const { address, } = useAccount();
+  const chainId = chain?.id != undefined ? chain.id :
+    process.env.NEXT_PUBLIC_MAINNET_OR_TESTNET == "mainnet" ? bscChainId : bscTestnetChainId;
 
   const { config, error: prepareError } = usePrepareContractWrite({
-    address: contractAddresses[chain.id],
+    address: contractAddresses[chainId],
     abi: contractABI,
     functionName: 'bulkBuyDomain',
     args: [names, deadlines],
@@ -84,10 +88,10 @@ export const useBulkBuyDomain = (names, deadlines, totalValue) => {
   const { isLoading, isSuccess, isError, error, } = useWaitForTransaction({
     hash: data?.hash,
     onSuccess(data) {
-      window.alert("wait for transaction success: ", data);
+      console.log("wait for transaction success: ", data);
     },
     onError(error) {
-      window.alert('wait for transaction result error: ', error);
+      console.log('wait for transaction result error: ', error);
     },
   })
 

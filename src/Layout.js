@@ -3,10 +3,10 @@ import {
 } from "@mui/material";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import { useThemeStore } from "./utils/store";
+import { useDappContext } from "./utils/context";
 
 const Layout = ({ children }) => {
-  const [theme,] = useThemeStore();
+  const { theme, } = useDappContext();
 
   return (
     <>

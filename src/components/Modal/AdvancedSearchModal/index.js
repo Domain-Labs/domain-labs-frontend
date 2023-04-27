@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
@@ -7,17 +7,19 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import TextField from '@mui/material/TextField';
-import { useCounterStore } from '../../utils/store'
-import { useNavigate, useParams } from "react-router-dom";
-import cancelImage from '../../assets/image/cancel.png'
+import { useNavigate, } from "react-router-dom";
+import { useDappContext } from "../../../utils/context";
+import { cancelImage } from "../../../utils/images";
 
-function DialogModal(props) {
-  const [open, setOpen] = React.useState(false);
-  const [row, setRows] = React.useState(0);
-  const [names, setNames] = React.useState([])
-  const [count, setCount] = useCounterStore();
+function AdvancedSearchModal(props) {
+  const {
+    cartStatus,
+    setCartStatus,
+  } = useDappContext();
+  const [isOpen, setIsOpen] = useState(false);
+  const [row, setRows] = useState(0);
+  const [names, setNames] = useState([])
   const navigate = useNavigate();
-
 
   const styles = theme => ({
     closeButton: {
@@ -41,21 +43,21 @@ function DialogModal(props) {
 
   const BulkSearch = () => {
     let array = names.filter((item) => item != "")
-    setCount({ ...count, names: array, cart: [] })
+    setCartStatus({ ...cartStatus, names: array, cart: [] })
   }
 
   useEffect(() => {
-    setOpen(props.open)
+    setIsOpen(props.isOpen)
   }, [props])
 
   useEffect(() => {
     if (names.length > 0)
       navigate('/search-result')
-  }, [count])
+  }, [cartStatus])
 
   return (
     <Dialog
-      open={open}
+      open={isOpen}
       color="primary"
       onClose={props.handleClose}
       aria-labelledby="alert-dialog-title"
@@ -83,14 +85,16 @@ function DialogModal(props) {
         {"Advanced Search"}
       </DialogTitle>
 
-      <img src={cancelImage} style={{
-        position: 'absolute',
-        width: '20px',
-        height: '20px',
-        right: '30px',
-        top: '18px',
-        cursor: 'pointer'
-      }}
+      <img
+        src={cancelImage}
+        style={{
+          position: 'absolute',
+          width: '20px',
+          height: '20px',
+          right: '30px',
+          top: '18px',
+          cursor: 'pointer'
+        }}
         onClick={props.handleClose}
       />
 
@@ -130,7 +134,9 @@ function DialogModal(props) {
             textTransform: 'capitalize',
             color: 'white',
             borderRadius: '12px',
-          }} onClick={BulkSearch}>
+          }}
+          onClick={BulkSearch}
+        >
           Search
         </Button>
       </DialogActions>
@@ -138,4 +144,4 @@ function DialogModal(props) {
   )
 }
 
-export default DialogModal
+export default AdvancedSearchModal

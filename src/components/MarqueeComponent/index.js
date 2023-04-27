@@ -1,11 +1,11 @@
 import Marquee from "react-easy-marquee";
 import { Box } from "@mui/system";
-import { useThemeStore, } from '../../utils/store'
 import ensLogo from '../../assets/image/svgs/ens-logo.svg';
 import binanceLogo from '../../assets/image/svgs/binance-logo.svg';
+import { useDappContext } from "../../utils/context";
 
 const MarqueeComponent = () => {
-    const [theme, setTheme] = useThemeStore();
+    const { theme, } = useDappContext();
 
     const exampleDomains = [
         {

@@ -18,7 +18,6 @@ import { useNavigate, useLocation, } from "react-router-dom";
 import { AiOutlineMenu } from 'react-icons/ai';
 import { RxCross1, } from 'react-icons/rx';
 import useWindowDimensions from "../../hooks/useDimension";
-import { useThemeStore, useCounterStore } from "../../utils/store";
 import whiteLogoImage from '../../assets/image/logo_white_mode.png';
 import darkLogoImage from '../../assets/image/logo_dark_mode.png';
 import yellowSunImage from '../../assets/image/light_mode.png'
@@ -26,16 +25,20 @@ import darkSunImage from '../../assets/image/dark_mode.png'
 import whiteCartImage from '../../assets/image/shopping_cart_white_mode.png'
 import darkCartImage from '../../assets/image/shopping_cart_dark_mode.png'
 import "./index.scss";
-import { useAccount } from "wagmi";
+import { useAccount, useNetwork } from "wagmi";
 import { toast } from "react-toastify";
+import { chainIds, linkArray } from "../../config";
+import { useDappContext } from "../../utils/context";
 
 const drawerWidth = 240;
 const navItems = ['Home', 'About', 'Contact'];
 
 const ElevationScroll = (props) => {
+  const {
+    theme,
+  } = useDappContext();
   const { width } = useWindowDimensions();
   const { children } = props;
-  const [theme, setTheme] = useThemeStore();
 
   const trigger = useScrollTrigger({
     disableHysteresis: true,
@@ -59,11 +62,15 @@ ElevationScroll.propTypes = {
 };
 
 const Header = (props) => {
+  const {
+    theme,
+    setTheme,
+    cartStatus,
+  } = useDappContext();
+  const { chain, } = useNetwork();
   const navigate = useNavigate();
   const location = useLocation();
-  const [count, setCount] = useCounterStore();
   const [isSwitchOn, setIsSwitchOn] = useState(true);
-  const [theme, setTheme] = useThemeStore();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const { window } = props;
   const container = window !== undefined ? () => window().document.body : undefined;
@@ -82,14 +89,32 @@ const Header = (props) => {
   };
 
   useEffect(() => {
+    const chainId = chain?.id;
+    console.log("chain id: ", chainId);
     console.log("okay");
     const pathname = location.pathname;
+
+    if (!chainIds[process.env.REACT_APP_NET_TYPE].includes(chainId) && pathname != '/') {
+      toast.error("Please switch your chain");
+      setTimeout(() => {
+        navigate('/');
+      })
+      return;
+    }
+
     if (address == process.env.REACT_APP_ADMIN_WALLET_1 ||
       address == process.env.REACT_APP_ADMIN_WALLET_2 ||
-      address == process.env.REACT_APP_DEV_WALLET
+      address == process.env.REACT_APP_DEV_WALLET_1 ||
+      address == process.env.REACT_APP_DEV_WALLET_2
     ) {
       console.log("you can access");
+      console.log("address: ", address);
+      console.log("dev wallet: ", process.env.REACT_APP_DEV_WALLET_1);
     } else if (pathname != '/') {
+      console.log("address: ", address);
+      console.log("dev wallet: ", process.env.REACT_APP_DEV_WALLET_1);
+      console.log("dev wallet: ", process.env.REACT_APP_DEV_WALLET_2);
+
       toast.warn("You can't access to this page");
       setTimeout(() => {
         navigate('/');
@@ -139,6 +164,7 @@ const Header = (props) => {
   const LogoComponent = () => (
     <Box
       display={'flex'}
+      alignItems={'center'}
     >
       <img
         src={theme == 'dark-theme' ? darkLogoImage : whiteLogoImage}
@@ -184,11 +210,59 @@ const Header = (props) => {
       <Box
         mt={'60px'}
       >
+        {
+          linkArray.map((item, index) => (
+            <Box
+              key={index}
+            >
+              <Typography
+                fontFamily={'Inter'}
+                fontStyle={'normal'}
+                fontWeight={'700'}
+                fontSize={'24px'}
+                lineHeight={'29px'}
+                letterSpacing={'0.01em'}
+                color={theme == 'dark-theme' ? 'white' : 'black'}
+                mx={'30px'}
+                my={'20px'}
+                onClick={() => {
+                  navigate(`${item.link}`);
+                  setMobileOpen(!mobileOpen);
+                }}
+                justifyContent={'left'}
+                display={'flex'}
+                style={{
+                  textDecoration: item.link == location.pathname ? 'underline' : 'none',
+                  textDecorationColor: item.link == location.pathname ? 'linear-gradient(71.39deg, #4BD8D8 -24.78%, #146EB4 112.23%)' : 'unset',
+                  textUnderlineOffset: '10px',
+                  background: item.link == location.pathname ? 'linear-gradient(71.39deg, #4BD8D8 -24.78%, #146EB4 112.23%)' : 'unset',
+                  WebkitBackgroundClip: item.link == location.pathname ? 'text' : 'unset',
+                  WebkitTextFillColor: item.link == location.pathname ? 'transparent' : 'unset',
+                  backgroundClip: item.link == location.pathname ? 'text' : 'unset',
+                  cursor: 'pointer',
+                }}
+              >
+                {item.name}
+              </Typography>
+              <Divider
+                sx={{
+                  borderColor: 'white',
+                }}
+              />
+            </Box>
+          ))
+        }
+      </Box>
+
+
+
+      <Box
+      >
         <Box
           display={'flex'}
           alignItems={'center'}
           mx={'30px'}
-          mb={'20px'}
+          my={'20px'}
         >
           <ThemeSwitchComponent />
           <Typography
@@ -203,6 +277,7 @@ const Header = (props) => {
             Theme
           </Typography>
         </Box>
+
         <Divider
           sx={{
             borderColor: 'white',
@@ -222,7 +297,7 @@ const Header = (props) => {
             onClick={location.pathname == '/' ? () => { } : () => toBuyPage()}
           >
             {
-              count.cart && count.cart > 0 ? (
+              cartStatus.cart && cartStatus.cart > 0 ? (
                 <Box sx={{
                   display: 'flex',
                   justifyContent: 'center',
@@ -255,7 +330,7 @@ const Header = (props) => {
                       right: '0'
                     }}
                   >
-                    {count.cart}
+                    {cartStatus.cart}
                   </span>
                 </Box>
               ) : (
@@ -322,7 +397,6 @@ const Header = (props) => {
       <ElevationScroll {...props}
         px={'10px !important'}
         class
-
       >
         <AppBar
           height={{ xs: '100px', sm: '60px' }}
@@ -354,7 +428,7 @@ const Header = (props) => {
             </Box>
 
             <Box
-              display={{ xs: 'flex', md: 'none' }}
+              display={{ xs: 'flex', lg: 'none' }}
               position={'absolute'}
               right={0}
               className='outline-menu-wrapper'
@@ -384,9 +458,8 @@ const Header = (props) => {
                   keepMounted: true, // Better open performance on mobile.
                 }}
                 sx={{
-                  display: { xs: 'block', md: 'none' },
+                  display: { xs: 'block', lg: 'none' },
                 }}
-                hideBackdrop={'false'}
               >
                 {drawer}
               </Drawer>
@@ -400,7 +473,7 @@ const Header = (props) => {
                 zIndex: '10000'
               }}
               display={{
-                xs: 'none', md: 'flex'
+                xs: 'none', lg: 'flex'
               }}
             >
               <Box
@@ -418,6 +491,39 @@ const Header = (props) => {
                   display={'flex'}
                   justifyContent={'center'}
                 >
+                  {
+                    linkArray.map((item, index) => (
+                      <Typography
+                        color={theme == 'dark-theme' ? 'white' : 'black'}
+                        fontSize={"18.4px"}
+                        fontWeight={'700'}
+                        fontStyle={'normal'}
+                        ml={'17px'}
+                        display={'flex'}
+                        fontFamily={'Inter'}
+                        key={index}
+                        onClick={() => navigate(`${item.link}`)}
+                        style={{
+                          textDecoration: item.link == location.pathname ? 'underline' : 'none',
+                          textDecorationColor: item.link == location.pathname ? 'linear-gradient(71.39deg, #4BD8D8 -24.78%, #146EB4 112.23%)' : 'unset',
+                          textUnderlineOffset: '10px',
+                          background: item.link == location.pathname ? 'linear-gradient(71.39deg, #4BD8D8 -24.78%, #146EB4 112.23%)' : 'unset',
+                          WebkitBackgroundClip: item.link == location.pathname ? 'text' : 'unset',
+                          WebkitTextFillColor: item.link == location.pathname ? 'transparent' : 'unset',
+                          backgroundClip: item.link == location.pathname ? 'text' : 'unset',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {item.name}
+                      </Typography>
+                    ))
+                  }
+                </Box>
+                <Box
+                  flexDirection={'row'}
+                  display={'flex'}
+                  justifyContent={'center'}
+                >
                   <ThemeSwitchComponent />
                   <Box
                     sx={{
@@ -428,7 +534,7 @@ const Header = (props) => {
                     display={'flex'}
                   >
                     {
-                      count.cart && count.cart > 0 ? (
+                      cartStatus.cart && cartStatus.cart > 0 ? (
                         <Box
                           sx={{
                             display: 'flex',
@@ -463,7 +569,7 @@ const Header = (props) => {
                               right: '0'
                             }}
                           >
-                            {count.cart}
+                            {cartStatus.cart}
                           </span>
                         </Box>
                       ) : (

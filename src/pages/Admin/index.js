@@ -4,15 +4,15 @@ import {
   Typography,
 } from "@mui/material";
 import axios from 'axios';
-import { useThemeStore } from "../../utils/store";
 import CanvasJSReact from '../../assets/js/canvasjs.react';
 import './index.scss';
+import { useDappContext } from "../../utils/context";
 // require('dotenv').config();
 
 var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
 const Admin = () => {
-  const [theme,] = useThemeStore();
+  const { theme, } = useDappContext();
   const [accessChartOptions, setAccessChartOptions] = useState({});
   const [purchasedChartOptions, setPurchasedChartOptions] = useState({});
   const [reveuneChartOptions, setReveuneChartOptions] = useState({});
@@ -172,7 +172,7 @@ const Admin = () => {
       </div>
 
       <Box
-        className="access-count-chart"
+        className="access-cartStatus-chart"
         mb={'100px'}
       >
         <CanvasJSChart options={accessChartOptions}
@@ -180,7 +180,7 @@ const Admin = () => {
       </Box>
 
       <Box
-        className="purchased-count-chart"
+        className="purchased-cartStatus-chart"
         mb={'100px'}
       >
         <CanvasJSChart options={purchasedChartOptions}

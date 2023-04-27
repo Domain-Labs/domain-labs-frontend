@@ -5,7 +5,6 @@ import {
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useCounterStore, useThemeStore } from '../../utils/store'
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import {
@@ -16,9 +15,10 @@ import comingSoonPageBgMobile from '../../assets/image/coming-soon-bg-mobile.png
 import twitterLogoComingSoon from '../../assets/image/twitter-logo-coming-soon.svg';
 import discordLogoComingSoon from '../../assets/image/discord-logo-coming-soon.svg';
 import './index.scss';
+import { useDappContext } from "../../utils/context";
 
 const SearchResult = () => {
-    const [theme, setTheme] = useThemeStore();
+    const { theme, } = useDappContext();
     const { address, } = useAccount();
     const [width, setWidth] = useState(0);
 
@@ -51,6 +51,7 @@ const SearchResult = () => {
             toast.success("Congrats! You’ve secured a spot in Whitelist!");
         } catch (e) {
             toast.error("Unfortunately your request was failed");
+            console.log("error:   ", e);
         }
     }
 

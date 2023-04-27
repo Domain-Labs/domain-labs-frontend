@@ -9,12 +9,14 @@ import mail from "../../assets/image/mail.png";
 import docImage from "../../assets/image/icons8-ethereum-name-service-64-2 1.png"
 import ecoImage from "../../assets/image/add_chart.png"
 import discussImage from "../../assets/image/hub.png";
+import { useNavigate } from "react-router-dom";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-function Footer() {
+const Footer = () => {
+  const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
 
   const handleClick = () => {
@@ -28,6 +30,8 @@ function Footer() {
 
     setOpen(false);
   };
+
+
 
   const LeftComponent = () => (
     <Box
@@ -46,7 +50,47 @@ function Footer() {
           cursor: 'pointer'
         }}
       >
-        Domain Labs all rights reserved 2023
+        Terms Of Service
+      </Typography>
+      <Typography
+        color="white"
+        sx={{
+          fontFamily: 'Inter',
+          fontWeight: '900',
+          fontSize: '18px',
+          lineHeight: '22px',
+          paddingTop: '20px',
+          cursor: 'pointer'
+        }}
+      >
+        Contact
+      </Typography>
+      <Typography
+        color="white"
+        sx={{
+          fontFamily: 'Inter',
+          fontWeight: '900',
+          fontSize: '18px',
+          lineHeight: '22px',
+          paddingTop: '20px',
+          cursor: 'pointer'
+        }}
+        onClick={() => navigate('/faqs')}
+      >
+        FAQs
+      </Typography>
+      <Typography
+        color="white"
+        sx={{
+          fontFamily: 'Inter',
+          fontWeight: '900',
+          fontSize: '18px',
+          lineHeight: '22px',
+          paddingTop: '20px',
+          cursor: 'pointer'
+        }}
+      >
+        Domain Labs all rights reserved {(new Date).getFullYear()}
       </Typography>
     </Box>
   )
@@ -152,7 +196,7 @@ function Footer() {
         >
           <Box
             display={'flex'}
-            alignItems={{xs:'start', md:'end'}}
+            alignItems={{ xs: 'start', md: 'end' }}
             pt={'80px'}
           >
             <LeftComponent />

@@ -7,37 +7,44 @@ import {
     useNetwork,
     useAccount,
 } from 'wagmi';
-import { useCounterStore, useThemeStore } from "../../utils/store";
 import {
     useBulkBuyDomain,
     useBulkIsDomain,
 } from '../../utils/interact'
 import {
-    domainSuffixes,
+    domainLogoImages,
+    domainSuffixes, secondsInDay,
 } from '../../config';
 import blackVectorImage from "../../assets/image/vector_white_mode.png";
 import whiteVectorImage from "../../assets/image/vector_dark_mode.png";
 import whiteBookmarkImage from "../../assets/image/bookmark_dark_mode.png";
 import whiteOffShoppingImage from "../../assets/image/remove_shopping_cart_black_mode.png"
-import picImage from '../../assets/image/svgs/ens-logo.svg';
 import timerImage from "../../assets/image/timer.png"
-const secondsInDay = 24 * 60 * 60 * 1000;
+import { useDappContext } from "../../utils/context";
 
 const Cart = () => {
+    const {
+        theme,
+        cartStatus,
+    } = useDappContext();
     const bulkIsDomain = useBulkIsDomain();
     const { chain, } = useNetwork();
     const { address, } = useAccount();
     const [results, setResults] = useState();
-    const [count, setCount] = useCounterStore();
     const [price, setPrice] = useState([]);
     const [totalValue, setTotalValue] = useState(0);
     const navigate = useNavigate();
-    const [theme, setTheme] = useThemeStore();
     const [toggle, setToggle] = useState([])
     const [duration, setDuration] = React.useState([]);
     const [discount, setDiscount] = React.useState()
     const [currentTime, setCurrentTime] = React.useState()
     const [result, setResult] = useState([]);
+    const [domainLogoImage, setDomainLogoImage] = useState('');
+
+    useEffect(() => {
+        setDomainLogoImage(domainLogoImages[chain.id]);
+    }, [chain])
+
     const bulkBuyDomain = useBulkBuyDomain(
         results?.map(item => item.name),
         duration.map(item => item * secondsInDay),
@@ -166,7 +173,7 @@ const Cart = () => {
         if (bulkIsDomain.status) {
             let tempArray = []
             {
-                bulkIsDomain.status && count.names?.map((name, id) => {
+                bulkIsDomain.status && cartStatus.names?.map((name, id) => {
                     tempArray[id] = {};
                     tempArray[id].status = bulkIsDomain?.result[id];
                     tempArray[id].name = name;
@@ -174,7 +181,7 @@ const Cart = () => {
                 setResults(tempArray);
             }
         }
-    }, [count, bulkIsDomain.isLoading])
+    }, [cartStatus, bulkIsDomain.isLoading])
 
     useEffect(() => {
         console.log("cart page result: ", result);
@@ -184,10 +191,10 @@ const Cart = () => {
             let tempDuration = [];
             let initialCost = 0;
             let tempPrice = [];
-            console.log("count.cartNames: ", count);
+            console.log("cartStatus.cartNames: ", cartStatus);
 
             {
-                count.cartNames?.map((name, id) => {
+                cartStatus.cartNames?.map((name, id) => {
                     console.log("name", name)
                     tempArray[id] = {};
                     tempArray[id].status = result[id];
@@ -200,7 +207,7 @@ const Cart = () => {
                     initialCost += calculatePrice(name.name, options[4].value);
                 })
 
-                let nameLength = count.cartNames ? count.cartNames.length : 0;
+                let nameLength = cartStatus.cartNames ? cartStatus.cartNames.length : 0;
                 initialCost = applyDiscount(initialCost, nameLength);
                 setTotalValue(initialCost)
                 setResults(tempArray);
@@ -528,7 +535,7 @@ const Cart = () => {
                                         textAlign={'left'}
                                     >
                                         <img
-                                            src={picImage}
+                                            src={domainLogoImage}
                                             width={'21px'}
                                             height={'24px'}
                                             style={{
