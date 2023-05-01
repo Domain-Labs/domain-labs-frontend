@@ -8,6 +8,7 @@ import ComingSoon from "./pages/ComingSoon";
 import Clio from "./pages/Clio";
 import Faqs from "./pages/Faqs";
 import Pricing from "./pages/Pricing";
+import Profile from './pages/Profile';
 
 const ContextWrapper = () => {
 
@@ -23,6 +24,7 @@ const ContextWrapper = () => {
           <Route path="/faqs" element={<Faqs />} />
           <Route path="/cart" element={<Cart />} />
           <Route path='/admin' element={<Admin />} />
+          <Route path='/profile' element={<Profile />} />
           <Route path='/' element={<ComingSoon />} />
         </Routes>
       </Layout>
