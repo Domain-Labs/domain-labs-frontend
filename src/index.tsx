@@ -1,31 +1,35 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import reportWebVitals from './reportWebVitals';
 import './index.css';
-
 import '@rainbow-me/rainbowkit/styles.css';
-import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit';
-import { configureChains, createClient, WagmiConfig } from 'wagmi';
-import { mainnet, polygon, optimism, arbitrum, goerli, bsc, bscTestnet, } from 'wagmi/chains';
-import { alchemyProvider } from 'wagmi/providers/alchemy';
-import { publicProvider } from 'wagmi/providers/public';
+
+import { RainbowKitProvider, getDefaultWallets } from '@rainbow-me/rainbowkit';
+import { WagmiConfig, configureChains, createClient } from 'wagmi';
+import { bsc, bscTestnet, goerli, mainnet } from 'wagmi/chains';
+
 import App from './App';
+import ReactDOM from 'react-dom/client';
+import { ToastContainer } from 'react-toastify';
+import { publicProvider } from 'wagmi/providers/public';
+import reportWebVitals from './reportWebVitals';
 
 const { chains, provider, webSocketProvider } = configureChains(
   [
-    // mainnet,
-    // polygon,
-    // optimism,
-    // arbitrum,
     goerli,
-    // bsc,
     bscTestnet,
-    // ...(process.env.REACT_APP_ENABLE_TESTNETS === 'true' ? [goerli] : []),
+    mainnet,
+    // bsc,
+    {
+      ...bsc,
+      rpcUrls: {
+        default: {
+          http: [`${process.env.REACT_APP_BINANCE_CHAIN_RPC}`],
+        },
+      },
+    },
   ],
   [
     // alchemyProvider({ apiKey: '_gg7wSSi0KMBsdKnGVfHDueq6xMB9EkC' }),
     publicProvider(),
-  ]
+  ],
 );
 
 const { connectors } = getDefaultWallets({
@@ -41,7 +45,7 @@ const wagmiClient = createClient({
 });
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+  document.getElementById('root') as HTMLElement,
 );
 
 root.render(
@@ -49,8 +53,18 @@ root.render(
   <WagmiConfig client={wagmiClient}>
     <RainbowKitProvider chains={chains}>
       <App />
+      <ToastContainer
+        position="top-right"
+        autoClose={1500}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </RainbowKitProvider>
-  </WagmiConfig>
+  </WagmiConfig>,
   // </React.StrictMode>
 );
 

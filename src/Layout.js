@@ -3,10 +3,9 @@ import {
 } from "@mui/material";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import { useDappContext } from "./utils/context";
-
+import { useTheme } from "./contexts/theme";
 const Layout = ({ children }) => {
-  const { theme, } = useDappContext();
+  const { theme, } = useTheme();
 
   return (
     <>
@@ -14,7 +13,7 @@ const Layout = ({ children }) => {
       <Box
         className="main-component"
         style={{
-          backgroundColor: theme == 'dark-theme' ? '#2A2A2A' : 'white',
+          backgroundColor: theme === 'dark-theme' ? '#2A2A2A' : 'white',
           minHeight: 'calc(100vh - 302px)',
         }}
       >

@@ -10,8 +10,8 @@ import {
 import { useNavigate, } from "react-router-dom";
 import searchImage from '../../assets/image/search.png';
 import './index.scss';
-import { useAccount, useNetwork } from "wagmi";
-import { useDappContext } from "../../utils/context";
+import { useAccount } from "wagmi";
+import { useTheme } from "../../contexts/theme";
 import SearchResultComponent from "../../components/SearchResultComponent";
 import { clockLogo, lampLogo, lanLogo } from "../../utils/images";
 import axios from "axios";
@@ -19,12 +19,10 @@ import { toast } from "react-toastify";
 
 const Clio = () => {
   const {
-    cartStatus,
-    setCartStatus,
     theme,
-  } = useDappContext();
+  } = useTheme();
+
   const { address, } = useAccount();
-  const { chain, } = useNetwork();
   const [clioQuery, setClioQuery] = useState('');
   const navigate = useNavigate();
   const [top, setTop] = useState(0);
@@ -46,7 +44,7 @@ const Clio = () => {
     }
 
     // check if it is possible to use clio
-    if ((isAlreadySignedUp.freeCount == 0) && (isAlreadySignedUp.clioEndTimestamp < Math.round(Date.now() / 1000))) {
+    if ((isAlreadySignedUp.freeCount === 0) && (isAlreadySignedUp.clioEndTimestamp < Math.round(Date.now() / 1000))) {
       toast.error("You should pay to use clio!");
       setTimeout(() => {
         navigate('/pricing');
@@ -54,7 +52,7 @@ const Clio = () => {
       }, 1000);
     }
 
-    if (clioQuery?.length == 0) {
+    if (clioQuery?.length === 0) {
       toast.error('Please type your clio query');
       return;
     }
@@ -67,14 +65,14 @@ const Clio = () => {
     const result = (await axios.post(`/clios/request-clio/`, postObject)).data;
     console.log("=========:  request clio", result);
 
-    setCartStatus({ names: result?.domainNames, cart: [] })
+    // setCartStatus({ names: result?.domainNames, cart: [] })
 
     setIsProcessing(false);
   }
 
   const styles = {
     container: {
-      backgroundColor: theme == 'dark-theme' ? '#2A2A2A' : 'white',
+      backgroundColor: theme === 'dark-theme' ? '#2A2A2A' : 'white',
       backgroundPosition: "center",
       backgroundRepeat: "no-repeat",
       backgroundSize: "cover",
@@ -83,7 +81,7 @@ const Clio = () => {
   };
 
   const onKeyPressed = (e) => {
-    if (e.code == 'Enter') {
+    if (e.code === 'Enter') {
       handleSearch()
     }
   }
@@ -112,7 +110,7 @@ const Clio = () => {
     {
       image: lampLogo,
       title: 'Instant Recommendations',
-      description: '\“Hey Clio, help me find domains for an E-commerce store that sells Bitcoin apparel.\”',
+      description: '“Hey Clio, help me find domains for an E-commerce store that sells Bitcoin apparel.”',
     },
     {
       image: clockLogo,
@@ -197,6 +195,7 @@ const Clio = () => {
                       <img
                         style={{ width: '16px', height: '16px' }}
                         src={searchImage}
+                        alt=""
                       />
                     </Box>
                     <Box
@@ -206,6 +205,7 @@ const Clio = () => {
                       <img
                         style={{ width: '24', height: '24px' }}
                         src={searchImage}
+                        alt=""
                       />
                     </Box>
                   </Button>
@@ -224,7 +224,7 @@ const Clio = () => {
                   fontFamily={'Inter'}
                   style={{
                     textAlign: 'left',
-                    color: theme == 'dark-theme' ? 'white' : 'black',
+                    color: theme === 'dark-theme' ? 'white' : 'black',
                   }}
                   fontWeight={400}
                   align="center"
@@ -279,7 +279,7 @@ const Clio = () => {
                         textAlign: 'center',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: theme == 'dark-theme' ? 'white' : 'black',
+                        color: theme === 'dark-theme' ? 'white' : 'black',
                         lineHeight: '1',
                         fontWeight: '700',
                         whiteSpace: 'nowrap',
@@ -314,7 +314,7 @@ const Clio = () => {
                         textAlign: 'center',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: theme == 'dark-theme' ? 'white' : 'black',
+                        color: theme === 'dark-theme' ? 'white' : 'black',
                         lineHeight: '1',
                         fontWeight: '700',
                         whiteSpace: 'nowrap',
@@ -334,7 +334,7 @@ const Clio = () => {
                         textAlign: 'center',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: theme == 'dark-theme' ? 'white' : 'black',
+                        color: theme === 'dark-theme' ? 'white' : 'black',
                         lineHeight: '1',
                         fontWeight: '700',
                         whiteSpace: 'nowrap',
@@ -356,7 +356,7 @@ const Clio = () => {
                       textAlign: 'center',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: theme == 'dark-theme' ? 'white' : 'black',
+                      color: theme === 'dark-theme' ? 'white' : 'black',
                       lineHeight: '1',
                       fontWeight: '700',
                       whiteSpace: 'nowrap',
@@ -410,6 +410,7 @@ const Clio = () => {
                               src={item.image}
                               width={'100px'}
                               height={'100px'}
+                              alt=""
                             />
                           </Box>
 
@@ -474,9 +475,9 @@ const Clio = () => {
           !isProcessing && (<Box
             px={{ xs: '30px', sm: '40px' }}
             sx={{
-              backgroundColor: theme == 'dark-theme' ? '#2A2A2A' : 'white',
+              backgroundColor: theme === 'dark-theme' ? '#2A2A2A' : 'white',
             }}
-            display={cartStatus?.names?.length > 0 ? 'block' : 'none'}
+            // display={cartStatus?.names?.length > 0 ? 'block' : 'none'}
           >
             <Box>
               <Typography
@@ -488,7 +489,7 @@ const Clio = () => {
                   borderRadius: '12px',
                   textAlign: 'center',
                   alignItems: 'center',
-                  color: theme == 'dark-theme' ? 'white' : 'black',
+                  color: theme === 'dark-theme' ? 'white' : 'black',
                   lineHeight: '1',
                   fontWeight: '700',
                   whiteSpace: 'nowrap',

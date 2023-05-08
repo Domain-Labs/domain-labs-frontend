@@ -1,20 +1,20 @@
-import Marquee from "react-easy-marquee";
 import { Box } from "@mui/system";
 import { IoMdArrowDropdown, IoMdArrowDropup } from 'react-icons/io';
 import { Typography } from "@mui/material";
 import { useState } from "react";
 import ReactHtmlParser from 'react-html-parser';
+import { useTheme } from "../../contexts/theme";
 import './index.scss';
-import { useDappContext } from "../../utils/context";
+
 
 const FaqsComponent = () => {
-    const { theme, } = useDappContext();
+    const { theme, } = useTheme();
     const [displayStates, setDisplayStates] = useState({
-        [0]: true,
-        [1]: true,
-        [2]: true,
-        [3]: true,
-        [4]: true,
+        0: true,
+        1: true,
+        2: true,
+        3: true,
+        4: true,
     });
 
     const faqs = [
@@ -54,7 +54,7 @@ const FaqsComponent = () => {
                     fontSize: '40px',
                     lineHeight: '48px',
                     letterSpacing: '-0.01em',
-                    color: theme == 'dark-theme' ? 'white' : 'black',
+                    color: theme === 'dark-theme' ? 'white' : 'black',
                 }}
             >
                 Domain Labs FAQ
@@ -73,7 +73,7 @@ const FaqsComponent = () => {
                     fontSize: '18px',
                     lineHeight: '22px',
                     letterSpacing: '-0.01em',
-                    color: theme == 'dark-theme' ? 'white' : 'black',
+                    color: theme === 'dark-theme' ? 'white' : 'black',
                 }}
             >
                 Answers to Your Most Common Questions
@@ -104,7 +104,7 @@ const FaqsComponent = () => {
                                     fontSize: '32px',
                                     lineHeight: '39px',
                                     letterSpacing: '-0.01em',
-                                    color: theme == 'dark-theme' ? 'white' : 'black',
+                                    color: theme === 'dark-theme' ? 'white' : 'black',
                                 }}
                             >
                                 {!displayStates[index] ? `FAQ ${index + 1}` : item.question}
@@ -116,7 +116,7 @@ const FaqsComponent = () => {
                                 alignItems={'center'}
                                 height={'100%'}
                                 display={'flex'}
-                                color={theme == 'dark-theme' ? 'white' : 'black'}
+                                color={theme === 'dark-theme' ? 'white' : 'black'}
                                 className="dropdown-dropup-svg-wrapper"
                                 onClick={() => setDisplayStates({
                                     ...displayStates,
@@ -147,14 +147,14 @@ const FaqsComponent = () => {
                                 fontSize: '16px',
                                 lineHeight: '19px',
                                 letterSpacing: '-0.01em',
-                                color: theme == 'dark-theme' ? 'white' : 'black',
+                                color: theme === 'dark-theme' ? 'white' : 'black',
                             }}
                         >
                             {ReactHtmlParser(item.answer)}
                         </Typography>
 
                         <Box
-                            display={index == faqs.length - 1 ? 'none' : 'block'}
+                            display={index === faqs.length - 1 ? 'none' : 'block'}
                         >
                             <hr />
                         </Box>

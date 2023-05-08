@@ -1,4 +1,4 @@
-import { Box, Grid, Typography, Button } from "@mui/material";
+import { Box, Typography, Button } from "@mui/material";
 import { useState, useEffect } from "react";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -8,10 +8,6 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import "react-toggle/style.css";
 import { useNetwork, } from "wagmi";
 import {
-    useBulkIsDomain,
-    useReadDomainByName,
-} from '../../../utils/interact';
-import {
     bscChainId,
     bscTestnetChainId,
     domainLogoImages,
@@ -20,7 +16,7 @@ import {
 import {
     cancelImage,
 } from "../../../utils/images";
-import { useDappContext } from "../../../utils/context";
+import { useTheme } from "../../../contexts/theme";
 import { getEllipsisTxt } from '../../../utils/formatters';
 import Moment from "react-moment";
 
@@ -28,20 +24,19 @@ const SearchDetailModal = (
     props
 ) => {
     const {
-        theme,
-        cartStatus,
-    } = useDappContext();
+        theme
+    } = useTheme();
     const { chain, } = useNetwork();
-    const [results, setResults] = useState([])
-    const [detailInfo, setDetailInfo] = useState([])
-    const [detailName, setDetailName] = useState('')
+    const [results] = useState([])
+    const [detailInfo] = useState([])
+    const [setDetailName] = useState('')
     const [domainInfo, setDomainInfo] = useState({});
     const [isOpen, setIsOpen] = useState(false);
     const [domainLogoImage, setDomainLogoImage] = useState('');
 
     useEffect(() => {
-        const chainId = chain?.id != undefined ? chain.id :
-            process.env.NEXT_PUBLIC_MAINNET_OR_TESTNET == "mainnet" ? bscChainId : bscTestnetChainId;
+        const chainId = chain?.id !== undefined ? chain.id :
+            process.env.NEXT_PUBLIC_MAINNET_OR_TESTNET === "mainnet" ? bscChainId : bscTestnetChainId;
         setDomainLogoImage(domainLogoImages[chainId]);
     }, [chain])
 
@@ -49,55 +44,12 @@ const SearchDetailModal = (
         setIsOpen(props.isOpen)
     }, [props])
 
-    const bulkIsDomain = useBulkIsDomain();
-
-    useEffect(() => {
-        if (bulkIsDomain.isLoading) return;
-
-        if (bulkIsDomain.status) {
-            let tempArray = []
-            {
-                bulkIsDomain.status && cartStatus.names?.map((name, id) => {
-                    tempArray[id] = {};
-                    tempArray[id].status = bulkIsDomain?.result[id];
-                    tempArray[id].name = name;
-                })
-                setResults(tempArray);
-                console.log(
-                    "temp array: ", tempArray
-                )
-            }
-        }
-    }, [
-        cartStatus,
-        bulkIsDomain.isLoading,
-        bulkIsDomain.result,
-    ])
-
     useEffect(() => {
         if ((props.id >= 0) && results.length > 0) {
             setDomainInfo(results[props.id])
             setDetailName(results[props.id].name);
         }
-    }, [
-        results,
-        props
-    ])
-
-    const readDomainByName = useReadDomainByName(detailName);
-
-    useEffect(() => {
-        if (readDomainByName.isLoading) return;
-
-        if (readDomainByName.status) {
-            setDetailInfo(readDomainByName.result);
-        }
-    }, [
-        chain,
-        readDomainByName.isLoading,
-        readDomainByName.result,
-        detailName,
-    ])
+    }, [results, props, setDetailName])
 
     return (
         <Dialog
@@ -109,12 +61,12 @@ const SearchDetailModal = (
             sx={{
                 ".MuiPaper-root": {
                     maxWidth: '380px',
-                    color: theme == 'dark-theme' ? 'white' : 'black',
-                    background: theme == 'dark-theme' ? '#353535' : 'white',
+                    color: theme === 'dark-theme' ? 'white' : 'black',
+                    background: theme === 'dark-theme' ? '#353535' : 'white',
                     borderRadius: "20px"
                 },
                 ".MuiDialogContentText-root": {
-                    color: theme == 'dark-theme' ? 'white' : 'black',
+                    color: theme === 'dark-theme' ? 'white' : 'black',
                 },
             }}
         >
@@ -141,6 +93,7 @@ const SearchDetailModal = (
                     cursor: 'pointer'
                 }}
                 onClick={props.handleClose}
+                alt=""
             />
 
             {
@@ -152,7 +105,7 @@ const SearchDetailModal = (
                     >
                         <Box
                             sx={{
-                                backgroundColor: theme == 'dark-theme' ? '#2A2A2A' : 'white',
+                                backgroundColor: theme === 'dark-theme' ? '#2A2A2A' : 'white',
                             }}
                         >
                             <Box
@@ -174,7 +127,7 @@ const SearchDetailModal = (
                                             marginBottom: '8px',
                                             position: 'relative'
                                         }}
-                                        backgroundColor={theme == 'dark-theme' ? 'blackk' : 'white'}
+                                        backgroundColor={theme === 'dark-theme' ? 'blackk' : 'white'}
                                     >
                                         <Box
                                             justifyContent='center'
@@ -188,6 +141,7 @@ const SearchDetailModal = (
                                                 width={'21px'}
                                                 height={'24px'}
                                                 style={{ marginLeft: '5px' }}
+                                                alt=""
                                             />
                                             {
                                                 domainInfo?.status ? (
@@ -196,7 +150,7 @@ const SearchDetailModal = (
                                                         fontSize={{ xs: '15px', md: '20px' }}
                                                         fontWeight={'700'}
                                                         variant="h5"
-                                                        color={theme == 'dark-theme' ? 'white' : 'black'}
+                                                        color={theme === 'dark-theme' ? 'white' : 'black'}
                                                     >
                                                         {domainInfo?.name}.{domainSuffixes[chain.id]}
                                                     </Typography>
@@ -206,7 +160,7 @@ const SearchDetailModal = (
                                                         fontSize={{ xs: '15px', md: '20px' }}
                                                         fontWeight={'700'}
                                                         variant="h5"
-                                                        color={theme == 'dark-theme' ? 'white' : 'black'}
+                                                        color={theme === 'dark-theme' ? 'white' : 'black'}
                                                     >
                                                         {domainInfo?.name}.{domainSuffixes[chain.id]}
                                                     </Typography>
@@ -240,7 +194,7 @@ const SearchDetailModal = (
                                                     >
                                                         <Typography
                                                             fontSize={{ xs: '15px', md: '20px' }}
-                                                            color={theme == 'dark-theme' ? 'white' : 'black'}
+                                                            color={theme === 'dark-theme' ? 'white' : 'black'}
                                                         >
                                                             owner:
                                                         </Typography>
@@ -248,7 +202,7 @@ const SearchDetailModal = (
                                                             onCopy={() => window.alert("copied")}>
                                                             <Typography
                                                                 fontSize={{ xs: '15px', md: '20px' }}
-                                                                color={theme == 'dark-theme' ? 'white' : 'black'}
+                                                                color={theme === 'dark-theme' ? 'white' : 'black'}
                                                                 sx={{ ml: '10px' }}
                                                             >
                                                                 {getEllipsisTxt(detailInfo.owner, 5)}
@@ -264,13 +218,13 @@ const SearchDetailModal = (
                                                     >
                                                         <Typography
                                                             fontSize={{ xs: '15px', md: '20px' }}
-                                                            color={theme == 'dark-theme' ? 'white' : 'black'}
+                                                            color={theme === 'dark-theme' ? 'white' : 'black'}
                                                         >
                                                             time:
                                                         </Typography>
                                                         <Typography
                                                             fontSize={{ xs: '15px', md: '20px' }}
-                                                            color={theme == 'dark-theme' ? 'white' : 'black'}
+                                                            color={theme === 'dark-theme' ? 'white' : 'black'}
                                                             sx={{ ml: '10px' }}
                                                         >
                                                             <Moment format="YYYY.MM.DD HH:mm">
@@ -287,13 +241,13 @@ const SearchDetailModal = (
                                                     >
                                                         <Typography
                                                             fontSize={{ xs: '15px', md: '20px' }}
-                                                            color={theme == 'dark-theme' ? 'white' : 'black'}
+                                                            color={theme === 'dark-theme' ? 'white' : 'black'}
                                                         >
                                                             expire time:
                                                         </Typography>
                                                         <Typography
                                                             fontSize={{ xs: '15px', md: '20px' }}
-                                                            color={theme == 'dark-theme' ? 'white' : 'black'}
+                                                            color={theme === 'dark-theme' ? 'white' : 'black'}
                                                             sx={{ ml: '10px' }}
                                                         >
                                                             {detailInfo.durationTime / (1000 * 24 * 60 * 60)}days

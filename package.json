@@ -55,10 +55,11 @@
   },
   "scripts": {
     "dev": "npm run start",
-    "start": "set PORT=3030 && react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!@rainbow-me)/\"",
-    "eject": "react-scripts eject"
+    "start": "SET PORT=3030 && cross-env GENERATE_SOURCEMAP=false react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
+    "eject": "react-app-rewired eject",
+    "deploy": "aws s3 sync build/ s3://domainlabstest"
   },
   "eslintConfig": {
     "extends": [
@@ -85,6 +86,5 @@
     "crypto-browserify": "^3.12.0",
     "react-app-rewired": "^2.2.1",
     "stream-browserify": "^3.0.0"
-  },
-  "proxy": "http://localhost:8000"
+  }
 }

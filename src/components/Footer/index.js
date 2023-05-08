@@ -1,15 +1,13 @@
-import React from "react";
-import { Box, Typography, Button, Grid } from "@mui/material";
-import Snackbar from '@mui/material/Snackbar';
-import { CopyToClipboard } from 'react-copy-to-clipboard'
+import { Box, Typography } from '@mui/material';
+
 import MuiAlert from '@mui/material/Alert';
-import twitterImage from "../../assets/image/Twitter-icon-circle-logo-WHITE 1.png";
-import linkedin from "../../assets/image/linkedin.png";
-import mail from "../../assets/image/mail.png";
-import docImage from "../../assets/image/icons8-ethereum-name-service-64-2 1.png"
-import ecoImage from "../../assets/image/add_chart.png"
-import discussImage from "../../assets/image/hub.png";
-import { useNavigate } from "react-router-dom";
+import React from 'react';
+import Snackbar from '@mui/material/Snackbar';
+import discussImage from '../../assets/image/hub.png';
+import docImage from '../../assets/image/icons8-ethereum-name-service-64-2 1.png';
+import ecoImage from '../../assets/image/add_chart.png';
+import twitterImage from '../../assets/image/Twitter-icon-circle-logo-WHITE 1.png';
+import { useNavigate } from 'react-router-dom';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -19,10 +17,6 @@ const Footer = () => {
   const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
 
-  const handleClick = () => {
-    setOpen(true);
-  };
-
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
@@ -31,14 +25,8 @@ const Footer = () => {
     setOpen(false);
   };
 
-
-
   const LeftComponent = () => (
-    <Box
-      display="flex"
-      flexDirection={'column'}
-      className='left-component'
-    >
+    <Box display="flex" flexDirection={'column'} className="left-component">
       <Typography
         color="white"
         sx={{
@@ -47,7 +35,7 @@ const Footer = () => {
           fontSize: '18px',
           lineHeight: '22px',
           paddingTop: '20px',
-          cursor: 'pointer'
+          cursor: 'pointer',
         }}
       >
         Terms Of Service
@@ -60,7 +48,7 @@ const Footer = () => {
           fontSize: '18px',
           lineHeight: '22px',
           paddingTop: '20px',
-          cursor: 'pointer'
+          cursor: 'pointer',
         }}
       >
         Contact
@@ -73,7 +61,7 @@ const Footer = () => {
           fontSize: '18px',
           lineHeight: '22px',
           paddingTop: '20px',
-          cursor: 'pointer'
+          cursor: 'pointer',
         }}
         onClick={() => navigate('/faqs')}
       >
@@ -87,13 +75,13 @@ const Footer = () => {
           fontSize: '18px',
           lineHeight: '22px',
           paddingTop: '20px',
-          cursor: 'pointer'
+          cursor: 'pointer',
         }}
       >
-        Domain Labs all rights reserved {(new Date).getFullYear()}
+        Domain Labs all rights reserved {new Date().getFullYear()}
       </Typography>
     </Box>
-  )
+  );
 
   const CenterComponent = () => (
     <Box
@@ -103,7 +91,7 @@ const Footer = () => {
       alignItems={'start'}
       pt={'40px'}
       width={'max-content'}
-      className='center-component'
+      className="center-component"
     >
       <Box
         display="flex"
@@ -112,14 +100,31 @@ const Footer = () => {
         alignItems={'center'}
         width={'100%'}
       >
-        <a href="https://docs.ens.domains" style={{ cursor: 'pointer' }} target="blank">
-          <img src={docImage} width={'32px'} height={'32px'} />
+        <a
+          href="https://docs.ens.domains"
+          style={{ cursor: 'pointer' }}
+          target="blank"
+        >
+          <img src={docImage} width={'32px'} height={'32px'} alt="docImage" />
         </a>
-        <a href="https://dune.com/makoto/ens" style={{ cursor: 'pointer' }} target="blank">
-          <img src={ecoImage} width={'24px'} height={'24px'} />
+        <a
+          href="https://dune.com/makoto/ens"
+          style={{ cursor: 'pointer' }}
+          target="blank"
+        >
+          <img src={ecoImage} width={'24px'} height={'24px'} alt="ecoImage" />
         </a>
-        <a href="https://discuss.ens.domains" style={{ cursor: 'pointer' }} target="blank">
-          <img src={discussImage} width={'32px'} height={'30.67px'} />
+        <a
+          href="https://discuss.ens.domains"
+          style={{ cursor: 'pointer' }}
+          target="blank"
+        >
+          <img
+            src={discussImage}
+            width={'32px'}
+            height={'30.67px'}
+            alt="discussImage"
+          />
         </a>
       </Box>
       <Typography
@@ -128,13 +133,13 @@ const Footer = () => {
           marginTop: '16px',
           fontSize: '18px',
           fontWeight: '900',
-          lineHeight: '22px'
+          lineHeight: '22px',
         }}
       >
         Web 3 links & Resources
       </Typography>
-    </Box >
-  )
+    </Box>
+  );
 
   const RightComponent = () => (
     <Box
@@ -142,17 +147,15 @@ const Footer = () => {
       justifyContent={{ xs: 'start', md: 'flex-end' }}
       alignItems={'end'}
       pt={'40px'}
-      className='right-component'
+      className="right-component"
     >
-      <Box
-        textAlign={'right'}
-      >
+      <Box textAlign={'right'}>
         <Typography
           color="white"
           sx={{
             fontSize: '18px',
             fontWeight: '900',
-            lineHeight: '22px'
+            lineHeight: '22px',
           }}
         >
           Keep up with conversation
@@ -160,28 +163,28 @@ const Footer = () => {
         <a
           href="https://twitter.com/domain_labs/status/1580022791067533312?s=46&t=H4ch0l4nzGEEWYSxh2SPjw"
           style={{
-            cursor: 'pointer'
+            cursor: 'pointer',
           }}
           target="blank"
         >
           <img
             src={twitterImage}
             style={{
-              marginTop: '22px'
+              marginTop: '22px',
             }}
+            alt="twitterImage"
           />
         </a>
-
       </Box>
     </Box>
-  )
+  );
 
   return (
     <Box
       px={5}
       py={5}
       sx={{
-        background: 'linear-gradient(180deg, #146EB4 -8.71%, #000000 166.67%)'
+        background: 'linear-gradient(180deg, #146EB4 -8.71%, #000000 166.67%)',
       }}
     >
       <Box
@@ -189,7 +192,7 @@ const Footer = () => {
         justifyContent={{ xs: 'center' }}
       >
         <Box
-          display={{ xs: 'block', sm: "flex" }}
+          display={{ xs: 'block', sm: 'flex' }}
           justifyContent={{ xs: 'left', sm: 'space-between' }}
           width={{ xs: 'max-content', sm: 'unset' }}
           flexDirection={{ xs: 'column', sm: 'row' }}
@@ -203,30 +206,20 @@ const Footer = () => {
           </Box>
 
           {/* > 900px*/}
-          <Box
-            display={{ xs: 'none', md: 'flex' }}
-          >
+          <Box display={{ xs: 'none', md: 'flex' }}>
             <CenterComponent />
           </Box>
-
 
           {/* > 900px*/}
-          <Box
-            display={{ xs: 'none', md: 'flex' }}
-          >
+          <Box display={{ xs: 'none', md: 'flex' }}>
             <RightComponent />
           </Box>
 
-
           {/* 600px ~  900px*/}
-          <Box
-            display={{ xs: 'block', sm: 'block', md: 'none' }}
-          >
+          <Box display={{ xs: 'block', sm: 'block', md: 'none' }}>
             <CenterComponent />
             <RightComponent />
           </Box>
-
-
         </Box>
       </Box>
 
@@ -235,8 +228,8 @@ const Footer = () => {
           Email address copied
         </Alert>
       </Snackbar>
-    </Box >
+    </Box>
   );
-}
+};
 
 export default Footer;

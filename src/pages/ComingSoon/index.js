@@ -1,7 +1,6 @@
 import {
     Box,
     Typography,
-    Button,
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { ConnectButton } from '@rainbow-me/rainbowkit';
@@ -14,11 +13,11 @@ import comingSoonPageBgDesktop from '../../assets/image/coming-soon-bg-desktop.p
 import comingSoonPageBgMobile from '../../assets/image/coming-soon-bg-mobile.png';
 import twitterLogoComingSoon from '../../assets/image/twitter-logo-coming-soon.svg';
 import discordLogoComingSoon from '../../assets/image/discord-logo-coming-soon.svg';
+import { useTheme } from "../../contexts/theme";
 import './index.scss';
-import { useDappContext } from "../../utils/context";
 
 const SearchResult = () => {
-    const { theme, } = useDappContext();
+    const { theme, } = useTheme();
     const { address, } = useAccount();
     const [width, setWidth] = useState(0);
 
@@ -66,7 +65,7 @@ const SearchResult = () => {
             mt={'100px'}
             px={{ xs: '30px', sm: '40px' }}
             sx={{
-                backgroundColor: theme == 'dark-theme' ? '#2A2A2A' : 'white',
+                backgroundColor: theme === 'dark-theme' ? '#2A2A2A' : 'white',
             }}
             style={{
                 backgroundImage: width >= 600 ?
@@ -224,11 +223,11 @@ const SearchResult = () => {
                             className='socials-coming-soon'
                         >
                             <a href='https://twitter.com/domain_labs/status/1618835949315846144?s=46&t=tMGthxNM6GxdbQbDLLO-Tw'>
-                                <img src={twitterLogoComingSoon} />
+                                <img src={twitterLogoComingSoon} alt="" />
                             </a>
 
                             <a href='https://discord.gg/7xuBdwkc'>
-                                <img src={discordLogoComingSoon} />
+                                <img src={discordLogoComingSoon} alt="" />
                             </a>
                         </Box>
                     </Box>

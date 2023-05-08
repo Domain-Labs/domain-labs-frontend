@@ -1,24 +1,24 @@
 import ContextWrapper from "./ContextWrapper";
-import { ToastContainer, } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import ContextProvider from "./utils/ContextProvider";
+import { Provider } from "react-redux";
+import { DappProvider } from "./contexts/dapp";
+import { ThemeProvider } from "./contexts/theme";
+
+import { persistor, store } from "./redux/store";
+import { PersistGate } from "redux-persist/integration/react";
 
 const App = () => {
 
   return (
-    <ContextProvider>
-      < ContextWrapper />
-      <ToastContainer
-        position="top-right"
-        autoClose={1500}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
-    </ContextProvider>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <DappProvider>
+          <ThemeProvider>
+            <ContextWrapper />
+          </ThemeProvider>
+        </DappProvider>
+      </PersistGate>
+    </Provider>
   );
 };
 

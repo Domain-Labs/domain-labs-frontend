@@ -5,25 +5,26 @@ import {
   Button,
 } from "@mui/material";
 import Toggle from "react-toggle";
-import './index.scss';
-import { useDappContext } from "../../utils/context";
-import { blueCheckIcon } from "../../utils/images";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import axios from "axios";
 import { toast } from 'react-toastify';
+import { useTheme } from '../../contexts/theme';
+import { blueCheckIcon } from "../../utils/images";
+
+import './index.scss';
 
 const Pricing = () => {
   const {
     theme,
-  } = useDappContext();
+  } = useTheme();
   const { address, } = useAccount();
   const [isAnnualPay, setIsAnnualPay] = useState(true);
   const [isAlreadySignedUp, setIsAlreadySignedUp] = useState(false);
 
   const styles = {
     container: {
-      backgroundColor: theme == 'dark-theme' ? '#2A2A2A' : 'white',
+      backgroundColor: theme === 'dark-theme' ? '#2A2A2A' : 'white',
       backgroundPosition: "center",
       backgroundRepeat: "no-repeat",
       backgroundSize: "cover",
@@ -59,7 +60,7 @@ const Pricing = () => {
         setIsAlreadySignedUp(isAlreadySignedUp);
       }
     })()
-  }, [])
+  }, [address])
 
   const handleFreeSignUp = async () => {
     const postObject = {
@@ -102,7 +103,7 @@ const Pricing = () => {
             fontSize: '40px',
             lineHeight: '48px',
             letterSpacing: '-0.01em',
-            color: theme == 'dark-theme' ? 'white' : 'black',
+            color: theme === 'dark-theme' ? 'white' : 'black',
           }}
         >
           Clio: AI Domain Search Price
@@ -134,6 +135,7 @@ const Pricing = () => {
                 >
                   < img
                     src={blueCheckIcon}
+                    alt=""
                   />
                   <Typography
                     display={'flex'}
@@ -147,7 +149,7 @@ const Pricing = () => {
                       fontSize: '20px',
                       lineHeight: '24px',
                       letterSpacing: '-0.01em',
-                      color: theme == 'dark-theme' ? 'white' : '#5B5B5B',
+                      color: theme === 'dark-theme' ? 'white' : '#5B5B5B',
                     }}
                   >
                     {item}
@@ -177,7 +179,7 @@ const Pricing = () => {
                 fontSize: '18px',
                 lineHeight: '22px',
                 letterSpacing: '-0.01em',
-                color: theme == 'dark-theme' ? 'white' : '#5B5B5B',
+                color: theme === 'dark-theme' ? 'white' : '#5B5B5B',
               }}
             >
               Billed Yearly
@@ -192,7 +194,7 @@ const Pricing = () => {
                 fontSize: '10px',
                 lineHeight: '12px',
                 letterSpacing: '-0.01em',
-                color: theme == 'dark-theme' ? 'white' : '#5B5B5B',
+                color: theme === 'dark-theme' ? 'white' : '#5B5B5B',
               }}
             >
               Get 3 Months Free*
@@ -233,7 +235,7 @@ const Pricing = () => {
                 fontSize: '18px',
                 lineHeight: '22px',
                 letterSpacing: '-0.01em',
-                color: theme == 'dark-theme' ? 'white' : '#5B5B5B',
+                color: theme === 'dark-theme' ? 'white' : '#5B5B5B',
               }}
             >
               Billed Monthly
@@ -349,7 +351,6 @@ const Pricing = () => {
                     fontSize: '16px',
                     lineHeight: '19px',
                     letterSpacing: '-0.01em',
-                    color: 'white',
                     padding: '10px 56.5px',
                     marginTop: '9px',
                     marginBottom: '26px',

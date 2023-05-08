@@ -1,19 +1,19 @@
 import {
   Box,
 } from "@mui/material";
-import './index.scss';
-import FaqsComponent from "../../components/FaqsComponent";
-import { useDappContext } from "../../utils/context";
 import { useEffect } from "react";
+import FaqsComponent from "../../components/FaqsComponent";
+import { useTheme } from "../../contexts/theme";
+import './index.scss';
 
 const Faqs = () => {
   const {
     theme,
-  } = useDappContext();
+  } = useTheme();
 
   const styles = {
     container: {
-      backgroundColor: theme == 'dark-theme' ? '#2A2A2A' : 'white',
+      backgroundColor: theme === 'dark-theme' ? '#2A2A2A' : 'white',
       backgroundPosition: "center",
       backgroundRepeat: "no-repeat",
       backgroundSize: "cover",
