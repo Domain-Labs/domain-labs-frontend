@@ -12,14 +12,15 @@ import { useState } from "react";
 import { useAccount } from "wagmi";
 import axios from "axios";
 import { toast } from 'react-toastify';
+import ClioSubscriptionModal from '../../components/Modal/ClioSubscriptionModal';
 
 const Pricing = () => {
   const {
     theme,
   } = useDappContext();
   const { address, } = useAccount();
-  const [isAnnualPay, setIsAnnualPay] = useState(true);
   const [isAlreadySignedUp, setIsAlreadySignedUp] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const styles = {
     container: {
@@ -74,15 +75,10 @@ const Pricing = () => {
   }
 
   const handleSecureSignUp = async () => {
-    const postObject = {
-      wallet: address,
-    }
-
-    const result = (await axios.post(`/clios/free-signup/`, postObject)).data;
-    console.log("result: ", result);
-    toast.success('You have successfully signed up for secure');
-    setIsAlreadySignedUp(true);
+    setIsOpen(true);
   }
+
+  
 
   return (
     <Box style={styles.container}>
@@ -159,92 +155,10 @@ const Pricing = () => {
         </Box>
 
         <Box
-          display="flex"
-          justifyContent={'center'}
-          alignItems={'baseline'}
-          p={'57px 20px'}
-          gap={'42px'}
-          className='buy-option-component'
-        >
-          <Box>
-            <Typography
-              display={'flex'}
-              textAlign={'start'}
-              sx={{
-                fontFamily: 'Inter',
-                fontStyle: 'normal',
-                fontWeight: '600',
-                fontSize: '18px',
-                lineHeight: '22px',
-                letterSpacing: '-0.01em',
-                color: theme == 'dark-theme' ? 'white' : '#5B5B5B',
-              }}
-            >
-              Billed Yearly
-            </Typography>
-            <Typography
-              display={'flex'}
-              textAlign={'start'}
-              sx={{
-                fontFamily: 'Inter',
-                fontStyle: 'normal',
-                fontWeight: '300',
-                fontSize: '10px',
-                lineHeight: '12px',
-                letterSpacing: '-0.01em',
-                color: theme == 'dark-theme' ? 'white' : '#5B5B5B',
-              }}
-            >
-              Get 3 Months Free*
-            </Typography>
-          </Box>
-
-          <Box
-            sx={{
-              transform: 'rotate(180deg)',
-            }}
-            alignItems='center'
-            display={'flex'}
-            className='buy-option-toggle-wrapper'
-            pb={'5px'}
-          >
-            <Toggle
-              defaultChecked={isAnnualPay}
-              icons={false}
-              onChange={() => setIsAnnualPay(!isAnnualPay)}
-              sx={{
-                color: '#D9D9D9',
-                width: '39px',
-                height: '20px',
-              }}
-            />
-          </Box>
-
-          <Box
-
-          >
-            <Typography
-              display={'flex'}
-              textAlign={'start'}
-              sx={{
-                fontFamily: 'Inter',
-                fontStyle: 'normal',
-                fontWeight: '600',
-                fontSize: '18px',
-                lineHeight: '22px',
-                letterSpacing: '-0.01em',
-                color: theme == 'dark-theme' ? 'white' : '#5B5B5B',
-              }}
-            >
-              Billed Monthly
-            </Typography>
-          </Box>
-        </Box>
-
-        <Box
           className="payment-plans-component"
           display={'flex'}
           justifyContent={'center'}
+          pt={'50px'}
           pb={'20px'}
         >
           <Box
@@ -474,6 +388,11 @@ const Pricing = () => {
               </Box>
             </Box>
           </Box>
+
+          <ClioSubscriptionModal
+            isOpen={isOpen}
+            handleClose={() => setIsOpen(false)}
+          />
 
         </Box>
       </Box>

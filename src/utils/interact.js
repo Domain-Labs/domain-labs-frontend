@@ -6,22 +6,22 @@ import {
   useAccount,
   useWaitForTransaction,
 } from 'wagmi';
-import { ethers } from 'ethers';
-import axios from 'axios';
-import { bscChainId, bscTestnetChainId, contractAddresses, } from '../config';
-import contractABI from '../assets/abi/contract-abi.json';
+import { BigNumber, ethers } from 'ethers';
+import { bscChainId, bscTestnetChainId, chainParams, contractAddresses, } from '../config';
 import { useDappContext } from './context';
+import { ClioPaymentABI, contractABI } from './assets';
 
 export const useBulkIsDomain = () => {
   const { cartStatus, } = useDappContext();
   const { chain } = useNetwork();
   const chainId = chain?.id != undefined ? chain.id :
-    process.env.NEXT_PUBLIC_MAINNET_OR_TESTNET == "mainnet" ? bscChainId : bscTestnetChainId;
+    process.env.REACT_APP_NET_TYPE == "testnet" ? bscTestnetChainId : bscChainId;
 
   const { data: bulkIsdomain, error, isLoading } = useContractRead({
     address: contractAddresses[chainId],
     abi: contractABI,
     functionName: "bulkIsdomain",
+    cacheTime: 2_000,
     args: [cartStatus.names ?? ['example']],
     onSuccess() {
       console.log("bulk is domain success: ", bulkIsdomain);
@@ -41,12 +41,13 @@ export const useBulkIsDomain = () => {
 export const useReadDomainByName = (detailName) => {
   const { chain } = useNetwork();
   const chainId = chain?.id != undefined ? chain.id :
-    process.env.NEXT_PUBLIC_MAINNET_OR_TESTNET == "mainnet" ? bscChainId : bscTestnetChainId;
+    process.env.REACT_APP_NET_TYPE == "testnet" ? bscTestnetChainId : bscChainId;
 
   const { data: readDomainByName, error, isLoading } = useContractRead({
     address: contractAddresses[chainId],
     abi: contractABI,
     functionName: "readDomainByName",
+    cacheTime: 2_000,
     args: [detailName],
     onSuccess() {
       console.log("read domain by name success: ", readDomainByName);
@@ -67,12 +68,13 @@ export const useBulkBuyDomain = (names, deadlines, totalValue) => {
   const { chain } = useNetwork();
   const { address, } = useAccount();
   const chainId = chain?.id != undefined ? chain.id :
-    process.env.NEXT_PUBLIC_MAINNET_OR_TESTNET == "mainnet" ? bscChainId : bscTestnetChainId;
+    process.env.REACT_APP_NET_TYPE == "testnet" ? bscTestnetChainId : bscChainId;
 
   const { config, error: prepareError } = usePrepareContractWrite({
     address: contractAddresses[chainId],
     abi: contractABI,
     functionName: 'bulkBuyDomain',
+    cacheTime: 2_000,
     args: [names, deadlines],
     overrides: {
       value: ethers.utils.parseEther(totalValue?.toString()),
@@ -84,9 +86,10 @@ export const useBulkBuyDomain = (names, deadlines, totalValue) => {
       console.log('prepare contract write Error', prepareError)
     },
   })
-  const { write: buyFunction, data } = useContractWrite(config)
+  const { write: bulkBuyDomainFunction, data } = useContractWrite(config)
   const { isLoading, isSuccess, isError, error, } = useWaitForTransaction({
     hash: data?.hash,
+    cacheTime: 2_000,
     onSuccess(data) {
       console.log("wait for transaction success: ", data);
     },
@@ -98,7 +101,13 @@ export const useBulkBuyDomain = (names, deadlines, totalValue) => {
   return {
     status: error == undefined ? true : false,
     isLoading,
-    buyFunction,
+    bulkBuyDomainFunction,
     isSuccess,
   }
+}
+
+export const getContract = (contractAddress, contractABI, provider) => {
+  const contract = new ethers.Contract(contractAddress, contractABI, provider?.getSigner());
+
+  return contract;
 }

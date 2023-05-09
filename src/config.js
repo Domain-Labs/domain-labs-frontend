@@ -62,7 +62,8 @@ export const linkArray = [
     },
 ]
 
-export const secondsInDay = 24 * 60 * 60 * 1000;
+export const secondsInDay = 24 * 60 * 60;
+export const secondsInMonth = secondsInDay * 30;
 
 export const ethereumChainId = 1;
 export const bscChainId = 56;
@@ -74,3 +75,43 @@ export const chainIds = {
     "mainnet": [ethereumChainId, bscChainId],
     "testnet": [goerliChainId, bscTestnetChainId],
 }
+
+export const chainParams = {
+    [97]: {
+        usdcAddress: '0x6d20B2670DA3aEc925F5Dc7e638165E462FEA7c9',
+        clioPaymentAddress: '0xc51602C214cACBB813Aa29fd2bf2F31BD408437a',
+    },
+    [5]: {
+        usdcAddress: '0xABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD',
+        clioPaymentAddress: '0xABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD',
+    },
+    [1]: {
+        usdcAddress: '0xABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD',
+        clioPaymentAddress: '0xABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD',
+    },
+    [56]: {
+        usdcAddress: '0xABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD',
+        clioPaymentAddress: '0xABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD',
+    },
+}
+
+export const clioSubscriptionDurations = [
+    {
+        label: 'One Month',
+        value: 1,
+    },
+    {
+        label: 'Three Months',
+        value: 3,
+    },
+    {
+        label: 'Six Months',
+        value: 6,
+    },
+    {
+        label: 'One Year',
+        value: 12,
+    },
+]
+
+export const paymentPerMonth = process.env.REACT_APP_NET_TYPE == 'testnet' ? 0.01 : 39;

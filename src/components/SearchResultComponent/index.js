@@ -14,8 +14,6 @@ import {
     useBulkIsDomain,
 } from '../../utils/interact';
 import {
-    blackVectorImage,
-    whiteVectorImage,
     whiteBookmarkImage,
     blackBookmarkImage,
     blackOnshoppingImage,

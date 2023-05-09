@@ -1,7 +1,10 @@
 import ContextWrapper from "./ContextWrapper";
-import { ToastContainer, } from 'react-toastify';
+import { toast, ToastContainer, } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { io } from "socket.io-client";
 import ContextProvider from "./utils/ContextProvider";
+import { useEffect } from "react";
+import { useDappContext } from "./utils/context";
 
 const App = () => {
 

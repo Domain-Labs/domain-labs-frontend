@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { DappContext } from "./context";
+import { io } from "socket.io-client";
 
 const ContextProvider = ({ children }) => {
   const [theme, setTheme] = useState('day-theme');
   const [cartStatus, setCartStatus] = useState({});
+  const [clioSocket, setClioSocket] = useState(io("/clio"));
 
   return (
     <DappContext.Provider
@@ -12,6 +14,8 @@ const ContextProvider = ({ children }) => {
         setTheme,
         cartStatus,
         setCartStatus,
+        clioSocket,
+        setClioSocket,
       }}
     >
       {children}

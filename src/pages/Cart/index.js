@@ -99,7 +99,7 @@ const Cart = () => {
         if (bulkBuyDomain.isLoading) return;
 
         try {
-            bulkBuyDomain.buyFunction?.();
+            bulkBuyDomain.bulkBuyDomainFunction?.();
         } catch (err) {
             console.log("error in write: ", err);
         }
