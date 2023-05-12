@@ -12,7 +12,7 @@ import { useDappContext } from './context';
 import { ClioPaymentABI, contractABI } from './assets';
 
 export const useBulkIsDomain = () => {
-  const { cartStatus, } = useDappContext();
+  const { cartStatus, newCartStatus, } = useDappContext();
   const { chain } = useNetwork();
   const chainId = chain?.id != undefined ? chain.id :
     process.env.REACT_APP_NET_TYPE == "testnet" ? bscTestnetChainId : bscChainId;
@@ -22,7 +22,9 @@ export const useBulkIsDomain = () => {
     abi: contractABI,
     functionName: "bulkIsdomain",
     cacheTime: 2_000,
-    args: [cartStatus.names ?? ['example']],
+    args: [
+      newCartStatus.map(item => { return item.name }) ?? ['example']
+    ],
     onSuccess() {
       console.log("bulk is domain success: ", bulkIsdomain);
     },

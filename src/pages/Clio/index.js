@@ -22,6 +22,8 @@ const Clio = () => {
     cartStatus,
     setCartStatus,
     theme,
+    newCartStatus,
+    setNewCartStatus,
   } = useDappContext();
   const { address, } = useAccount();
   const { chain, } = useNetwork();
@@ -30,7 +32,7 @@ const Clio = () => {
   const [top, setTop] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false)
 
-  const handleSearch = async () => {
+  const handleClioQuery = async () => {
     // get name candidates from clio
     setIsProcessing(true)
 
@@ -69,6 +71,18 @@ const Clio = () => {
 
     setCartStatus({ names: result?.domainNames, cart: [] })
 
+    const candidateDomainNames = result?.domainNames;
+
+    const newCartStatus = (candidateDomainNames ?? []).map((item) => {
+      return {
+        name: item,
+        isRegistered: undefined,
+        isInCart: false,
+      }
+    });
+    console.log("///////////////////:   ", newCartStatus);
+    setNewCartStatus(newCartStatus);
+
     setIsProcessing(false);
   }
 
@@ -84,7 +98,7 @@ const Clio = () => {
 
   const onKeyPressed = (e) => {
     if (e.code == 'Enter') {
-      handleSearch()
+      handleClioQuery()
     }
   }
 
@@ -185,7 +199,7 @@ const Clio = () => {
                   />
 
                   <Button
-                    onClick={handleSearch}
+                    onClick={handleClioQuery}
                     style={{
                       minWidth: '40px'
                     }}
@@ -279,13 +293,15 @@ const Clio = () => {
                         textAlign: 'center',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: theme == 'dark-theme' ? 'white' : 'black',
+                        color: theme == 'dark-theme' ? 'white' : '#666666',
                         lineHeight: '1',
                         fontWeight: '700',
                         whiteSpace: 'nowrap',
+                        cursor: 'pointer',
                       }}
                       fontWeight={400}
                       align="center"
+                      // onClick={() => navigate('/clio')}
                     >
                       {'Meet '}
                     </Typography>
@@ -293,7 +309,6 @@ const Clio = () => {
                       fontSize={{ xs: '25px', md: '33px' }}
                       mx={{ xs: '2px', sm: '10px' }}
                       style={{
-                        textTransform: 'uppercase',
                         color: "#513eff",
                         fontFamily: 'Inter',
                         fontWeight: '700',
@@ -301,6 +316,7 @@ const Clio = () => {
                         background: 'linear-gradient(90deg,#4BD8D8,#146EB4,#4BD8D8,#146EB4,#4BD8D8,#146EB4,#4BD8D8,#146EB4,#4BD8D8,#146EB4,#4BD8D8,#146EB4)',
                         WebkitBackgroundClip: "text",
                         WebkitTextFillColor: "transparent",
+                        cursor: 'pointer',
                       }}
                     >
                       {/* -webkit-background-clip */}
@@ -314,7 +330,7 @@ const Clio = () => {
                         textAlign: 'center',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: theme == 'dark-theme' ? 'white' : 'black',
+                        color: theme == 'dark-theme' ? 'white' : '#666666',
                         lineHeight: '1',
                         fontWeight: '700',
                         whiteSpace: 'nowrap',
@@ -334,7 +350,7 @@ const Clio = () => {
                         textAlign: 'center',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: theme == 'dark-theme' ? 'white' : 'black',
+                        color: theme == 'dark-theme' ? 'white' : '#666666',
                         lineHeight: '1',
                         fontWeight: '700',
                         whiteSpace: 'nowrap',
@@ -356,7 +372,7 @@ const Clio = () => {
                       textAlign: 'center',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: theme == 'dark-theme' ? 'white' : 'black',
+                      color: theme == 'dark-theme' ? 'white' : '#666666',
                       lineHeight: '1',
                       fontWeight: '700',
                       whiteSpace: 'nowrap',
@@ -419,10 +435,7 @@ const Clio = () => {
                             mt={'37px'}
                           >
                             <Typography
-                              // display={'flex'}
                               justifyContent={'right'}
-                              // textAlign={'start'}
-                              // width={{ xs: 'unset', md: 'max-content' }}
                               sx={{
                                 fontFamily: 'Inter',
                                 fontStyle: 'normal',
@@ -445,8 +458,6 @@ const Clio = () => {
                             <Typography
                               display={'flex'}
                               justifyContent={'center'}
-                              // textAlign={'start'}
-                              // width={{ xs: 'unset', md: 'max-content' }}
                               sx={{
                                 fontFamily: 'Inter',
                                 fontStyle: 'normal',
@@ -476,7 +487,7 @@ const Clio = () => {
             sx={{
               backgroundColor: theme == 'dark-theme' ? '#2A2A2A' : 'white',
             }}
-            display={cartStatus?.names?.length > 0 ? 'block' : 'none'}
+            display={newCartStatus?.length > 0 ? 'block' : 'none'}
           >
             <Box>
               <Typography

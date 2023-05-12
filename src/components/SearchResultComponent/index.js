@@ -26,15 +26,17 @@ import SearchDetailModal from "../Modal/SearchDetailModal";
 const SearchResultComponent = () => {
     const {
         theme,
-        cartStatus,
-        setCartStatus,
+        // cartStatus,
+        // setCartStatus,
+        newCartStatus,
+        setNewCartStatus,
     } = useDappContext();
     const bulkIsDomain = useBulkIsDomain();
     const { chain, } = useNetwork();
     const navigate = useNavigate()
     const [results, setResults] = useState([])
     const [sale, setSale] = useState([]);
-    const [isSelectedAll, setIsSelectedAll] = useState(false);
+    const [isSelectedAll,] = useState(false);
     const [domainLogoImage, setDomainLogoImage] = useState('');
     const [searchId, setSearchId] = useState(0);
     const [isOpenSearchDetailModal, setIsOpenSearchDetailModal] = useState(false);
@@ -48,34 +50,47 @@ const SearchResultComponent = () => {
         tempArray[id] = true;
 
         setSale(tempArray);
-        let cart = cartStatus.cart;
-        !cart ? cart = 0 : cart = cart;
+        // let cart = cartStatus.cart;
+        // !cart ? cart = 0 : cart = cart;
 
-        console.log("cartStatus: ", cartStatus);
+        // console.log("cartStatus: ", cartStatus);
 
-        let tempArray1 = cartStatus.cartNames ? cartStatus.cartNames.slice() : []
-        console.log("tempArray1: ", tempArray1);
-        console.log({ id: id, name: results[id].name })
-        console.log("current cart:   ", { ...cartStatus, cart: cart * 1 + 1, cartNames: tempArray1 })
+        // let tempArray1 = cartStatus.cartNames ? cartStatus.cartNames.slice() : []
+        // console.log("tempArray1: ", tempArray1);
+        // console.log({ id: id, name: results[id].name })
+        // console.log("current cart:   ", { ...cartStatus, cart: cart * 1 + 1, cartNames: tempArray1 })
 
-        tempArray1.push({ id: id, name: results[id].name })
-        setCartStatus({ ...cartStatus, cart: cart + 1, cartNames: tempArray1 })
+        // tempArray1.push({ id: id, name: results[id].name })
+        // setCartStatus({ ...cartStatus, cart: cart + 1, cartNames: tempArray1 })
+
+        const tempCartStatus = [...newCartStatus];
+        console.log("//////////////////   new cart status: ", tempCartStatus);
+        tempCartStatus[id].isInCart = true;
+        console.log("//////////////////   new cart status: ", tempCartStatus);
+        setNewCartStatus(tempCartStatus);
+
     }
 
     const removeFromCart = (id) => {
         let tempArray = Array.from(sale)
         tempArray[id] = false;
         setSale(tempArray)
-        let cart = cartStatus.cart;
-        console.log(cart)
-        let tempArray1 = Array.from(cartStatus.cartNames)
-        let temp;
-        tempArray1.map((val, idx) => {
-            if (val.id == id)
-                temp = idx
-        })
-        tempArray1.slice(temp, 1)
-        setCartStatus({ ...cartStatus, cart: cart * 1 - 1, cartNames: tempArray1 })
+        // let cart = cartStatus.cart;
+        // console.log(cart)
+        // let tempArray1 = Array.from(cartStatus.cartNames)
+        // let temp;
+        // tempArray1.map((val, idx) => {
+        //     if (val.id == id)
+        //         temp = idx
+        // })
+        // tempArray1.slice(temp, 1)
+        // setCartStatus({ ...cartStatus, cart: cart * 1 - 1, cartNames: tempArray1 })
+
+        const tempCartStatus = [...newCartStatus];
+        console.log("//////////////////   new cart status: ", tempCartStatus);
+        tempCartStatus[id].isInCart = false;
+        console.log("//////////////////   new cart status: ", tempCartStatus);
+        setNewCartStatus(tempCartStatus);
     }
 
     const onClickToDetail = (id) => {
@@ -89,43 +104,60 @@ const SearchResultComponent = () => {
         console.log("results: ", results);
         let tempArray = Array.from(sale)
 
-        let cartNames = [];
-        results?.map((result, index) => {
-            if (!result.status) {
-                cartNames.push({ id: index, name: result.name });
-                tempArray[index] = true;
-            }
-        });
+        // let cartNames = [];
+        // results?.map((result, index) => {
+        //     if (!result.status) {
+        //         cartNames.push({ id: index, name: result.name });
+        //         tempArray[index] = true;
+        //     }
+        // });
 
-        setSale(tempArray);
-        console.log("cart names: ", cartNames);
-        console.log({
-            ...cartStatus,
-            cart: cartNames.length,
-            cartNames: cartNames,
-        });
-        setCartStatus({
-            ...cartStatus,
-            cart: cartNames.length,
-            cartNames: cartNames,
+        // setSale(tempArray);
+        // console.log("cart names: ", cartNames);
+        // console.log({
+        //     ...cartStatus,
+        //     cart: cartNames.length,
+        //     cartNames: cartNames,
+        // });
+        // setCartStatus({
+        //     ...cartStatus,
+        //     cart: cartNames.length,
+        //     cartNames: cartNames,
+        // })
+
+        const tempCartStatus = [...newCartStatus];
+        console.log("//////////////////   new cart status: ", tempCartStatus);
+        const newTempCartStatus = tempCartStatus.map((item) => {
+            return {
+                name: item.name,
+                isRegistered: item.isRegistered,
+                isInCart: item.isRegistered ? false : true,
+            }
         })
+        console.log("//////////////////   new cart status: ", newTempCartStatus);
+        setNewCartStatus(newTempCartStatus);
     }
 
     useEffect(() => {
         if (bulkIsDomain.isLoading) return;
-        console.log("bulk is dmomain", bulkIsDomain.result);
         if (bulkIsDomain.status) {
-            let tempArray = []
+            let tempNewCartStatus = []
             {
-                bulkIsDomain.status && cartStatus.names?.map((name, id) => {
-                    tempArray[id] = {};
-                    tempArray[id].status = bulkIsDomain?.result[id];
-                    tempArray[id].name = name;
+                bulkIsDomain.status && newCartStatus?.map((item, id) => {
+                    tempNewCartStatus.push({
+                        name: item.name,
+                        isRegistered: bulkIsDomain?.result[id],
+                        isInCart: item.isInCart,
+                    })
                 })
-                setResults(tempArray);
+                setNewCartStatus(tempNewCartStatus);
             }
         }
-    }, [cartStatus, bulkIsDomain.isLoading])
+    }, [
+        // cartStatus,
+        bulkIsDomain.result,
+        newCartStatus.map(item => { return item.name }),
+    ])
 
     useEffect(() => {
         const chainId = chain?.id != undefined ? chain.id :
@@ -140,7 +172,7 @@ const SearchResultComponent = () => {
                 sx={{ flexDirection: 'row' }}
             >
                 {
-                    (results.length > 0) && (
+                    (newCartStatus.length > 0) && (
                         <Box
                             display={'flex'}
                             justifyContent={'right'}
@@ -178,8 +210,8 @@ const SearchResultComponent = () => {
                     display="grid"
                 >
                     {
-                        results?.map((result, id) => (
-                            sale[id] ? (
+                        newCartStatus?.map((item, id) => (
+                            item.isInCart ? (
                                 <Box
                                     key={id}
                                     sx={{
@@ -217,7 +249,7 @@ const SearchResultComponent = () => {
                                             variant="h5"
                                             color="white"
                                         >
-                                            {result.name}.{domainSuffixes[chain.id]}
+                                            {item.name}.{domainSuffixes[chain.id]}
                                         </Typography>
                                     </Box>
                                     <Box>
@@ -291,14 +323,14 @@ const SearchResultComponent = () => {
                                             style={{ marginLeft: '5px' }}
                                         />
                                         {
-                                            result.status ? (
+                                            item.isRegistered ? (
                                                 <Typography
                                                     sx={{ opacity: '0.5' }}
                                                     fontSize={{ md: '1.8vw', sm: '25px' }}
                                                     fontWeight={'700'}
                                                     variant="h5"
                                                 >
-                                                    {result.name}.{domainSuffixes[chain.id]}
+                                                    {item.name}.{domainSuffixes[chain.id]}
                                                 </Typography>
                                             ) : (
                                                 <Typography
@@ -307,7 +339,7 @@ const SearchResultComponent = () => {
                                                     fontWeight={'700'}
                                                     variant="h5"
                                                 >
-                                                    {result.name}.{domainSuffixes[chain.id]}
+                                                    {item.name}.{domainSuffixes[chain.id]}
                                                 </Typography>
                                             )
                                         }
@@ -319,7 +351,7 @@ const SearchResultComponent = () => {
                                             justifyContent="space-between"
                                         >
                                             {
-                                                result.status ? (
+                                                item.isRegistered ? (
                                                     <Typography
                                                         sx={{ ml: '30px' }}
                                                         fontSize={{ md: '1.3vw', sm: '18px' }}
@@ -349,7 +381,7 @@ const SearchResultComponent = () => {
                                         }}
                                     >
                                         {
-                                            result.status ? (
+                                            item.isRegistered ? (
                                                 <>
                                                     <img src={blackBookmarkImage} />
                                                     <img src={blackOffshoppingImage} />

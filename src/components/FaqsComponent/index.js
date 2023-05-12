@@ -20,7 +20,7 @@ const FaqsComponent = () => {
     const faqs = [
         {
             question: 'FAQ 1 - What is Clio and how does it help with domain searches?',
-            answer: 'A: Clio is an AI-powered domain assistant developed by Domain Labs in collaboration with OpenAI. It helps users find the perfect domain name by providing accurate and personalized recommendations based on their preferences, saving them time and effort during the domain search process. Introducing Clio, your AI domain assistant powered by OpenAI, one of the top AI companies in the world. At Domain Labs, we believe in providing the best possible experience for our customers, and that\'s why we use OpenAI to power Clio. With Clio, you can save time and money on domain searches, with accurate and personalized recommendations based on your preferences. And with OpenAI powering Clio, you can trust that you\'re getting the most advanced AI technology available. Thank you for choosing Domain Labs and Clio for your domain search needs.',
+            answer: 'A: Clio is an AI-powered domain assistant developed by Domain Labs in collaboration with OpenAI. It helps users find the perfect domain name by providing accurate and personalized recommendations based on their preferences, saving them time and effort during the domain search process.',
         },
         {
             question: 'FAQ 2 - How does Clio\'s AI technology work?',
@@ -78,6 +78,38 @@ const FaqsComponent = () => {
             >
                 Answers to Your Most Common Questions
             </Typography>
+
+            <Box
+                display={'flex'}
+                justifyContent={'center'}
+            >
+                <Box
+                    sx={{
+                        background: 'linear-gradient(84.72deg, #4BD8D8 -26.27%, #146EB4 106.95%)',
+                        borderRadius: '20px',
+                    }}
+                    mt={'40px'}
+                    maxWidth={'800px'}
+                >
+                    <Typography
+                        fontSize={{ md: "2.999vw", xs: "2.5707vw" }}
+                        p='40px'
+                        style={{
+                            fontFamily: 'Inter',
+                            fontWeight: '700',
+                            fontSize: '18px',
+                            lineHeight: '22px',
+                            alignItems: 'center',
+                            color: 'white',
+                        }}
+                        fontWeight={400}
+                        align="left"
+                        marginRight={'10px'}
+                    >
+                        Introducing Clio, your AI domain assistant powered by OpenAI, one of the top AI companies in the world. At Domain Labs, we believe in providing the best possible experience for our customers, and that's why we use OpenAI to power Clio. With Clio, you can save time and money on domain searches, with accurate and personalized recommendations based on your preferences. And with OpenAI powering Clio, you can trust that you're getting the most advanced AI technology available. Thank you for choosing Domain Labs and Clio for your domain search needs.
+                    </Typography>
+                </Box>
+            </Box>
 
             <Box
                 mt={'117px'}

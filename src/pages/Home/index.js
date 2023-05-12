@@ -26,11 +26,13 @@ import { useDappContext } from "../../utils/context";
 const Home = () => {
   const { switchNetwork, } = useSwitchNetwork();
   const { chain, } = useNetwork();
-  const [domainNames, setDomainNames] = useState();
+  const [domainName, setDomainName] = useState();
   const {
     theme,
     cartStatus,
     setCartStatus,
+    newCartStatus,
+    setNewCartStatus,
   } = useDappContext();
   const [isOpenAdvancedSearch, setIsOpenAdvancedSearch] = useState(false);
   const navigate = useNavigate();
@@ -42,8 +44,16 @@ const Home = () => {
   const [isProcessing, setIsProcessing] = useState(false)
   const handleSearch = () => {
     let names = []
-    names.push(domainNames)
+    names.push(domainName)
     setCartStatus({ names: names, cart: [] })
+    const newCartStatus = [
+      {
+        name: domainName,
+        isRegistered: undefined,
+        isInCart: false,
+      }
+    ];
+    setNewCartStatus(newCartStatus);
     setIsProcessing(true)
   }
 
@@ -81,10 +91,13 @@ const Home = () => {
   useEffect(() => {
     if (cartStatus?.names?.length > 0 && isProcessing)
       navigate('/search-result')
-  }, [cartStatus])
+  }, [
+    newCartStatus?.map(item => { return item.name }),
+  ])
 
   useEffect(() => {
     setCartStatus({})
+    setNewCartStatus([]);
   }, []);
 
   return (
@@ -232,8 +245,8 @@ const Home = () => {
                       }}
                     >
                       <TextField
-                        value={domainNames}
-                        onChange={(e) => setDomainNames(e.target.value.trim().toLocaleLowerCase())}
+                        value={domainName}
+                        onChange={(e) => setDomainName(e.target.value.trim().toLocaleLowerCase())}
                         onKeyUp={onKeyPressed}
                         InputProps={{ border: 'none', disableUnderline: true }}
                         style={{
@@ -290,6 +303,10 @@ const Home = () => {
                       alignItems={'center'}
                       width={'100%'}
                       maxWidth={'960px'}
+                      onClick={() => navigate('/clio')}
+                      style={{
+                        cursor: 'pointer',
+                      }}
                     >
                       <Typography
                         fontSize={{ xs: '16px', md: '18px' }}
@@ -323,7 +340,6 @@ const Home = () => {
                           WebkitBackgroundClip: "text",
                           WebkitTextFillColor: "transparent",
                         }}
-                        onClick={() => navigate('/clio')}
                       >
                         {/* -webkit-background-clip */}
                         {' Try Clio AI Domain Search'}

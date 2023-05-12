@@ -66,6 +66,7 @@ const Header = (props) => {
     theme,
     setTheme,
     cartStatus,
+    newCartStatus,
   } = useDappContext();
   const { chain, } = useNetwork();
   const navigate = useNavigate();
@@ -297,7 +298,7 @@ const Header = (props) => {
             onClick={location.pathname == '/' ? () => { } : () => toBuyPage()}
           >
             {
-              cartStatus.cart && cartStatus.cart > 0 ? (
+              newCartStatus.length > 0 ? (
                 <Box sx={{
                   display: 'flex',
                   justifyContent: 'center',
@@ -330,7 +331,7 @@ const Header = (props) => {
                       right: '0'
                     }}
                   >
-                    {cartStatus.cart}
+                    {newCartStatus?.filter(item => item.isInCart == true)?.length}
                   </span>
                 </Box>
               ) : (

@@ -50,7 +50,7 @@ const Footer = () => {
           cursor: 'pointer'
         }}
       >
-        Terms Of Service
+        Privacy & Terms
       </Typography>
       <Typography
         color="white"

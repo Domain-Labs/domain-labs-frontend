@@ -90,7 +90,6 @@ const ClioSubscriptionModal = (
         });
     };
 
-
     useEffect(() => {
         (async () => {
             if (props.isOpen) {

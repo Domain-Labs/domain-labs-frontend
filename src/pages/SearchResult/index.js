@@ -40,93 +40,92 @@ const SearchResult = () => {
     const [searchId, setSearchId] = useState(0);
     const [isOpenSearchDetailModal, setIsOpenSearchDetailModal] = useState(false);
 
-    const addToCart = (id) => {
-        console.log("id: ", id);
+    // const addToCart = (id) => {
+    //     console.log("id: ", id);
 
-        let tempArray = Array.from(sale)
-        console.log("temp array: ", tempArray);
+    //     let tempArray = Array.from(sale)
+    //     console.log("temp array: ", tempArray);
 
-        tempArray[id] = true;
+    //     tempArray[id] = true;
 
-        setSale(tempArray);
-        let cart = cartStatus.cart;
-        !cart ? cart = 0 : cart = cart;
+    //     setSale(tempArray);
+    //     let cart = cartStatus.cart;
+    //     !cart ? cart = 0 : cart = cart;
 
-        console.log("cartStatus: ", cartStatus);
+    //     console.log("cartStatus: ", cartStatus);
 
-        let tempArray1 = cartStatus.cartNames ? cartStatus.cartNames.slice() : []
-        console.log("tempArray1: ", tempArray1);
-        console.log({ id: id, name: results[id].name })
-        console.log("current cart:   ", { ...cartStatus, cart: cart * 1 + 1, cartNames: tempArray1 })
+    //     let tempArray1 = cartStatus.cartNames ? cartStatus.cartNames.slice() : []
+    //     console.log("tempArray1: ", tempArray1);
+    //     console.log({ id: id, name: results[id].name })
+    //     console.log("current cart:   ", { ...cartStatus, cart: cart * 1 + 1, cartNames: tempArray1 })
 
-        tempArray1.push({ id: id, name: results[id].name })
-        setCartStatus({ ...cartStatus, cart: cart + 1, cartNames: tempArray1 })
-    }
+    //     tempArray1.push({ id: id, name: results[id].name })
+    //     setCartStatus({ ...cartStatus, cart: cart + 1, cartNames: tempArray1 })
+    // }
 
-    const removeFromCart = (id) => {
-        let tempArray = Array.from(sale)
-        tempArray[id] = false;
-        setSale(tempArray)
-        let cart = cartStatus.cart;
-        console.log(cart)
-        let tempArray1 = Array.from(cartStatus.cartNames)
-        let temp;
-        tempArray1.map((val, idx) => {
-            if (val.id == id)
-                temp = idx
-        })
-        tempArray1.slice(temp, 1)
-        setCartStatus({ ...cartStatus, cart: cart * 1 - 1, cartNames: tempArray1 })
-    }
+    // const removeFromCart = (id) => {
+    //     let tempArray = Array.from(sale)
+    //     tempArray[id] = false;
+    //     setSale(tempArray)
+    //     let cart = cartStatus.cart;
+    //     console.log(cart)
+    //     let tempArray1 = Array.from(cartStatus.cartNames)
+    //     let temp;
+    //     tempArray1.map((val, idx) => {
+    //         if (val.id == id)
+    //             temp = idx
+    //     })
+    //     tempArray1.slice(temp, 1)
+    //     setCartStatus({ ...cartStatus, cart: cart * 1 - 1, cartNames: tempArray1 })
+    // }
 
-    const onClickToDetail = (id) => {
-        if (results[id].status) {
-            setSearchId(id);
-            setIsOpenSearchDetailModal(true);
-        }
-    }
+    // const onClickToDetail = (id) => {
+    //     if (results[id].status) {
+    //         setSearchId(id);
+    //         setIsOpenSearchDetailModal(true);
+    //     }
+    // }
 
-    const handleSelectOrDeselectAll = () => {
-        console.log("results: ", results);
-        let tempArray = Array.from(sale)
+    // const handleSelectOrDeselectAll = () => {
+    //     console.log("results: ", results);
+    //     let tempArray = Array.from(sale)
 
-        let cartNames = [];
-        results?.map((result, index) => {
-            if (!result.status) {
-                cartNames.push({ id: index, name: result.name });
-                tempArray[index] = true;
-            }
-        });
+    //     let cartNames = [];
+    //     results?.map((result, index) => {
+    //         if (!result.status) {
+    //             cartNames.push({ id: index, name: result.name });
+    //             tempArray[index] = true;
+    //         }
+    //     });
 
-        setSale(tempArray);
-        console.log("cart names: ", cartNames);
-        console.log({
-            ...cartStatus,
-            cart: cartNames.length,
-            cartNames: cartNames,
-        });
-        setCartStatus({
-            ...cartStatus,
-            cart: cartNames.length,
-            cartNames: cartNames,
-        })
-    }
+    //     setSale(tempArray);
+    //     console.log("cart names: ", cartNames);
+    //     console.log({
+    //         ...cartStatus,
+    //         cart: cartNames.length,
+    //         cartNames: cartNames,
+    //     });
+    //     setCartStatus({
+    //         ...cartStatus,
+    //         cart: cartNames.length,
+    //         cartNames: cartNames,
+    //     })
+    // }
 
-    useEffect(() => {
-        if (bulkIsDomain.isLoading) return;
-        console.log("bulk is dmomain", bulkIsDomain.result);
-        if (bulkIsDomain.status) {
-            let tempArray = []
-            {
-                bulkIsDomain.status && cartStatus.names?.map((name, id) => {
-                    tempArray[id] = {};
-                    tempArray[id].status = bulkIsDomain?.result[id];
-                    tempArray[id].name = name;
-                })
-                setResults(tempArray);
-            }
-        }
-    }, [cartStatus, bulkIsDomain.isLoading])
+    // useEffect(() => {
+    //     if (bulkIsDomain.isLoading) return;
+    //     if (bulkIsDomain.status) {
+    //         let tempArray = []
+    //         {
+    //             bulkIsDomain.status && cartStatus.names?.map((name, id) => {
+    //                 tempArray[id] = {};
+    //                 tempArray[id].status = bulkIsDomain?.result[id];
+    //                 tempArray[id].name = name;
+    //             })
+    //             setResults(tempArray);
+    //         }
+    //     }
+    // }, [cartStatus, bulkIsDomain.isLoading])
 
     useEffect(() => {
         setDomainLogoImage(domainLogoImages[chain.id]);

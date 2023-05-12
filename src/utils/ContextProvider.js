@@ -5,6 +5,12 @@ import { io } from "socket.io-client";
 const ContextProvider = ({ children }) => {
   const [theme, setTheme] = useState('day-theme');
   const [cartStatus, setCartStatus] = useState({});
+  const [newCartStatus, setNewCartStatus] = useState([]);
+  // [{
+  //   name: domainName,
+  //   isRegistered: undefined,
+  //   isInCart: false,
+  // }]
   const [clioSocket, setClioSocket] = useState(io("/clio"));
 
   return (
@@ -14,6 +20,8 @@ const ContextProvider = ({ children }) => {
         setTheme,
         cartStatus,
         setCartStatus,
+        newCartStatus,
+        setNewCartStatus,
         clioSocket,
         setClioSocket,
       }}

@@ -15,6 +15,8 @@ function AdvancedSearchModal(props) {
   const {
     cartStatus,
     setCartStatus,
+    newCartStatus,
+    setNewCartStatus,
   } = useDappContext();
   const [isOpen, setIsOpen] = useState(false);
   const [row, setRows] = useState(0);
@@ -44,6 +46,15 @@ function AdvancedSearchModal(props) {
   const BulkSearch = () => {
     let array = names.filter((item) => item != "")
     setCartStatus({ ...cartStatus, names: array, cart: [] })
+
+    const newCartStatus = array.map((item) => {
+      return {
+        name: item,
+        isRegistered: undefined,
+        isInCart: false,
+      }
+    });
+    setNewCartStatus(newCartStatus);
   }
 
   useEffect(() => {
@@ -53,7 +64,10 @@ function AdvancedSearchModal(props) {
   useEffect(() => {
     if (names.length > 0)
       navigate('/search-result')
-  }, [cartStatus])
+  }, [
+    cartStatus,
+    newCartStatus.map(item => { return item.name }),
+  ])
 
   return (
     <Dialog

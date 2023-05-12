@@ -26,11 +26,12 @@ const Cart = () => {
     const {
         theme,
         cartStatus,
+        newCartStatus,
     } = useDappContext();
     const bulkIsDomain = useBulkIsDomain();
     const { chain, } = useNetwork();
     const { address, } = useAccount();
-    const [results, setResults] = useState();
+    // const [results, setResults] = useState();
     const [price, setPrice] = useState([]);
     const [totalValue, setTotalValue] = useState(0);
     const navigate = useNavigate();
@@ -46,7 +47,7 @@ const Cart = () => {
     }, [chain])
 
     const bulkBuyDomain = useBulkBuyDomain(
-        results?.map(item => item.name),
+        newCartStatus.filter(item => item.isInCart == true),
         duration.map(item => item * secondsInDay),
         totalValue
     );
@@ -95,6 +96,7 @@ const Cart = () => {
         priceTemp = 0.0041 * time / 365;
         return priceTemp;
     }
+
     const buyDomain = async () => {
         if (bulkBuyDomain.isLoading) return;
 
@@ -107,7 +109,7 @@ const Cart = () => {
         if (bulkIsDomain.isSuccess) {
             const postObject = {
                 wallet: address,
-                buyCount: results.length,
+                buyCount: newCartStatus?.filter(item => item.isInCart == true).length,
                 buyMoney: totalValue,
             }
 
@@ -129,7 +131,7 @@ const Cart = () => {
         let toggleArray = toggle.slice();
         toggleArray[idx] = false
         setToggle(toggleArray)
-        let length = results[idx].name.length;
+        let length = newCartStatus[idx].name.length;
         if (length > 0)
             switch (length) {
                 case 3:
@@ -166,57 +168,56 @@ const Cart = () => {
         setDiscount(100 - tempDiscount);
     }
 
-    useEffect(() => {
-        if (bulkIsDomain.isLoading) return;
-        console.log("bulk is dmomain", bulkIsDomain.result);
-        setResult(bulkIsDomain.result);
-        if (bulkIsDomain.status) {
-            let tempArray = []
-            {
-                bulkIsDomain.status && cartStatus.names?.map((name, id) => {
-                    tempArray[id] = {};
-                    tempArray[id].status = bulkIsDomain?.result[id];
-                    tempArray[id].name = name;
-                })
-                setResults(tempArray);
-            }
-        }
-    }, [cartStatus, bulkIsDomain.isLoading])
+    // useEffect(() => {
+    //     if (bulkIsDomain.isLoading) return;
+    //     setResult(bulkIsDomain.result);
+    //     if (bulkIsDomain.status) {
+    //         let tempArray = []
+    //         {
+    //             bulkIsDomain.status && cartStatus.names?.map((name, id) => {
+    //                 tempArray[id] = {};
+    //                 tempArray[id].status = bulkIsDomain?.result[id];
+    //                 tempArray[id].name = name;
+    //             })
+    //             setResults(tempArray);
+    //         }
+    //     }
+    // }, [cartStatus, bulkIsDomain.isLoading])
 
     useEffect(() => {
         console.log("cart page result: ", result);
-        if (result) {
+        if (bulkIsDomain.result) {
             let tempArray = [];
             let currentTime = [];
             let tempDuration = [];
             let initialCost = 0;
             let tempPrice = [];
-            console.log("cartStatus.cartNames: ", cartStatus);
+            console.log("newCartStatus: ", newCartStatus);
 
             {
-                cartStatus.cartNames?.map((name, id) => {
-                    console.log("name", name)
-                    tempArray[id] = {};
-                    tempArray[id].status = result[id];
+                newCartStatus?.map((item, id) => {
+                    console.log("item", item)
+                    // tempArray[id] = {};
+                    // tempArray[id].status = result[id];
                     currentTime[id] = options[4].label;
-                    tempArray[id].name = name.name;
+                    // tempArray[id].name = name.name;
                     tempDuration[id] = options[4].value;
-                    console.log(name.name, options[4].value)
+                    console.log(item.name, options[4].value)
 
-                    tempPrice[id] = calculatePrice(name.name, options[4].value);
-                    initialCost += calculatePrice(name.name, options[4].value);
+                    tempPrice[id] = calculatePrice(item.name, options[4].value);
+                    initialCost += calculatePrice(item.name, options[4].value);
                 })
 
                 let nameLength = cartStatus.cartNames ? cartStatus.cartNames.length : 0;
                 initialCost = applyDiscount(initialCost, nameLength);
                 setTotalValue(initialCost)
-                setResults(tempArray);
+                // setResults(tempArray);
                 setCurrentTime(currentTime);
                 setPrice(tempPrice)
                 setDuration(tempDuration);
             }
         }
-    }, [result])
+    }, [bulkIsDomain.result])
 
     return (
         <Box
@@ -513,7 +514,7 @@ const Cart = () => {
                     display="grid"
                 >
                     {
-                        results?.map((val, idx) => {
+                        newCartStatus?.filter(item => item.isInCart == true)?.map((item, idx) => {
                             return (
                                 <Box
                                     key={idx}
@@ -553,7 +554,7 @@ const Cart = () => {
                                             variant="h5"
                                             color="white"
                                         >
-                                            {val.name}.{domainSuffixes[chain.id]}
+                                            {item.name}.{domainSuffixes[chain.id]}
                                         </Typography>
                                     </Box>
                                     <Box>
