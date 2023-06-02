@@ -1,11 +1,10 @@
-import {
-  Box,
-} from "@mui/material";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import { useTheme } from "./contexts/theme";
+import { Box } from '@mui/material';
+import Footer from './components/Footer';
+import Header from './components/Header';
+import { useTheme } from './contexts/theme';
+
 const Layout = ({ children }) => {
-  const { theme, } = useTheme();
+  const { theme } = useTheme();
 
   return (
     <>

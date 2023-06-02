@@ -45,7 +45,7 @@ const Home = () => {
   };
 
   const searchClicked = () => {
-    dispatch(setSearchString(searchStr));
+    dispatch(setSearchString(searchStr.toLowerCase()));
     navigate(`/search-result`);
   };
 

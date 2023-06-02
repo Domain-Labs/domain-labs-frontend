@@ -13,8 +13,8 @@ import reportWebVitals from './reportWebVitals';
 
 const { chains, provider, webSocketProvider } = configureChains(
   [
-    goerli,
-    bscTestnet,
+    // goerli,
+    // bscTestnet,
     mainnet,
     // bsc,
     {

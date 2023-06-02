@@ -28,6 +28,7 @@ import darkLogoImage from '../../assets/image/logo_dark_mode.png';
 import darkSunImage from '../../assets/image/dark_mode.png';
 import { linkArray } from '../../config';
 import { toast } from 'react-toastify';
+import { useDapp } from '../../contexts/dapp';
 import { useSelector } from 'react-redux';
 import { useTheme } from '../../contexts/theme';
 import useWindowDimensions from '../../hooks/useDimension';
@@ -76,6 +77,7 @@ const Header = (props) => {
   const [isSwitchOn, setIsSwitchOn] = useState(true);
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const { cart } = useSelector((state) => state.cart);
+  const { isConnected, networkId } = useDapp();
   const { window } = props;
   const container =
     window !== undefined ? () => window().document.body : undefined;
@@ -281,7 +283,7 @@ const Header = (props) => {
             }}
             onClick={location.pathname === '/' ? () => {} : () => toBuyPage()}
           >
-            {cart && cart.length > 0 ? (
+            {isConnected && cart && cart.length > 0 ? (
               <Box
                 sx={{
                   display: 'flex',

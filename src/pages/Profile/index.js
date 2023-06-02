@@ -3,14 +3,9 @@ import {
   Box,
   Button,
   Checkbox,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  MenuItem,
-  OutlinedInput,
+  Pagination,
+  PaginationItem,
   Paper,
-  Select,
   Table,
   TableBody,
   TableCell,
@@ -19,39 +14,44 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  TextField,
   Typography,
 } from '@mui/material';
-import React, { useEffect, useMemo, useState } from 'react';
+import { binanceImage, ensImage, sampleAvatar } from '../../utils/images';
+import { useEffect, useState } from 'react';
 
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import ExtendDialog from './Dialogs/ExtendDialog';
 import { FaArrowCircleUp } from 'react-icons/fa';
 import { RxPlusCircled } from 'react-icons/rx';
-import sampleAvatar from '../../assets/image/profile_avatar.png';
-import timer from '../../assets/image/timer.png';
+import TransferDialog from './Dialogs/TransferDialog';
+import { getDomainsByAddress } from '../../redux/actions/profileActions';
+import moment from 'moment';
+import { useDapp } from '../../contexts/dapp';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
+import { useSelector } from 'react-redux';
 import { useTheme } from '../../contexts/theme';
 
 const Profile = () => {
   const { theme } = useTheme();
-  const [domains, setDomains] = useState([]);
+  const dispatch = useDispatch();
+  // const [domains, setDomains] = useState([]);
   const [modal, setModal] = useState('');
-  const [address, setAddress] = useState(
-    '0x5F5DD76D380da23CD5B8705852F67dDeb64C977b',
-  );
-  // temporary option
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(0);
+  const [onePageDomains, setOnePageDomains] = useState([]);
+  const [selDomain, setSelDomain] = useState();
+  const { address, networkId } = useDapp();
+  const { domains, loading } = useSelector((state) => state.profile);
+
   const navigate = useNavigate();
+  const domainSuffixes = ['eth', 'bnb'];
+  const domainLogos = [ensImage, binanceImage];
+
   const backHome = () => {
     navigate('/');
   };
-  const options = useMemo(
-    () => [
-      { label: '1 Year', value: 365 },
-      { label: '3 Years', value: 1095 },
-      { label: '5 Years', value: 1825 },
-    ],
-    [],
-  );
+
   const styles = {
     container: {
       backgroundColor: theme === 'dark-theme' ? '#2A2A2A' : 'white',
@@ -64,15 +64,46 @@ const Profile = () => {
   const linearGradient =
     'linear-gradient(86.23deg, #4BD8D8 -48.31%, #146EB4 114.96%)';
 
+  const calcExpiration = (unix_time) => {
+    const now = Date.now();
+    const expDate = new Date(unix_time * 1000).toDateString();
+    return moment(expDate).format('MM/DD/YYYY');
+    // const days = Math.floor((unix_time * 1000 - now) / (24 * 3600 * 1000));
+    // const months = Math.floor(days / 30);
+    // if (months < 12) {
+    //   return `${months} months`;
+    // } else {
+    //   return `${Math.floor(months / 12)} years ${months % 12} months`;
+    // }
+  };
+
+  const handleExtend = (domain) => {
+    setSelDomain(domain);
+    setModal('extend');
+  };
+
   useEffect(() => {
-    setDomains([
-      {
-        name: 'moonrider.bnb',
-        registrationDate: new Date().toDateString(),
-        expirationDate: new Date().toDateString(),
-      },
-    ]);
-  }, []);
+    console.log(address, 'address');
+    dispatch(getDomainsByAddress(address));
+  }, [address, dispatch]);
+
+  useEffect(() => {
+    const perPage = 5; // perPage
+    console.log(domains);
+    let network = 0;
+    if (networkId === 1) {
+      network = 0;
+    } else if (networkId === 56) {
+      network = 1;
+    }
+    const fDomains = domains.filter((domain) => domain.network === network);
+    setTotalPage(Math.ceil(fDomains.length / 5));
+    const tmp = fDomains.slice(
+      perPage * (currentPage - 1),
+      perPage * currentPage,
+    );
+    setOnePageDomains(tmp);
+  }, [currentPage, domains, networkId]);
 
   return (
     <Box
@@ -175,7 +206,7 @@ const Profile = () => {
               }}
               color={theme === 'dark-theme' ? 'white' : '#2A2A2A'}
             >
-              <Typography fontWeight={700}>Wang JunDong</Typography>
+              {/* <Typography fontWeight={700}>Wang JunDong</Typography> */}
               <CopyToClipboard
                 text={address}
                 onCopy={() => window.alert('copied')}
@@ -247,15 +278,6 @@ const Profile = () => {
                     color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
                   }}
                 >
-                  Registration Date
-                </TableCell>
-                <TableCell
-                  align="right"
-                  sx={{
-                    fontWeight: 700,
-                    color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
-                  }}
-                >
                   Expiration Date
                 </TableCell>
                 <TableCell
@@ -272,15 +294,19 @@ const Profile = () => {
                 borderBottom: `2px solid #146EB4`,
               }}
             >
-              {domains.map((row) => (
+              {onePageDomains.map((row, index) => (
                 <TableRow
-                  key={row.name}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  key={index}
+                  sx={{
+                    '&:last-child td, &:last-child th': { border: 0 },
+                    cursor: 'pointer',
+                  }}
                 >
                   <TableCell
                     sx={{
                       fontWeight: 700,
                       color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
+                      width: '30px',
                     }}
                   >
                     <Checkbox
@@ -291,14 +317,30 @@ const Profile = () => {
                     />
                   </TableCell>
                   <TableCell
-                    component="th"
+                    component="td"
                     scope="row"
                     sx={{
                       fontWeight: 700,
                       color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
                     }}
                   >
-                    {row.name}
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignContent: 'center',
+                        alignSelf: 'center',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <img src={domainLogos[row.network]} alt="logo" />
+                      <Typography
+                        sx={{
+                          marginLeft: 1,
+                        }}
+                      >
+                        {row.name}.{domainSuffixes[row.network]}
+                      </Typography>
+                    </Box>
                   </TableCell>
                   <TableCell
                     align="right"
@@ -307,176 +349,53 @@ const Profile = () => {
                       color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
                     }}
                   >
-                    {row.registrationDate}
+                    {calcExpiration(row.expirationDate)}
                   </TableCell>
                   <TableCell
                     align="right"
-                    sx={{
-                      fontWeight: 700,
-                      color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
-                    }}
-                  >
-                    {row.expirationDate}
-                  </TableCell>
-                  <TableCell
-                    align="right"
+                    onClick={() => handleExtend(row)}
                     sx={{
                       fontWeight: 700,
                       color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
                       textUnderlinePosition: 'under',
+                      textDecoration: 'underline',
                     }}
                   >
-                    Details
+                    Extend
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
-            <TableFooter>
-              <TableRow>
-                <TablePagination
-                  rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-                  colSpan={5}
-                  count={domains.length}
-                  rowsPerPage={5}
-                  page={0}
-                  SelectProps={{
-                    inputProps: {
-                      'aria-label': 'rows per page',
-                    },
-                  }}
-                  // onPageChange={handleChangePage}
-                  // onRowsPerPageChange={handleChangeRowsPerPage}
-                  // ActionsComponent={TablePaginationActions}
-                  sx={{
-                    border: 'none',
-                  }}
-                />
-              </TableRow>
-            </TableFooter>
           </Table>
+          <Pagination
+            count={totalPage}
+            color="primary"
+            onChange={(e, value) => {
+              setCurrentPage(value);
+            }}
+            renderItem={(item) => (
+              <PaginationItem
+                sx={{
+                  color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
+                }}
+                {...item}
+              />
+            )}
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignContent: 'center',
+              marginTop: '10px',
+            }}
+          />
         </TableContainer>
       </Box>
-      <Dialog
-        sx={{ '& .MuiDialog-paper': { width: '80%', maxHeight: 435 } }}
-        maxWidth="xs"
-        open={modal === 'transfer'}
-      >
-        <DialogTitle>Transfer Domains</DialogTitle>
-        <DialogContent>
-          <Typography sx={{ fontSize: '16px', fontWeight: '600' }}>
-            Approve
-          </Typography>
-          <Typography sx={{ wordBreak: 'break-all', fontSize: '14px' }}>
-            Contract approval allows the contract to perform transfering of
-            domains on your behalf
-          </Typography>
-          <Typography
-            sx={{ fontSize: '16px', fontWeight: '600', marginTop: '16px' }}
-          >
-            Domainlabs Marketplace:
-          </Typography>
-          <TextField
-            required
-            variant="filled"
-            sx={{
-              width: '100%',
-              marginTop: '10px',
-              '& input': {
-                padding: '10px 16px !important',
-                fontSize: '16px',
-                fontFamily: 'Inter',
-                color: 'white',
-              },
-              backgroundColor: '#AAA',
-              border: 'none',
-              color: 'white',
-            }}
-            placeholder="0x5F5DD76D380da23CD5B8705852F67dDeb64C977b"
-          />
-        </DialogContent>
-        <DialogActions
-          sx={{
-            padding: '16px 24px',
-          }}
-        >
-          <Button
-            autoFocus
-            onClick={() => setModal('')}
-            sx={{
-              background: linearGradient,
-              width: '100%',
-              color: 'white',
-            }}
-          >
-            Approve
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog
-        sx={{ '& .MuiDialog-paper': { width: '80%', maxHeight: 435 } }}
-        maxWidth="xs"
+      <TransferDialog open={modal === 'transfer'} close={() => setModal('')} />
+      <ExtendDialog
         open={modal === 'extend'}
-      >
-        <DialogTitle>Extend Registration</DialogTitle>
-        <DialogContent
-          dividers
-          sx={{
-            display: { xs: 'block', sm: 'flex' },
-            textAlign: 'center',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Typography
-            sx={{ fontSize: '16px', fontWeight: '600', fontFamily: 'Inter' }}
-          >
-            Registration Year: &nbsp;
-          </Typography>
-          <Select
-            input={<OutlinedInput />}
-            inputProps={{ 'aria-label': 'Without label' }}
-            sx={{
-              borderRadius: '20px',
-              width: '150px',
-              '& .MuiSelect-select, & .MuiSelect-select:focus ': {
-                borderRadius: '20px',
-                background: 'white',
-                padding: '5px 32px 5px 12px',
-              },
-            }}
-          >
-            <MenuItem value={0} disabled={true}>
-              <Box
-                alignItems="center"
-                display={'flex'}
-                justifyContent={'center'}
-              ></Box>
-            </MenuItem>
-            {options.map((option) => (
-              <MenuItem key={option.label} value={option.value}>
-                <Box
-                  alignItems="center"
-                  display={'flex'}
-                  justifyContent={'center'}
-                >
-                  <img src={timer} alt="timer" /> &nbsp; {option.label}
-                </Box>
-              </MenuItem>
-            ))}
-          </Select>
-          <Typography
-            sx={{ fontSize: '16px', fontWeight: '600', fontFamily: 'Inter' }}
-          >
-            0.017 BNB
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button autoFocus onClick={() => setModal('')}>
-            Cancel
-          </Button>
-          <Button onClick={() => setModal('')}>Ok</Button>
-        </DialogActions>
-      </Dialog>
+        close={() => setModal('')}
+        domain={selDomain}
+      />
     </Box>
   );
 };

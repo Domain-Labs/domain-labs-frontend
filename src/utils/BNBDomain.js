@@ -1,6 +1,5 @@
 import {
   getBNBRegisterContract,
-  getBNBResolverContract,
   getBaseRegisterContract,
   getDomainLabsBNBContract,
 } from './Contracts';
@@ -8,41 +7,34 @@ import {
 import { BigNumber } from 'ethers';
 import { Buffer } from 'buffer';
 import Web3 from 'web3';
-import axios from 'axios';
+import { duration } from 'moment';
+import { getTransactionReceiptMined } from './EtherUtils';
 import { labelhash } from './labelhash';
-import { namehash } from './namehash';
 
-// import SID, {SIDfunctions} from '@siddomains/sidjs'
-
+// order is very important
+window.Buffer = window.Buffer || Buffer;
 const SID = require('@siddomains/sidjs').default;
 const SIDfunctions = require('@siddomains/sidjs');
-window.Buffer = window.Buffer || Buffer;
 
 const SPACE_ID_RESOLVER_ADDR = '0x7a18768edb2619e73c4d5067b90fd84a71993c1d';
 const SPACE_ID_BNB_REGISTER_ADDR = '0xD9A99AE1f5D173cCf36E19777ACa5B8268B5F291';
 const SPACE_ID_BASE_REGISTER_ADDR =
   '0xE3b1D32e43Ce8d658368e2CBFF95D57Ef39Be8a6';
 
-const DOMAINLABS_ADDR = '0xE945FfDebB4e2b710B39816cdD018709E7A9eD68';
+const BNS_DOMAIN_LABS = '0xE945FfDebB4e2b710B39816cdD018709E7A9eD68';
 
 export const checkAvailability = async (name, provider) => {
   const Register = getBNBRegisterContract({
     address: SPACE_ID_BNB_REGISTER_ADDR,
     provider,
   });
-  const Resolver = getBNBResolverContract({
-    address: SPACE_ID_RESOLVER_ADDR,
-    provider,
-  });
   const available = await Register['available(string)'](name);
-  const namedHash = namehash(`${name}.bnb`);
   if (!available) {
     const sid = new SID({
       provider,
       sidAddress: SIDfunctions.getSidAddress(56),
     });
     const address = await sid.name(`${name}.bnb`).getAddress(); // 0x123
-    // const address1 = await Resolver['addr(bytes32)'](namedHash);
     const expiry = await getExpiryDate(name, provider);
     const timeLeft = expiry * 1000 - Date.now();
     const leftDays = (timeLeft / 1000 / 3600 / 24).toFixed(0);
@@ -70,32 +62,38 @@ export const getExpiryDate = async (name, provider) => {
 
 export const getRentPrice = async (name, days, provider) => {
   const Register = getDomainLabsBNBContract({
-    address: DOMAINLABS_ADDR,
+    address: BNS_DOMAIN_LABS,
     provider,
   });
+  console.log(Register, 'register');
   const rentPrice = await Register['rentPrice(string,uint256)'](
     name,
     days * 24 * 3600,
   );
-  console.log(Math.round(rentPrice / Math.pow(10, 15)) / 1000, 'rer');
-  return Math.round(rentPrice / Math.pow(10, 15)) / 1000;
+  const web3 = new Web3(provider.connection.url);
+  const gasPrice = await web3.eth.getGasPrice();
+  const gasPriceInETH =
+    Math.round((gasPrice * 500000) / Math.pow(10, 15)) / 1000;
+  return {
+    price: Math.round(rentPrice / Math.pow(10, 15)) / 1000,
+    gasPrice: gasPriceInETH,
+  };
 };
 
 export const getRentPrices = async (results, provider) => {
   const Register = getDomainLabsBNBContract({
-    address: DOMAINLABS_ADDR,
+    address: BNS_DOMAIN_LABS,
     provider,
   });
   const [rentPrice] = await Register['rentPrices((string,uint256,bytes32)[])'](
     results,
   );
-  console.log(rentPrice, 'rent prices');
   return rentPrice;
 };
 
 export const commits = async (results, provider, signer) => {
   const Register = getDomainLabsBNBContract({
-    address: DOMAINLABS_ADDR,
+    address: BNS_DOMAIN_LABS,
     provider,
   });
   const rlts = results.map((item) => {
@@ -112,10 +110,11 @@ export const commits = async (results, provider, signer) => {
       'commits((string,uint256,bytes32)[])'
     ](rlts, { gasLimit: 400000 * rlts.length });
     // const web3 = new Web3(provider.connection.url);
-    console.log(provider.connection.url);
-    // const transRlts = await web3.eth.getTransactionReceipt(commitment.hash);
-    // console.log(commitment, transRlts, 'transRlts');
-    return true;
+    const web3 = new Web3(provider.connection.url);
+    const receipt = await getTransactionReceiptMined(web3, commitment.hash);
+    if (receipt.status) {
+      return true;
+    } else return false;
   } catch (err) {
     console.log(err);
     return false;
@@ -124,7 +123,7 @@ export const commits = async (results, provider, signer) => {
 
 export const register = async (results, provider, signer) => {
   const Register = getDomainLabsBNBContract({
-    address: DOMAINLABS_ADDR,
+    address: BNS_DOMAIN_LABS,
     provider,
   });
   const rlts = results.map((item) => {
@@ -135,7 +134,6 @@ export const register = async (results, provider, signer) => {
     };
   });
   const price = await getRentPrices(rlts, provider);
-  console.log(price, 'price');
   const permanantRegister = Register.connect(signer);
   const regRlts = await permanantRegister[
     'registerBnb((string,uint256,bytes32)[],address)'
@@ -143,28 +141,37 @@ export const register = async (results, provider, signer) => {
     value: BigNumber.from(price)
       .mul(BigNumber.from(105))
       .div(BigNumber.from(100)),
-    gasLimit: 600000 * rlts.length,
+    gasLimit: 500000 * rlts.length,
   });
-  // return true;
-  console.log(regRlts, 'register hash');
   const web3 = new Web3(provider.connection.url);
-  let transRlts;
-  do {
-    transRlts = await web3.eth.getTransactionReceipt(regRlts.hash);
-    console.log(transRlts, 'transaction hash');
-    // if (transRlts && transRlts.status) {
-    //   return true;
-    // } else {
-    //   return false;
-    // }
-  } while (transRlts);
+  const receipt = await getTransactionReceiptMined(web3, regRlts.hash);
+  if (receipt.status) {
+    return true;
+  } else return false;
 };
 
-export const getPriceInUSD = async () => {
-  const res = await axios.get(
-    'https://binance.com/api/v3/ticker/price?symbol=BNBUSDT',
-    {},
+export const extend = async (result, provider, signer) => {
+  const Register = getDomainLabsBNBContract({
+    address: BNS_DOMAIN_LABS,
+    provider,
+  });
+  const permanentRegister = Register.connect(signer);
+  // const priceObj = await getRentPrice(result.name, result.duration, provider);
+  // console.log(priceObj);
+  const rentPrice = await Register['rentPrice(string,uint256)'](
+    result.name,
+    result.duration * 24 * 3600,
   );
-  return res.data.price;
-  // return 307;
+
+  const rlts = await permanentRegister['renewBnb(string,uint256)'](
+    result.name,
+    result.duration,
+    {
+      value: BigNumber.from(rentPrice)
+        .mul(BigNumber.from(105))
+        .div(BigNumber.from(100)),
+      gasLimit: 500000,
+    },
+  );
+  console.log(rlts, 'rewnew results');
 };

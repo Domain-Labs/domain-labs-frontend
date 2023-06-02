@@ -2,18 +2,18 @@ import {
   getDomainLabsENSContract,
   getENSBaseRegisterContract,
   getENSRegisterContract,
-  getENSResolverContract,
 } from './Contracts';
 
 import { BigNumber } from 'ethers';
 import { ENS } from '@ensdomains/ensjs';
+import Web3 from 'web3';
+import { getTransactionReceiptMined } from '../utils/EtherUtils';
 import { labelhash } from './labelhash';
-import { namehash } from './namehash';
 
 const ENS_RESOLVER_ADDR = '0x231b0ee14048e9dccd1d247744d114a4eb5e8e63';
 const ENS_REGISTER_ADDR = '0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5';
 const ENS_BASE_REGISTER_ADDR = '0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85';
-const ENS_DOMAIN_LBAS = '0x84f742dCF445ed7e7Dce82Ae084936E489B53BA3';
+const ENS_DOMAIN_LABS = '0x84f742dCF445ed7e7Dce82Ae084936E489B53BA3';
 
 export const checkAvailability = async (name, provider) => {
   const ENSInstance = new ENS();
@@ -22,17 +22,10 @@ export const checkAvailability = async (name, provider) => {
     address: ENS_REGISTER_ADDR,
     provider,
   });
-  const Resolver = getENSResolverContract({
-    address: ENS_RESOLVER_ADDR, //ENS_RESOLVER_ADDR,
-    provider,
-  });
+
   const available = await Register['available(string)'](name);
-  const namedHash = namehash(`${name}.eth`);
   if (!available) {
-    const address = await Resolver['addr(bytes32)'](namedHash);
-    const profile = await ENSInstance.getProfile(`${name}.eth`);
-    console.log(profile, 'profile');
-    console.log(address, 'address');
+    const address = await ENSInstance.getAddr(`${name}.eth`);
     const expiry = await getExpiryDate(name, provider);
     const timeLeft = expiry * 1000 - Date.now();
     const leftDays = (timeLeft / 1000 / 3600 / 24).toFixed(0);
@@ -60,21 +53,26 @@ export const getExpiryDate = async (name, provider) => {
 
 export const getRentPrice = async (name, days, provider) => {
   const Register = getDomainLabsENSContract({
-    address: ENS_DOMAIN_LBAS,
+    address: ENS_DOMAIN_LABS,
     provider,
   });
   const rentPrice = await Register['rentPrice(string,uint256)'](
     name,
     days * 24 * 3600,
   );
-  console.log(rentPrice, 'rent price');
-  return Math.round(rentPrice / Math.pow(10, 15)) / 1000;
-  // return rentPrice;
+  const web3 = new Web3(provider.connection.url);
+  const gasPrice = await web3.eth.getGasPrice();
+  const gasPriceInETH =
+    Math.round((gasPrice * 500000) / Math.pow(10, 15)) / 1000;
+  return {
+    price: Math.round(rentPrice / Math.pow(10, 15)) / 1000,
+    gasPrice: gasPriceInETH,
+  };
 };
 
 export const getRentPrices = async (results, provider) => {
   const Register = getDomainLabsENSContract({
-    address: ENS_DOMAIN_LBAS,
+    address: ENS_DOMAIN_LABS,
     provider,
   });
   const [rentPrice] = await Register['rentPrices((string,uint256,bytes32)[])'](
@@ -85,36 +83,85 @@ export const getRentPrices = async (results, provider) => {
 
 export const commits = async (results, provider, signer) => {
   const Register = getDomainLabsENSContract({
-    address: ENS_DOMAIN_LBAS,
+    address: ENS_DOMAIN_LABS,
     provider,
   });
   const permanantRegister = Register.connect(signer);
   try {
-    await permanantRegister['commits((string,uint256,bytes32)[],address)'](
-      results,
-      ENS_RESOLVER_ADDR,
-    );
+    const commitment = await permanantRegister[
+      'commits((string,uint256,bytes32)[],address)'
+    ](results, ENS_RESOLVER_ADDR);
+    const web3 = new Web3(provider.connection.url);
+    const receipt = await getTransactionReceiptMined(web3, commitment.hash);
+    if (receipt.status) {
+      return true;
+    } else return false;
   } catch (error) {
     console.log(error);
+    return false;
   }
 };
 
 export const register = async (results, provider, signer) => {
   const Register = getDomainLabsENSContract({
-    address: ENS_DOMAIN_LBAS,
+    address: ENS_DOMAIN_LABS,
     provider,
   });
   const permanantRegister = Register.connect(signer);
   const rentPrice = await getRentPrices(results, provider);
-  console.log(rentPrice, 'rent price');
-  await permanantRegister['registerENS((string,uint256,bytes32)[],address)'](
-    results,
-    ENS_RESOLVER_ADDR,
+  try {
+    const regRlts = await permanantRegister[
+      'registerENS((string,uint256,bytes32)[],address)'
+    ](results, ENS_RESOLVER_ADDR, {
+      value: BigNumber.from(rentPrice)
+        .mul(BigNumber.from(105))
+        .div(BigNumber.from(100)),
+      gasLimit: 500000 * results.length,
+    });
+    const web3 = new Web3(provider.connection.url);
+    const receipt = await getTransactionReceiptMined(web3, regRlts.hash);
+    if (receipt.status) {
+      return true;
+    } else return false;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+export const extend = async (result, provider, signer) => {
+  const Register = getDomainLabsENSContract({
+    address: ENS_DOMAIN_LABS,
+    provider,
+  });
+  const permanentRegister = Register.connect(signer);
+  // const priceObj = await getRentPrice(result.name, result.duration, provider);
+  // console.log(priceObj);
+  const rentPrice = await Register['rentPrice(string,uint256)'](
+    result.name,
+    result.duration * 24 * 3600,
+  );
+
+  const rlts = await permanentRegister['renewENS(string,uint256)'](
+    result.name,
+    result.duration,
     {
       value: BigNumber.from(rentPrice)
         .mul(BigNumber.from(105))
         .div(BigNumber.from(100)),
-      gasLimit: 300000 * results.length,
+      gasLimit: 500000,
     },
   );
+  console.log(rlts, 'rewnew results');
 };
+
+// export const getNames = async (address, provider) => {
+//   const ENSInstance = new ENS();
+//   await ENSInstance.setProvider(provider);
+//   const names = await ENSInstance.getNames({
+//     address: address,
+//     type: 'resolvedAddress',
+//   });
+//   console.log(names, 'Resolved Names');
+//   return names;
+// };

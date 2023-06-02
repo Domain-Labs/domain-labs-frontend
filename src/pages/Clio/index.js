@@ -1,51 +1,48 @@
-import { useState, useEffect } from "react";
-import {
-  Box,
-  Typography,
-  Grid,
-  Button,
-  Paper,
-  TextField,
-} from "@mui/material";
-import { useNavigate, } from "react-router-dom";
-import searchImage from '../../assets/image/search.png';
 import './index.scss';
-import { useAccount } from "wagmi";
-import { useTheme } from "../../contexts/theme";
-import SearchResultComponent from "../../components/SearchResultComponent";
-import { clockLogo, lampLogo, lanLogo } from "../../utils/images";
-import axios from "axios";
-import { toast } from "react-toastify";
+
+import { Box, Button, Grid, Paper, TextField, Typography } from '@mui/material';
+import { clockLogo, lampLogo, lanLogo } from '../../utils/images';
+import { useEffect, useState } from 'react';
+
+import SearchResultComponent from '../../components/SearchResultComponent';
+import axios from 'axios';
+import searchImage from '../../assets/image/search.png';
+import { toast } from 'react-toastify';
+import { useAccount } from 'wagmi';
+import { useNavigate } from 'react-router-dom';
+import { useTheme } from '../../contexts/theme';
 
 const Clio = () => {
-  const {
-    theme,
-  } = useTheme();
+  const { theme } = useTheme();
 
-  const { address, } = useAccount();
+  const { address } = useAccount();
   const [clioQuery, setClioQuery] = useState('');
   const navigate = useNavigate();
   const [top, setTop] = useState(0);
-  const [isProcessing, setIsProcessing] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleSearch = async () => {
     // get name candidates from clio
-    setIsProcessing(true)
+    setIsProcessing(true);
 
     // check if signed up
-    const isAlreadySignedUp = (await axios.get(`/clios/is-signedUp/${address}`)).data;
-    console.log("is signed up: ", isAlreadySignedUp);
+    const isAlreadySignedUp = (await axios.get(`/clios/is-signedUp/${address}`))
+      .data;
+    console.log('is signed up: ', isAlreadySignedUp);
     if (!isAlreadySignedUp) {
       setTimeout(() => {
-        toast.error("Please sign up at first!");
+        toast.error('Please sign up at first!');
         navigate('/pricing');
         return;
       }, 1000);
     }
 
     // check if it is possible to use clio
-    if ((isAlreadySignedUp.freeCount === 0) && (isAlreadySignedUp.clioEndTimestamp < Math.round(Date.now() / 1000))) {
-      toast.error("You should pay to use clio!");
+    if (
+      isAlreadySignedUp.freeCount === 0 &&
+      isAlreadySignedUp.clioEndTimestamp < Math.round(Date.now() / 1000)
+    ) {
+      toast.error('You should pay to use clio!');
       setTimeout(() => {
         navigate('/pricing');
         return;
@@ -59,94 +56,82 @@ const Clio = () => {
 
     const postObject = {
       wallet: address,
-      clioQuery: (clioQuery ?? 'I am going to make shop site.') + 'How can I name that domain which ends with .eth? Please give me 10 domain names.',
-    }
+      clioQuery:
+        (clioQuery ?? 'I am going to make shop site.') +
+        'How can I name that domain which ends with .eth? Please give me 10 domain names.',
+    };
 
     const result = (await axios.post(`/clios/request-clio/`, postObject)).data;
-    console.log("=========:  request clio", result);
+    console.log('=========:  request clio', result);
 
     // setCartStatus({ names: result?.domainNames, cart: [] })
 
     setIsProcessing(false);
-  }
+  };
 
   const styles = {
     container: {
       backgroundColor: theme === 'dark-theme' ? '#2A2A2A' : 'white',
-      backgroundPosition: "center",
-      backgroundRepeat: "no-repeat",
-      backgroundSize: "cover",
-      minHeight: "100vh",
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      backgroundSize: 'cover',
+      minHeight: '100vh',
     },
   };
 
   const onKeyPressed = (e) => {
     if (e.code === 'Enter') {
-      handleSearch()
+      handleSearch();
     }
-  }
+  };
 
   useEffect(() => {
     let timerId = setInterval(() => {
       var w = window.innerWidth * (-2.7 / 100);
       if (top < w * 3) {
-        setTop(0)
+        setTop(0);
+      } else {
+        setTop(top + w);
       }
-      else {
-        setTop(top + w)
-      }
-    }, 2500)
+    }, 2500);
     return () => {
-      clearInterval(timerId)
-    }
-  }, [top])
+      clearInterval(timerId);
+    };
+  }, [top]);
 
   const pros = [
     {
       image: lanLogo,
       title: 'Algorithmic Accuracy',
-      description: 'Advanced AI technology for accurate suggestions based on user needs and preferences.',
+      description:
+        'Advanced AI technology for accurate suggestions based on user needs and preferences.',
     },
     {
       image: lampLogo,
       title: 'Instant Recommendations',
-      description: '“Hey Clio, help me find domains for an E-commerce store that sells Bitcoin apparel.”',
+      description:
+        '“Hey Clio, help me find domains for an E-commerce store that sells Bitcoin apparel.”',
     },
     {
       image: clockLogo,
       title: 'Time-Saving Solution',
       description: 'Personalized domain suggestions that save you time.',
     },
-  ]
+  ];
 
   return (
     <Box>
-      <Box
-        style={styles.container}
-        pb={'50px'}
-      >
-        <Box
-          overflow="hidden"
-          px={{ md: 10, xs: 5 }}
-          pt={25}
-        >
+      <Box style={styles.container} pb={'50px'}>
+        <Box overflow="hidden" px={{ md: 10, xs: 5 }} pt={25}>
           <Grid
             container
-            display='flex'
+            display="flex"
             alignItems="center"
             justifyContent="center"
           >
-            <Grid
-              item
-              xs={12}
-              sm={12}
-            >
+            <Grid item xs={12} sm={12}>
               {/* search box of main page*/}
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-              >
+              <Box display="flex" justifyContent="center" alignItems="center">
                 <Paper
                   style={{
                     maxWidth: '960px',
@@ -160,15 +145,15 @@ const Clio = () => {
                     paddingLeft: '24px',
                     paddingRight: '10px',
                     borderRadius: '16px',
-                    boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)'
+                    boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
                   }}
-                  className='clio-query-wrapper'
+                  className="clio-query-wrapper"
                 >
                   <TextField
                     value={clioQuery}
                     placeholder={'Hi, I’m Clio. How can I help?'}
                     onChange={(e) => {
-                      setClioQuery(e.target.value)
+                      setClioQuery(e.target.value);
                     }}
                     onKeyUp={onKeyPressed}
                     InputProps={{
@@ -179,13 +164,13 @@ const Clio = () => {
                     style={{
                       width: '100%',
                     }}
-                    variant='standard'
+                    variant="standard"
                   />
 
                   <Button
                     onClick={handleSearch}
                     style={{
-                      minWidth: '40px'
+                      minWidth: '40px',
                     }}
                   >
                     <Box
@@ -214,7 +199,7 @@ const Clio = () => {
 
               <Box
                 display={'flex'}
-                py='32px'
+                py="32px"
                 px={1}
                 mx={{ xs: 'unset', lg: 'calc((100vw - 994px) / 2 - 100px)' }}
                 gap={'5px'}
@@ -255,12 +240,10 @@ const Clio = () => {
                   borderRadius: '12px',
                   textAlign: 'center',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
                 }}
               >
-                <Box
-                  display={'block'}
-                >
+                <Box display={'block'}>
                   {/* title of main page*/}
                   <Box
                     style={{
@@ -273,7 +256,7 @@ const Clio = () => {
                     <Typography
                       fontSize={{ xs: '25px', md: '33px' }}
                       mr={{ xs: '2px', sm: '5px' }}
-                      py='5px'
+                      py="5px"
                       style={{
                         borderRadius: '12px',
                         textAlign: 'center',
@@ -294,13 +277,14 @@ const Clio = () => {
                       mx={{ xs: '2px', sm: '10px' }}
                       style={{
                         textTransform: 'uppercase',
-                        color: "#513eff",
+                        color: '#513eff',
                         fontFamily: 'Inter',
                         fontWeight: '700',
                         whiteSpace: 'nowrap',
-                        background: 'linear-gradient(90deg,#4BD8D8,#146EB4,#4BD8D8,#146EB4,#4BD8D8,#146EB4,#4BD8D8,#146EB4,#4BD8D8,#146EB4,#4BD8D8,#146EB4)',
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
+                        background:
+                          'linear-gradient(90deg,#4BD8D8,#146EB4,#4BD8D8,#146EB4,#4BD8D8,#146EB4,#4BD8D8,#146EB4,#4BD8D8,#146EB4,#4BD8D8,#146EB4)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
                       }}
                     >
                       {/* -webkit-background-clip */}
@@ -308,7 +292,7 @@ const Clio = () => {
                     </Typography>
                     <Typography
                       fontSize={{ xs: '25px', md: '33px' }}
-                      py='5px'
+                      py="5px"
                       style={{
                         borderRadius: '12px',
                         textAlign: 'center',
@@ -328,7 +312,7 @@ const Clio = () => {
 
                     <Typography
                       fontSize={{ xs: '25px', md: '33px' }}
-                      py='5px'
+                      py="5px"
                       style={{
                         borderRadius: '12px',
                         textAlign: 'center',
@@ -350,7 +334,7 @@ const Clio = () => {
                   <Box
                     display={{ xs: 'block', sm: 'none' }}
                     fontSize={{ xs: '25px', md: '33px' }}
-                    py='5px'
+                    py="5px"
                     style={{
                       borderRadius: '12px',
                       textAlign: 'center',
@@ -373,7 +357,7 @@ const Clio = () => {
                 justifyContent={'center'}
                 alignItems={'center'}
                 p={'57px 20px'}
-                className='pros-component'
+                className="pros-component"
               >
                 <Box
                   display="flex"
@@ -382,97 +366,92 @@ const Clio = () => {
                   gap={'60px'}
                   flexDirection={{ xs: 'column', lg: 'row' }}
                 >
-                  {
-                    pros.map((item, index) => (
+                  {pros.map((item, index) => (
+                    <Box
+                      width={'341px'}
+                      minHeight={'338px'}
+                      justifyContent={'start'}
+                      alignItems={'center'}
+                      gap={'12px'}
+                      borderRadius={'40px'}
+                      sx={{
+                        background: '#0E4F81',
+                      }}
+                      key={index}
+                    >
                       <Box
-                        width={'341px'}
-                        minHeight={'338px'}
-                        justifyContent={'start'}
-                        alignItems={'center'}
-                        gap={'12px'}
-                        borderRadius={'40px'}
-                        sx={{
-                          background: '#0E4F81',
-                        }}
-                        key={index}
+                        display="flex"
+                        p={'74px 40px 25px'}
+                        justifyContent={'center'}
+                        flexDirection={'column'}
                       >
+                        <Box display={'flex'} justifyContent={'center'}>
+                          <img
+                            src={item.image}
+                            width={'100px'}
+                            height={'100px'}
+                            alt=""
+                          />
+                        </Box>
+
                         <Box
-                          display="flex"
-                          p={'74px 40px 25px'}
+                          display={'flex'}
                           justifyContent={'center'}
-                          flexDirection={'column'}
+                          mt={'37px'}
                         >
-                          <Box
-                            display={'flex'}
-                            justifyContent={'center'}
+                          <Typography
+                            // display={'flex'}
+                            justifyContent={'right'}
+                            // textAlign={'start'}
+                            // width={{ xs: 'unset', md: 'max-content' }}
+                            sx={{
+                              fontFamily: 'Inter',
+                              fontStyle: 'normal',
+                              fontWeight: '900',
+                              fontSize: '20px',
+                              lineHeight: '24px',
+                              letterSpacing: '-0.01em',
+                              color: 'white',
+                            }}
                           >
-                            <img
-                              src={item.image}
-                              width={'100px'}
-                              height={'100px'}
-                              alt=""
-                            />
-                          </Box>
+                            {item.title}
+                          </Typography>
+                        </Box>
 
-                          <Box
+                        <Box
+                          display={'flex'}
+                          justifyContent={'center'}
+                          mt={'21px'}
+                        >
+                          <Typography
                             display={'flex'}
                             justifyContent={'center'}
-                            mt={'37px'}
+                            // textAlign={'start'}
+                            // width={{ xs: 'unset', md: 'max-content' }}
+                            sx={{
+                              fontFamily: 'Inter',
+                              fontStyle: 'normal',
+                              fontWeight: '500',
+                              fontSize: '16px',
+                              lineHeight: '19px',
+                              letterSpacing: '-0.01em',
+                              color: 'white',
+                            }}
                           >
-                            <Typography
-                              // display={'flex'}
-                              justifyContent={'right'}
-                              // textAlign={'start'}
-                              // width={{ xs: 'unset', md: 'max-content' }}
-                              sx={{
-                                fontFamily: 'Inter',
-                                fontStyle: 'normal',
-                                fontWeight: '900',
-                                fontSize: '20px',
-                                lineHeight: '24px',
-                                letterSpacing: '-0.01em',
-                                color: 'white',
-                              }}
-                            >
-                              {item.title}
-                            </Typography>
-                          </Box>
-
-                          <Box
-                            display={'flex'}
-                            justifyContent={'center'}
-                            mt={'21px'}
-                          >
-                            <Typography
-                              display={'flex'}
-                              justifyContent={'center'}
-                              // textAlign={'start'}
-                              // width={{ xs: 'unset', md: 'max-content' }}
-                              sx={{
-                                fontFamily: 'Inter',
-                                fontStyle: 'normal',
-                                fontWeight: '500',
-                                fontSize: '16px',
-                                lineHeight: '19px',
-                                letterSpacing: '-0.01em',
-                                color: 'white',
-                              }}
-                            >
-                              {item.description}
-                            </Typography>
-                          </Box>
+                            {item.description}
+                          </Typography>
                         </Box>
                       </Box>
-                    ))
-                  }
+                    </Box>
+                  ))}
                 </Box>
               </Box>
             </Grid>
           </Grid>
         </Box>
 
-        {
-          !isProcessing && (<Box
+        {!isProcessing && (
+          <Box
             px={{ xs: '30px', sm: '40px' }}
             sx={{
               backgroundColor: theme === 'dark-theme' ? '#2A2A2A' : 'white',
@@ -482,7 +461,7 @@ const Clio = () => {
             <Box>
               <Typography
                 fontSize={{ xs: '25px', md: '33px' }}
-                my='25px'
+                my="25px"
                 display={'flex'}
                 justifyContent={'left'}
                 style={{
@@ -501,11 +480,11 @@ const Clio = () => {
             </Box>
 
             <SearchResultComponent />
-          </Box>)
-        }
+          </Box>
+        )}
       </Box>
-    </Box >
+    </Box>
   );
-}
+};
 
 export default Clio;

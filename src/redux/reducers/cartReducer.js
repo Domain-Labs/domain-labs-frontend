@@ -1,7 +1,22 @@
-import { ADD_CART, REMOVE_ALL, REMOVE_CART } from "../actions/cartActions";
+import {
+  ADD_CART,
+  BUY_DOMAIN,
+  BUY_DOMAIN_FAILED,
+  BUY_DOMAIN_SUCCESS,
+  REMOVE_ALL,
+  REMOVE_CART,
+  REQUEST_DOMAIN,
+  REQUEST_DOMAIN_FAIL,
+  REQUEST_DOMAIN_SUCCESS,
+  SET_STEP,
+} from '../actions/cartActions';
 
 const initialState = {
   cart: [],
+  step: 0, //0: buy domain, 1: waiting for 60s, 2: register domain
+  waiting: null,
+  loading: false,
+  buyItems: [],
 };
 
 const cartReducer = (state = initialState, action) => {
@@ -9,11 +24,15 @@ const cartReducer = (state = initialState, action) => {
   switch (action.type) {
     case ADD_CART:
       exist = state.cart.findIndex((item) => {
-        return item.name === action.payload.name && item.domain === action.payload.domain;
+        return (
+          item.name === action.payload.name &&
+          item.domain === action.payload.domain
+        );
       });
       if (exist < 0) {
-        const nCart = [...state.cart, {...action.payload}];
+        const nCart = [...state.cart, { ...action.payload }];
         return {
+          ...state,
           cart: nCart,
         };
       } else {
@@ -23,25 +42,74 @@ const cartReducer = (state = initialState, action) => {
       }
     case REMOVE_CART:
       exist = state.cart.findIndex((item) => {
-        return item.name === action.payload.name && item.domain === action.payload.domain;
+        return (
+          item.name === action.payload.name &&
+          item.domain === action.payload.domain
+        );
       });
-      console.log(exist, action.payload,"item");
+      console.log(exist, action.payload, 'item');
       if (exist < 0) {
         return {
           ...state,
         };
       } else {
         const nCart = [...state.cart];
-        nCart.splice(exist, 1)
+        nCart.splice(exist, 1);
         return {
+          ...state,
           cart: nCart,
         };
       }
     case REMOVE_ALL:
-      const filtered = state.cart.filter((item) => item.domain !== action.payload.domain);
+      const filtered = state.cart.filter(
+        (item) => item.domain !== action.payload.domain,
+      );
       return {
-        cart: filtered
-      }
+        ...state,
+        cart: [], // filtered
+      };
+    case SET_STEP:
+      return {
+        ...state,
+        step: action.payload,
+      };
+    case REQUEST_DOMAIN:
+      return {
+        ...state,
+        loading: true,
+      };
+    case REQUEST_DOMAIN_FAIL:
+      return {
+        ...state,
+        loading: false,
+      };
+    case REQUEST_DOMAIN_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        waiting: Date.now(),
+        step: 1,
+      };
+    case BUY_DOMAIN:
+      return {
+        ...state,
+        loading: true,
+        buyItems: action.payload,
+      };
+    case BUY_DOMAIN_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        buyItems: [],
+        step: 0,
+      };
+    case BUY_DOMAIN_FAILED:
+      return {
+        ...state,
+        loading: false,
+        buyItems: [],
+        step: 0,
+      };
     default:
       return state;
   }

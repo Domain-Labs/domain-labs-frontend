@@ -18,11 +18,17 @@ import {
   whiteVectorImage,
 } from '../../utils/images';
 import { domainNames, domainSuffixes } from '../../config';
-import { removeAll, removeCart } from '../../redux/actions/cartActions';
+import {
+  removeAll,
+  removeCart,
+  requestDomain,
+  setStep,
+} from '../../redux/actions/cartActions';
 
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { LoadingButton } from '@mui/lab';
 import { domainLogoImages } from '../../config';
+import { getPriceInUSD } from '../../utils/EtherUtils';
 import randomBytes from 'randombytes';
 import timer from '../../assets/image/timer.png';
 import { useDapp } from '../../contexts/dapp';
@@ -35,14 +41,19 @@ const Cart = () => {
   const { address, provider, signer, networkId } = useDapp();
   const { cart } = useSelector((state) => state.cart);
   const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [buttonText, setButtonText] = useState('Request Domains');
+  // const [loading, setLoading] = useState(false);
+  const [waitingTime, setWaitingTime] = useState(60);
   const [price, setPrice] = useState(0);
-  const [step, setStep] = useState(0);
-  const [gasPrice] = useState(0);
+  const [priceInUsd, setPriceInUsd] = useState(0);
+  // const [step, setStep] = useState(0);
+  const [gasPrice, setGasPrice] = useState(0);
   const navigate = useNavigate();
   const { theme } = useTheme();
   const dispatch = useDispatch();
+  const { loading, step, waiting } = useSelector((state) => {
+    console.log(state);
+    return state.cart;
+  });
 
   const _removeCart = (_domainName, domain) => {
     dispatch(removeCart({ name: _domainName, domain: domain }));
@@ -61,32 +72,15 @@ const Cart = () => {
     navigate('/home');
   };
 
-  const requestDomain = async () => {
-    let domainFuncs;
-    if (networkId === 1 || networkId === 5) {
-      domainFuncs = ENS;
-    } else {
-      domainFuncs = BNS;
-    }
-    setLoading(true);
-    setButtonText('Requesting...');
-    try {
-      const rlt = await domainFuncs.commits(results, provider, signer);
-      console.log(rlt, 'result from commits');
-      // if (rlt) {
-      setButtonText('Waiting for 60s');
-      setTimeout(() => {
-        setStep(1);
-        setButtonText('Buy Domains');
-        setLoading(false);
-      }, 60000);
-      // } else {
-      //   setButtonText('Request Domains');
-      //   setLoading(false);
-      // }
-    } catch (error) {
-      console.log(error, 'error message');
-    }
+  const _requestDomain = async () => {
+    dispatch(
+      requestDomain({
+        network: networkId === 1 ? 'ENS' : 'BNS',
+        results,
+        provider,
+        signer,
+      }),
+    );
   };
 
   const buyDomain = async () => {
@@ -96,7 +90,7 @@ const Cart = () => {
     } else {
       domainFuncs = BNS;
     }
-    setLoading(true);
+    // setLoading(true);
 
     try {
       await domainFuncs.register(results, provider, signer);
@@ -105,8 +99,8 @@ const Cart = () => {
     } catch (err) {
       console.log(err, 'error from buyDomain');
     }
-    setStep(0);
-    setLoading(false);
+    // setStep(0);
+    // setLoading(false);
   };
 
   const timeSelect = async (idx, value) => {
@@ -119,17 +113,37 @@ const Cart = () => {
     } else {
       domainFuncs = BNS;
     }
-    const price = await domainFuncs.getRentPrice(
+    const result = await domainFuncs.getRentPrice(
       nResults[idx].name,
       nResults[idx].year,
       provider,
     );
-    nResults[idx].price = price;
+    nResults[idx].price = result.price;
+    nResults[idx].gasPrice = result.gasPrice;
+
     setResults(nResults);
+  };
+
+  const buttonText = () => {
+    if (step === 0) {
+      return 'Request Domains';
+    } else if (step === 1) {
+      return `Waiting for ${waitingTime}s`;
+    } else if (step === 2) {
+      return 'Buy Domains';
+    }
   };
 
   useEffect(() => {
     const domainSuffix = domainSuffixes[networkId];
+    const domainName = domainNames[networkId];
+    getPriceInUSD(domainName)
+      .then((res) => {
+        setPriceInUsd(res);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
     const tmps = cart
       .filter((_item) => _item.domain === domainSuffix)
       .map((item) => {
@@ -145,30 +159,42 @@ const Cart = () => {
           year: 0,
           duration: 0,
           price: price,
+          gasPrice: gasPrice,
           secret: '0x' + randomBytes(32).toString('hex'),
         };
       });
     setResults(tmps);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [cart, networkId, price]);
 
   useEffect(() => {
     let _price = 0;
+    let _gas = 0;
     results.map(async (item) => {
       _price += item.price;
+      _gas += item.gasPrice;
     });
     setPrice(_price);
+    setGasPrice(_gas);
+    dispatch(setStep(0));
   }, [results]);
 
   useEffect(() => {
-    // let domainFuncs;
-    // if (networkId === 1 || networkId === 5) {
-    //   domainFuncs = ENS;
-    // } else {
-    //   domainFuncs = BNS;
-    // }
-    // domainFuncs.getPriceInUSD();
-  }, [networkId]);
+    if (step === 1) {
+      let timerId = setInterval(() => {
+        const now = Date.now();
+        const timeElapsed = Math.floor((now - waiting) / 1000);
+        setWaitingTime(60 - timeElapsed);
+        console.log(timeElapsed, waiting, '---------');
+        if (timeElapsed >= 60) {
+          dispatch(setStep(2));
+        }
+      }, 1000);
+      return () => {
+        clearInterval(timerId);
+      };
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, step]);
 
   return (
     <Box
@@ -295,7 +321,7 @@ const Cart = () => {
               borderBottom: '0.5px solid #D3D3D3',
             }}
           >
-            <Typography>Total {domainSuffixes[networkId]}</Typography>
+            <Typography>Total {domainNames[networkId]}</Typography>
             <Typography>{price}</Typography>
           </Box>
           <Box
@@ -312,7 +338,9 @@ const Cart = () => {
             }}
           >
             <Typography>Total USD</Typography>
-            <Typography>{price * 343}</Typography>
+            <Typography>
+              {Math.floor(price * priceInUsd * 100) / 100}
+            </Typography>
           </Box>
           <Box
             display={'flex'}
@@ -328,7 +356,9 @@ const Cart = () => {
             }}
           >
             <Typography>Gas Price</Typography>
-            <Typography>{gasPrice}</Typography>
+            <Typography>
+              {Math.floor(gasPrice * priceInUsd * 100) / 100}
+            </Typography>
           </Box>
           <Box
             display={'flex'}
@@ -346,13 +376,13 @@ const Cart = () => {
               Grand total($)
             </Typography>
             <Typography fontSize={'24px'} fontWeight={'700'}>
-              {price * 343}
+              {Math.floor((price + gasPrice) * priceInUsd * 100) / 100}
             </Typography>
           </Box>
           <Box>
             <LoadingButton
               loading={loading}
-              loadingPosition="end"
+              disabled={step === 1}
               sx={{
                 background:
                   'linear-gradient(86.23deg, #4BD8D8 -48.31%, #146EB4 114.96%)',
@@ -363,10 +393,10 @@ const Cart = () => {
                 px: '40px',
               }}
               onClick={() => {
-                step === 0 ? requestDomain() : buyDomain();
+                step === 0 ? _requestDomain() : buyDomain();
               }}
             >
-              {buttonText}
+              {buttonText()}
             </LoadingButton>
           </Box>
         </Box>

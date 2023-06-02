@@ -99,6 +99,7 @@ const SearchResult = () => {
 
   useEffect(() => {
     if (provider && signer) {
+      console.log('check availability');
       _checkAvailability();
     }
   }, [_checkAvailability, provider, signer, address, networkId]);
