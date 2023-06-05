@@ -1,18 +1,16 @@
 import axios from 'axios';
 
-export const getTransactionReceiptMined = (web3Interface, txHash, interval) => {
+export const getTransactionReceiptMined = (web3, txHash, interval) => {
   const transactionReceiptAsync = function (resolve, reject) {
-    web3Interface.eth.getTransactionReceipt(txHash, (error, receipt) => {
+    web3.eth.getTransactionReceipt(txHash, (error, receipt) => {
       if (error) {
         reject(error);
       } else if (receipt == null) {
-        console.log('restart ...');
         setTimeout(
           () => transactionReceiptAsync(resolve, reject),
           interval ? interval : 500,
         );
       } else {
-        console.log(receipt, 'finished ...');
         resolve(receipt);
       }
     });
