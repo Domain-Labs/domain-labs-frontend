@@ -17,7 +17,7 @@ import {
   whiteOffShoppingImage,
   whiteVectorImage,
 } from '../../utils/images';
-import { domainNames, domainSuffixes } from '../../config';
+import { domainExtensions, domainNames, domainSuffixes } from '../../config';
 import {
   removeAll,
   removeCart,
@@ -51,7 +51,6 @@ const Cart = () => {
   const { theme } = useTheme();
   const dispatch = useDispatch();
   const { loading, step, waiting } = useSelector((state) => {
-    console.log(state);
     return state.cart;
   });
 
@@ -136,7 +135,7 @@ const Cart = () => {
 
   useEffect(() => {
     const domainSuffix = domainSuffixes[networkId];
-    const domainName = domainNames[networkId];
+    const domainName = domainExtensions[networkId];
     getPriceInUSD(domainName)
       .then((res) => {
         setPriceInUsd(res);
@@ -176,7 +175,7 @@ const Cart = () => {
     setPrice(_price);
     setGasPrice(_gas);
     dispatch(setStep(0));
-  }, [results]);
+  }, [dispatch, results]);
 
   useEffect(() => {
     if (step === 1) {
@@ -184,7 +183,6 @@ const Cart = () => {
         const now = Date.now();
         const timeElapsed = Math.floor((now - waiting) / 1000);
         setWaitingTime(60 - timeElapsed);
-        console.log(timeElapsed, waiting, '---------');
         if (timeElapsed >= 60) {
           dispatch(setStep(2));
         }
@@ -469,8 +467,7 @@ const Cart = () => {
           display="grid"
         >
           {results.length > 0 &&
-            cart.length > 0 &&
-            cart.map((item, idx) => {
+            results.map((item, idx) => {
               return (
                 <Box
                   key={idx}

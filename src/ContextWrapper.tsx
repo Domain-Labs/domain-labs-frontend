@@ -1,31 +1,86 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Layout from "./Layout";
-import Cart from "./pages/Cart"
-import Home from "./pages/Home";
-import SearchResult from "./pages/SearchResult";
-import Admin from "./pages/Admin";
-import ComingSoon from "./pages/ComingSoon";
-import Clio from "./pages/Clio";
-import Faqs from "./pages/Faqs";
-import Pricing from "./pages/Pricing";
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+
+import Admin from './pages/Admin';
+import Cart from './pages/Cart';
+import Clio from './pages/Clio';
+import ComingSoon from './pages/ComingSoon';
+import Faqs from './pages/Faqs';
+import Home from './pages/Home';
+import Layout from './Layout';
+import Pricing from './pages/Pricing';
 import Profile from './pages/Profile';
+import SearchResult from './pages/SearchResult';
+import { useDapp } from './contexts/dapp';
+
+function PrivateRoute(props: any) {
+  const { isConnected } = useDapp();
+  if (!isConnected) return <Navigate to="/home" />;
+  return props.children;
+}
 
 const ContextWrapper = () => {
-
   return (
     <BrowserRouter>
-      <Layout
-      >
+      <Layout>
         <Routes>
           <Route path="/home" element={<Home />} />
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="/search-result" element={<SearchResult />} />
-          <Route path="/clio" element={<Clio />} />
-          <Route path="/faqs" element={<Faqs />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path='/admin' element={<Admin />} />
-          <Route path='/profile' element={<Profile />} />
-          <Route path='/' element={<ComingSoon />} />
+          <Route
+            path="/pricing"
+            element={
+              <PrivateRoute>
+                <Pricing />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/search-result"
+            element={
+              <PrivateRoute>
+                <SearchResult />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/clio"
+            element={
+              <PrivateRoute>
+                <Clio />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/faqs"
+            element={
+              <PrivateRoute>
+                <Faqs />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/cart"
+            element={
+              <PrivateRoute>
+                <Cart />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <PrivateRoute>
+                <Admin />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            }
+          />
+          <Route path="/" element={<Navigate to={'/home'} />} />
         </Routes>
       </Layout>
     </BrowserRouter>

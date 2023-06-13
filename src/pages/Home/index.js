@@ -20,6 +20,7 @@ import binanceLogo from '../../assets/image/svgs/binance-logo.svg';
 import ensLogo from '../../assets/image/svgs/ens-logo.svg';
 import searchImage from '../../assets/image/search.png';
 import { setSearchString } from '../../redux/actions/domainActions';
+import { toast } from 'react-toastify';
 import { useDapp } from '../../contexts/dapp';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -29,7 +30,7 @@ const Home = () => {
   const { switchNetwork } = useSwitchNetwork();
   const { chain } = useNetwork();
   const dispatch = useDispatch();
-  const { setNetworkId } = useDapp();
+  const { setNetworkId, isConnected } = useDapp();
   const { theme } = useTheme();
   const [, setChainId] = useState(chain ? chain.id : 5);
   const [isOpenAdvancedSearch, setIsOpenAdvancedSearch] = useState(false);
@@ -38,6 +39,10 @@ const Home = () => {
   const [top, setTop] = useState(0);
 
   const handleChainChange = (event) => {
+    if (!isConnected) {
+      toast.error('Please switch your chain');
+      return;
+    }
     const id = Number(event.target.value);
     switchNetwork(`0x${id.toString(16)}`);
     setChainId(id);
@@ -45,11 +50,19 @@ const Home = () => {
   };
 
   const searchClicked = () => {
+    if (!isConnected) {
+      toast.error('Please switch your chain');
+      return;
+    }
     dispatch(setSearchString(searchStr.toLowerCase()));
     navigate(`/search-result`);
   };
 
   const onKeyPressed = (e) => {
+    if (!isConnected) {
+      toast.error('Please switch your chain');
+      return;
+    }
     if (e.code === 'Enter') {
       searchClicked();
     }
@@ -240,7 +253,13 @@ const Home = () => {
                         }}
                         fontSize={{ xs: '12px', sm: ' 14px', md: '16px' }}
                         className="custom-font"
-                        onClick={() => setIsOpenAdvancedSearch(true)}
+                        onClick={() => {
+                          if (!isConnected) {
+                            toast.error('Please switch your chain');
+                            return;
+                          }
+                          setIsOpenAdvancedSearch(true);
+                        }}
                       >
                         Advanced Search
                       </Typography>
@@ -309,6 +328,7 @@ const Home = () => {
                           fontFamily: 'Inter',
                           fontWeight: '700',
                           whiteSpace: 'nowrap',
+                          cursor: 'pointer',
                           background:
                             'linear-gradient(90deg,#4BD8D8,#146EB4,#4BD8D8,#146EB4,#4BD8D8,#146EB4,#4BD8D8,#146EB4,#4BD8D8,#146EB4,#4BD8D8,#146EB4)',
                           WebkitBackgroundClip: 'text',

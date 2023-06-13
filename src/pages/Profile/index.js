@@ -82,27 +82,32 @@ const Profile = () => {
     setModal('extend');
   };
 
+  const handleTransfer = (domain) => {
+    setSelDomain(domain);
+    setModal('transfer');
+  };
+
   useEffect(() => {
-    console.log(address, 'address');
     dispatch(getDomainsByAddress(address));
   }, [address, dispatch]);
 
   useEffect(() => {
     const perPage = 5; // perPage
-    console.log(domains);
     let network = 0;
     if (networkId === 1) {
       network = 0;
     } else if (networkId === 56) {
       network = 1;
     }
-    const fDomains = domains.filter((domain) => domain.network === network);
-    setTotalPage(Math.ceil(fDomains.length / 5));
-    const tmp = fDomains.slice(
-      perPage * (currentPage - 1),
-      perPage * currentPage,
-    );
-    setOnePageDomains(tmp);
+    if (domains && domains.length) {
+      const fDomains = domains.filter((domain) => domain.network === network);
+      setTotalPage(Math.ceil(fDomains.length / 5));
+      const tmp = fDomains.slice(
+        perPage * (currentPage - 1),
+        perPage * currentPage,
+      );
+      setOnePageDomains(tmp);
+    }
   }, [currentPage, domains, networkId]);
 
   return (
@@ -142,7 +147,7 @@ const Profile = () => {
             Profile
           </Typography>
         </Box>
-        <Box display={'flex'} alignItems={'center'}>
+        {/* <Box display={'flex'} alignItems={'center'}>
           <Button
             variant="contained"
             color="inherit"
@@ -159,7 +164,7 @@ const Profile = () => {
             <RxPlusCircled />
             &nbsp;Domain Transfer
           </Button>
-        </Box>
+        </Box> */}
       </Box>
       <Box
         display={{ xs: 'block', sm: 'flex' }}
@@ -223,7 +228,7 @@ const Profile = () => {
               </Typography>
             </Box>
           </Box>
-          <Box
+          {/* <Box
             display={'flex'}
             alignItems={'center'}
             alignSelf={'center'}
@@ -240,7 +245,7 @@ const Profile = () => {
           >
             <FaArrowCircleUp />
             &nbsp;Domain Renew
-          </Box>
+          </Box> */}
         </Box>
         <TableContainer
           component={Paper}
@@ -309,12 +314,12 @@ const Profile = () => {
                       width: '30px',
                     }}
                   >
-                    <Checkbox
+                    {/* <Checkbox
                       sx={{
                         fontWeight: 700,
                         color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
                       }}
-                    />
+                    /> */}
                   </TableCell>
                   <TableCell
                     component="td"
@@ -353,15 +358,43 @@ const Profile = () => {
                   </TableCell>
                   <TableCell
                     align="right"
-                    onClick={() => handleExtend(row)}
                     sx={{
-                      fontWeight: 700,
                       color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
-                      textUnderlinePosition: 'under',
-                      textDecoration: 'underline',
                     }}
                   >
-                    Extend
+                    <Button
+                      variant="contained"
+                      color="inherit"
+                      sx={{
+                        background:
+                          theme === 'dark-theme' ? '#AAA' : linearGradient,
+                        color: 'white',
+                        ':hover': {
+                          color: 'white',
+                          backgroundColor: '#AAA',
+                        },
+                      }}
+                      onClick={() => handleTransfer(row)}
+                    >
+                      Transfer
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="inherit"
+                      sx={{
+                        background:
+                          theme === 'dark-theme' ? '#AAA' : linearGradient,
+                        color: 'white',
+                        ':hover': {
+                          color: 'white',
+                          backgroundColor: '#AAA',
+                        },
+                        marginLeft: 1,
+                      }}
+                      onClick={() => handleExtend(row)}
+                    >
+                      Extend
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -390,7 +423,11 @@ const Profile = () => {
           />
         </TableContainer>
       </Box>
-      <TransferDialog open={modal === 'transfer'} close={() => setModal('')} />
+      <TransferDialog
+        open={modal === 'transfer'}
+        close={() => setModal('')}
+        domain={selDomain}
+      />
       <ExtendDialog
         open={modal === 'extend'}
         close={() => setModal('')}

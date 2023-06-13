@@ -81,14 +81,18 @@ const SearchResult = () => {
       domain.searchList.map((searchString) => {
         if (searchString === '' || !searchString) return false;
         domainFuncs.checkAvailability(searchString, provider).then((rlt) => {
-          const exist = cart.cart.findIndex((item) => item.name === rlt.name);
-          const exist1 = results.findIndex((item) => item.name === rlt.name);
-          if (exist1 === -1) {
-            setResults((prev) => {
-              const nRlts = [...prev];
-              nRlts.push({ ...rlt, cart: exist > -1 });
-              return nRlts;
-            });
+          if (domain.isClio && !rlt.available) {
+            return false;
+          } else {
+            const exist = cart.cart.findIndex((item) => item.name === rlt.name);
+            const exist1 = results.findIndex((item) => item.name === rlt.name);
+            if (exist1 === -1) {
+              setResults((prev) => {
+                const nRlts = [...prev];
+                nRlts.push({ ...rlt, cart: exist > -1 });
+                return nRlts;
+              });
+            }
           }
         });
         return true;
@@ -102,7 +106,8 @@ const SearchResult = () => {
       console.log('check availability');
       _checkAvailability();
     }
-  }, [_checkAvailability, provider, signer, address, networkId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [_checkAvailability, provider, signer]);
 
   return (
     <Box
@@ -209,6 +214,7 @@ const SearchResult = () => {
               xs: 'repeat(1, 1fr)',
             },
           }}
+          alignItems={'flex-start'}
           gap={'20px'}
           display="grid"
         >

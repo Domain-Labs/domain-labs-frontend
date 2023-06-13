@@ -1,9 +1,14 @@
-import { SET_SEARCH_LIST, SET_SEARCH_STRING } from '../actions/domainActions';
+import {
+  SET_SEARACH_LIST_CLIO,
+  SET_SEARCH_LIST,
+  SET_SEARCH_STRING,
+} from '../actions/domainActions';
 
 const initialState = {
   searchString: '',
   searchList: [],
   isSingleSearch: true,
+  isClio: false,
 };
 
 const domainReducer = (state = initialState, action) => {
@@ -19,6 +24,14 @@ const domainReducer = (state = initialState, action) => {
         ...state,
         searchList: action.payload,
         isSingleSearch: false,
+        isClio: true,
+      };
+    case SET_SEARACH_LIST_CLIO:
+      return {
+        ...state,
+        searchList: action.payload,
+        isSingleSearch: false,
+        isClio: true,
       };
     default:
       return state;

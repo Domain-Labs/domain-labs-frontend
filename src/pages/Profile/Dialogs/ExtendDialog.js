@@ -17,7 +17,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { LoadingButton } from '@mui/lab';
 import { RxCrossCircled } from 'react-icons/rx';
-import { domainNames } from '../../../config';
+import { domainExtensions } from '../../../config';
 import { getPriceInUSD } from '../../../utils/EtherUtils';
 import { useDapp } from '../../../contexts/dapp';
 
@@ -48,7 +48,7 @@ export default function ExtendDialog(props) {
     } else {
       domainFuncs = BNS;
     }
-    const result = await domainFuncs.getRentPrice(
+    const result = await domainFuncs.getExtendPrice(
       domain.name,
       e.target.value,
       provider,
@@ -57,6 +57,7 @@ export default function ExtendDialog(props) {
   };
 
   const renewDomain = async () => {
+    if (!duration) return;
     let domainFuncs;
     if (networkId === 1 || networkId === 5) {
       domainFuncs = ENS;
@@ -74,11 +75,11 @@ export default function ExtendDialog(props) {
     );
     setLoading(false);
     console.log(result, 'result');
-    close();
+    setTimeout(() => close(), 500);
   };
 
   useEffect(() => {
-    const domainName = domainNames[networkId];
+    const domainName = domainExtensions[networkId];
     getPriceInUSD(domainName)
       .then((res) => {
         setPriceInUSD(res);
@@ -87,6 +88,11 @@ export default function ExtendDialog(props) {
         console.log(error);
       });
   }, [networkId]);
+
+  useEffect(() => {
+    setPrice(0);
+    setDuration(null);
+  }, [open]);
 
   return (
     <Dialog
@@ -169,7 +175,7 @@ export default function ExtendDialog(props) {
           required
           disabled
           variant="filled"
-          value={`${price} ${domainNames[networkId]}`}
+          value={`${price} ${domainExtensions[networkId]}`}
           sx={{
             width: '100%',
             marginTop: '10px',

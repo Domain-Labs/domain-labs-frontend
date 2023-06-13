@@ -1,30 +1,31 @@
-import { Box, Typography, Button } from "@mui/material";
-import { useState, useEffect } from "react";
-import { useNetwork } from "wagmi";
-import {
-    domainSuffixes,
-    domainLogoImages,
-    domainNames,
-    bscChainId,
-    bscTestnetChainId,
-} from "../../config";
-import {
-    whiteBookmarkImage,
-    blackBookmarkImage,
-    blackOnshoppingImage,
-    whiteOffShoppingImage,
-    blackOffshoppingImage,
-} from "../../utils/images";
-import SearchDetailModal from "../Modal/SearchDetailModal";
+import 'react-toggle/style.css';
 
-import "react-toggle/style.css";
+import { Box, Button, Typography } from '@mui/material';
+import {
+  blackBookmarkImage,
+  blackOffshoppingImage,
+  blackOnshoppingImage,
+  whiteBookmarkImage,
+  whiteOffShoppingImage,
+} from '../../utils/images';
+import {
+  bscChainId,
+  bscTestnetChainId,
+  domainLogoImages,
+  domainNames,
+  domainSuffixes,
+} from '../../config';
+import { useEffect, useState } from 'react';
 
-const SearchResultComponent = () => {
+import SearchDetailModal from '../Modal/SearchDetailModal';
+import { useNetwork } from 'wagmi';
+
+const SearchResultComponent = (props) => {
   const { chain } = useNetwork();
-  const [results] = useState([]);
+  const [results] = useState(props.domains);
   const [sale] = useState([]);
   const [isSelectedAll] = useState(false);
-  const [domainLogoImage, setDomainLogoImage] = useState("");
+  const [domainLogoImage, setDomainLogoImage] = useState('');
   const [searchId, setSearchId] = useState(0);
   const [isOpenSearchDetailModal, setIsOpenSearchDetailModal] = useState(false);
 
@@ -45,7 +46,7 @@ const SearchResultComponent = () => {
     const chainId =
       chain?.id !== undefined
         ? chain.id
-        : process.env.NEXT_PUBLIC_MAINNET_OR_TESTNET === "mainnet"
+        : process.env.NEXT_PUBLIC_MAINNET_OR_TESTNET === 'mainnet'
         ? bscChainId
         : bscTestnetChainId;
     setDomainLogoImage(domainLogoImages[chainId]);
@@ -53,18 +54,18 @@ const SearchResultComponent = () => {
 
   return (
     <>
-      <Box mt={"60px"} sx={{ flexDirection: "row" }}>
+      <Box mt={'60px'} sx={{ flexDirection: 'row' }}>
         {results.length > 0 && (
-          <Box display={"flex"} justifyContent={"right"}>
+          <Box display={'flex'} justifyContent={'right'}>
             <Button
               sx={{
-                color: "white",
-                px: "20px",
-                py: "10px",
+                color: 'white',
+                px: '20px',
+                py: '10px',
                 background:
-                  "linear-gradient(79.42deg, #4BD8D8 -28.43%, #146EB4 125.83%)",
-                borderRadius: "8px",
-                width: "150px",
+                  'linear-gradient(79.42deg, #4BD8D8 -28.43%, #146EB4 125.83%)',
+                borderRadius: '8px',
+                width: '150px',
               }}
               onClick={() => handleSelectOrDeselectAll()}
             >
@@ -74,16 +75,16 @@ const SearchResultComponent = () => {
         )}
         <Box
           sx={{
-            marginTop: "20px",
-            paddingBottom: "40px",
+            marginTop: '20px',
+            paddingBottom: '40px',
             gridTemplateColumns: {
-              lg: "repeat(4, 1fr)",
-              md: "repeat(3, 1fr)",
-              sm: "repeat(2, 1fr)",
-              xs: "repeat(1, 1fr)",
+              lg: 'repeat(4, 1fr)',
+              md: 'repeat(3, 1fr)',
+              sm: 'repeat(2, 1fr)',
+              xs: 'repeat(1, 1fr)',
             },
           }}
-          gap={"20px"}
+          gap={'20px'}
           display="grid"
         >
           {results?.map((result, id) =>
@@ -91,39 +92,39 @@ const SearchResultComponent = () => {
               <Box
                 key={id}
                 sx={{
-                  padding: "25px 20px 10px 20px",
-                  boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
-                  borderRadius: "16px",
-                  marginBottom: "8px",
+                  padding: '25px 20px 10px 20px',
+                  boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+                  borderRadius: '16px',
+                  marginBottom: '8px',
                   background:
-                    "linear-gradient(79.42deg, #4BD8D8 -28.43%, #146EB4 125.83%)",
+                    'linear-gradient(79.42deg, #4BD8D8 -28.43%, #146EB4 125.83%)',
                 }}
                 onClick={() => onClickToDetail(id)}
               >
                 <Box
                   justifyContent="center"
                   display="inline-flex"
-                  gap={"5px"}
-                  alignItems={"center"}
-                  textAlign={"left"}
+                  gap={'5px'}
+                  alignItems={'center'}
+                  textAlign={'left'}
                 >
                   <img
                     src={domainLogoImage}
-                    width={"21px"}
-                    height={"24px"}
+                    width={'21px'}
+                    height={'24px'}
                     style={{
-                      marginLeft: "5px",
-                      cursor: "pointer",
+                      marginLeft: '5px',
+                      cursor: 'pointer',
                     }}
                     alt=""
                   />
                   <Typography
-                    sx={{ opacity: "1" }}
+                    sx={{ opacity: '1' }}
                     fontSize={{
-                      md: "1.8vw",
-                      sm: "25px",
+                      md: '1.8vw',
+                      sm: '25px',
                     }}
-                    fontWeight={"700"}
+                    fontWeight={'700'}
                     variant="h5"
                     color="white"
                   >
@@ -137,10 +138,10 @@ const SearchResultComponent = () => {
                     justifyContent="space-between"
                   >
                     <Typography
-                      sx={{ ml: "30px" }}
+                      sx={{ ml: '30px' }}
                       fontSize={{
-                        md: "1.3vw",
-                        sm: "18px",
+                        md: '1.3vw',
+                        sm: '18px',
                       }}
                       color="white"
                     >
@@ -150,25 +151,25 @@ const SearchResultComponent = () => {
                 </Box>
                 <Box
                   sx={{
-                    display: "flex",
-                    float: "right",
-                    gap: "20px",
-                    marginTop: "15px",
-                    bottom: "10px",
-                    right: "20px",
+                    display: 'flex',
+                    float: 'right',
+                    gap: '20px',
+                    marginTop: '15px',
+                    bottom: '10px',
+                    right: '20px',
                   }}
                 >
                   <img
                     src={whiteBookmarkImage}
                     style={{
-                      cursor: "pointer",
+                      cursor: 'pointer',
                     }}
                     alt=""
                   />
                   <img
                     src={whiteOffShoppingImage}
                     style={{
-                      cursor: "pointer",
+                      cursor: 'pointer',
                     }}
                     onClick={() => removeFromCart(id)}
                     alt=""
@@ -181,42 +182,42 @@ const SearchResultComponent = () => {
               <Box
                 key={id}
                 sx={{
-                  padding: "25px 20px 10px 20px",
-                  boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
-                  borderRadius: "16px",
-                  marginBottom: "8px",
+                  padding: '25px 20px 10px 20px',
+                  boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+                  borderRadius: '16px',
+                  marginBottom: '8px',
                 }}
                 onClick={() => onClickToDetail(id)}
-                backgroundColor={"#D2EBFF"}
+                backgroundColor={'#D2EBFF'}
               >
                 <Box
                   justifyContent="center"
                   display="inline-flex"
-                  gap={"5px"}
-                  alignItems={"center"}
-                  textAlign={"left"}
+                  gap={'5px'}
+                  alignItems={'center'}
+                  textAlign={'left'}
                 >
                   <img
                     src={domainLogoImage}
-                    width={"21px"}
-                    height={"24px"}
-                    style={{ marginLeft: "5px" }}
+                    width={'21px'}
+                    height={'24px'}
+                    style={{ marginLeft: '5px' }}
                     alt="domainLogo"
                   />
                   {result.status ? (
                     <Typography
-                      sx={{ opacity: "0.5" }}
-                      fontSize={{ md: "1.8vw", sm: "25px" }}
-                      fontWeight={"700"}
+                      sx={{ opacity: '0.5' }}
+                      fontSize={{ md: '1.8vw', sm: '25px' }}
+                      fontWeight={'700'}
                       variant="h5"
                     >
                       {result.name}.{domainSuffixes[chain.id]}
                     </Typography>
                   ) : (
                     <Typography
-                      sx={{ opacity: "1" }}
-                      fontSize={{ md: "1.8vw", sm: "25px" }}
-                      fontWeight={"700"}
+                      sx={{ opacity: '1' }}
+                      fontSize={{ md: '1.8vw', sm: '25px' }}
+                      fontWeight={'700'}
                       variant="h5"
                     >
                       {result.name}.{domainSuffixes[chain.id]}
@@ -231,52 +232,52 @@ const SearchResultComponent = () => {
                   >
                     {result.status ? (
                       <Typography
-                        sx={{ ml: "30px" }}
-                        fontSize={{ md: "1.3vw", sm: "18px" }}
-                        color={"#868686"}
+                        sx={{ ml: '30px' }}
+                        fontSize={{ md: '1.3vw', sm: '18px' }}
+                        color={'#868686'}
                       >
-                        {"This Domain is registered already."}
+                        {'This Domain is registered already.'}
                       </Typography>
                     ) : (
                       <Typography
-                        sx={{ ml: "30px" }}
-                        fontSize={{ md: "1.3vw", sm: "18px" }}
+                        sx={{ ml: '30px' }}
+                        fontSize={{ md: '1.3vw', sm: '18px' }}
                       >
-                        {"This Domain is available."}
+                        {'This Domain is available.'}
                       </Typography>
                     )}
                   </Box>
                 </Box>
                 <Box
                   sx={{
-                    display: "flex",
-                    float: "right",
-                    gap: "20px",
-                    marginTop: "15px",
-                    bottom: "10px",
-                    right: "20px",
+                    display: 'flex',
+                    float: 'right',
+                    gap: '20px',
+                    marginTop: '15px',
+                    bottom: '10px',
+                    right: '20px',
                   }}
                 >
                   {result.status ? (
                     <>
-                      <img src={blackBookmarkImage} alt=""/>
-                      <img src={blackOffshoppingImage} alt=""/>
+                      <img src={blackBookmarkImage} alt="" />
+                      <img src={blackOffshoppingImage} alt="" />
                     </>
                   ) : (
                     <>
                       <img
                         src={blackBookmarkImage}
                         style={{
-                          opacity: "0.5",
-                          cursor: "pointer",
+                          opacity: '0.5',
+                          cursor: 'pointer',
                         }}
                         alt=""
                       />
                       <img
                         src={blackOnshoppingImage}
                         style={{
-                          opacity: "0.5",
-                          cursor: "pointer",
+                          opacity: '0.5',
+                          cursor: 'pointer',
                         }}
                         alt=""
                         onClick={() => addToCart(id)}
@@ -286,7 +287,7 @@ const SearchResultComponent = () => {
                   {/* <img src={theme == 'dark-theme' ? whiteOffShoppingImage: blackOffshoppingImage}/>*/}
                 </Box>
               </Box>
-            )
+            ),
           )}
         </Box>
       </Box>

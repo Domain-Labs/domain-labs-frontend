@@ -26,6 +26,7 @@ import { chainIds } from '../../config';
 import darkCartImage from '../../assets/image/shopping_cart_dark_mode.png';
 import darkLogoImage from '../../assets/image/logo_dark_mode.png';
 import darkSunImage from '../../assets/image/dark_mode.png';
+import { domainSuffixes } from '../../config';
 import { linkArray } from '../../config';
 import { toast } from 'react-toastify';
 import { useDapp } from '../../contexts/dapp';
@@ -77,6 +78,7 @@ const Header = (props) => {
   const [isSwitchOn, setIsSwitchOn] = useState(true);
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const { cart } = useSelector((state) => state.cart);
+  const [availableCart, setAvailableCart] = useState([]);
   const { isConnected, networkId } = useDapp();
   const { window } = props;
   const container =
@@ -97,17 +99,15 @@ const Header = (props) => {
 
   useEffect(() => {
     const chainId = chain?.id;
-    console.log('chain id: ', chainId);
-    console.log('okay');
     const pathname = location.pathname;
 
     if (
       !chainIds[process.env.REACT_APP_NET_TYPE].includes(chainId) &&
-      pathname !== '/'
+      pathname !== '/home'
     ) {
       toast.error('Please switch your chain');
       setTimeout(() => {
-        navigate('/');
+        navigate('/home');
       });
       return;
     }
@@ -121,7 +121,7 @@ const Header = (props) => {
       console.log('you can access');
       console.log('address: ', address);
       console.log('dev wallet: ', process.env.REACT_APP_DEV_WALLET_1);
-    } else if (pathname !== '/') {
+    } else if (pathname === '/admin') {
       console.log('address: ', address);
       console.log('dev wallet: ', process.env.REACT_APP_DEV_WALLET_1);
       console.log('dev wallet: ', process.env.REACT_APP_DEV_WALLET_2);
@@ -132,6 +132,14 @@ const Header = (props) => {
       }, 1000);
     }
   }, [location, address, chain?.id, navigate]);
+
+  useEffect(() => {
+    const domainSuffix = domainSuffixes[networkId];
+    const _availableCart = cart.filter(
+      (_item) => _item.domain === domainSuffix,
+    );
+    setAvailableCart(_availableCart);
+  }, [cart, networkId]);
 
   const ThemeSwitchComponent = () => (
     <Box className="theme-switch-component" display={'flex'}>
@@ -283,7 +291,7 @@ const Header = (props) => {
             }}
             onClick={location.pathname === '/' ? () => {} : () => toBuyPage()}
           >
-            {isConnected && cart && cart.length > 0 ? (
+            {isConnected && availableCart && availableCart.length > 0 ? (
               <Box
                 sx={{
                   display: 'flex',
@@ -321,7 +329,7 @@ const Header = (props) => {
                     right: '0',
                   }}
                 >
-                  {cart.length}
+                  {availableCart.length}
                 </span>
               </Box>
             ) : (
@@ -534,7 +542,9 @@ const Header = (props) => {
                     }
                     display={'flex'}
                   >
-                    {cart && cart.length > 0 ? (
+                    {isConnected &&
+                    availableCart &&
+                    availableCart.length > 0 ? (
                       <Box
                         sx={{
                           display: 'flex',
@@ -572,7 +582,7 @@ const Header = (props) => {
                             right: '0',
                           }}
                         >
-                          {cart.length}
+                          {availableCart.length}
                         </span>
                       </Box>
                     ) : (

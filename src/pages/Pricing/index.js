@@ -1,34 +1,34 @@
-import { useEffect, } from 'react';
-import {
-  Box,
-  Typography,
-  Button,
-} from "@mui/material";
-import Toggle from "react-toggle";
-import { useState } from "react";
-import { useAccount } from "wagmi";
-import axios from "axios";
-import { toast } from 'react-toastify';
-import { useTheme } from '../../contexts/theme';
-import { blueCheckIcon } from "../../utils/images";
-
 import './index.scss';
 
+import { Box, Button, Typography } from '@mui/material';
+
+import { BASE_API_URL } from '../../config';
+import { LoadingButton } from '@mui/lab';
+import Toggle from 'react-toggle';
+import axios from 'axios';
+import { blueCheckIcon } from '../../utils/images';
+import { subscribe } from '../../utils/Clio';
+import { toast } from 'react-toastify';
+import { useAccount } from 'wagmi';
+import { useDapp } from '../../contexts/dapp';
+import { useEffect } from 'react';
+import { useState } from 'react';
+import { useTheme } from '../../contexts/theme';
+
 const Pricing = () => {
-  const {
-    theme,
-  } = useTheme();
-  const { address, } = useAccount();
+  const { theme } = useTheme();
+  const { address } = useAccount();
+  const [isProcessing, setIsProcessing] = useState('');
   const [isAnnualPay, setIsAnnualPay] = useState(true);
   const [isAlreadySignedUp, setIsAlreadySignedUp] = useState(false);
-
+  const { provider, signer, networkId } = useDapp();
   const styles = {
     container: {
       backgroundColor: theme === 'dark-theme' ? '#2A2A2A' : 'white',
-      backgroundPosition: "center",
-      backgroundRepeat: "no-repeat",
-      backgroundSize: "cover",
-      minHeight: "100vh",
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      backgroundSize: 'cover',
+      minHeight: '100vh',
     },
   };
 
@@ -54,43 +54,76 @@ const Pricing = () => {
   useEffect(() => {
     (async () => {
       // check if signed up
-      const isAlreadySignedUp = (await axios.get(`/clios/is-signedUp/${address}`)).data;
-      console.log("is signed up: ", isAlreadySignedUp);
+      let isAlreadySignedUp = false;
+      const res = await axios.post(`${BASE_API_URL}/getIsSubscribe`, {
+        address: address.toLowerCase(),
+      });
+      isAlreadySignedUp = res.data.subscribed;
+      console.log('is signed up: ', isAlreadySignedUp);
       if (isAlreadySignedUp) {
         setIsAlreadySignedUp(isAlreadySignedUp);
       }
-    })()
-  }, [address])
+    })();
+  }, [address]);
 
   const handleFreeSignUp = async () => {
     const postObject = {
-      wallet: address,
+      address: address.toLowerCase(),
+      endTime:
+        Date.now() +
+        (isAnnualPay ? 365 * 24 * 3600 * 1000 : 30 * 24 * 3600 * 1000),
+      trial: true,
+    };
+    console.log('okay free sign up');
+    setIsProcessing('free');
+    try {
+      const result = (await axios.post(`${BASE_API_URL}/subscribe`, postObject))
+        .data;
+      console.log('result: ', result);
+      toast.success('Success! Your Clio subscription is active');
+      setIsAlreadySignedUp(true);
+    } catch (error) {
+      console.log(error);
+      toast.error('Failed to sign up');
     }
-    console.log("okay free sign up");
-
-    const result = (await axios.post(`/clios/free-signup/`, postObject)).data;
-    console.log("result: ", result);
-    toast.success('You have successfully signed up for free');
-    setIsAlreadySignedUp(true);
-  }
+    setIsProcessing('');
+  };
 
   const handleSecureSignUp = async () => {
-    const postObject = {
-      wallet: address,
+    if (networkId !== 56) {
+      toast.warn('Please change your network to BSC');
+      return;
     }
 
-    const result = (await axios.post(`/clios/free-signup/`, postObject)).data;
-    console.log("result: ", result);
-    toast.success('You have successfully signed up for secure');
-    setIsAlreadySignedUp(true);
-  }
+    const postObject = {
+      address: address.toLowerCase(),
+      endTime:
+        Date.now() +
+        (isAnnualPay ? 365 * 24 * 3600 * 1000 : 30 * 24 * 3600 * 1000),
+    };
+    setIsProcessing('secure');
+    const rlt = await subscribe(isAnnualPay, provider, signer);
+    try {
+      if (rlt) {
+        const result = (
+          await axios.post(`${BASE_API_URL}/subscribe`, postObject)
+        ).data;
+        console.log(result);
+        setIsAlreadySignedUp(true);
+        toast.success('Success! Your Clio subscription is active');
+      } else {
+        toast.error('Failed to sign up, try again!');
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error('Failed to sign up, try again!');
+    }
+    setIsProcessing('');
+  };
 
   return (
     <Box style={styles.container}>
-      <Box
-        mt={'90px'}
-        pt={'60px'}
-      >
+      <Box mt={'90px'} pt={'60px'}>
         <Typography
           display={'flex'}
           justifyContent={'center'}
@@ -114,7 +147,7 @@ const Pricing = () => {
           justifyContent={'center'}
           alignItems={'center'}
           p={'57px 20px'}
-          className='pros-component'
+          className="pros-component"
         >
           <Box
             display="flex"
@@ -123,40 +156,35 @@ const Pricing = () => {
             gap={'60px'}
             flexDirection={{ xs: 'column', md: 'row' }}
           >
-            {
-              pros.map((item, index) => (
-                <Box
-                  display="flex"
-                  justifyContent={'start'}
-                  alignItems={'center'}
-                  gap={'12px'}
-                  width={'100%'}
-                  key={index}
+            {pros.map((item, index) => (
+              <Box
+                display="flex"
+                justifyContent={'start'}
+                alignItems={'center'}
+                gap={'12px'}
+                width={'100%'}
+                key={index}
+              >
+                <img src={blueCheckIcon} alt="" />
+                <Typography
+                  display={'flex'}
+                  justifyContent={'left'}
+                  textAlign={'start'}
+                  width={{ xs: 'unset', md: 'max-content' }}
+                  sx={{
+                    fontFamily: 'Inter',
+                    fontStyle: 'normal',
+                    fontWeight: '700',
+                    fontSize: '20px',
+                    lineHeight: '24px',
+                    letterSpacing: '-0.01em',
+                    color: theme === 'dark-theme' ? 'white' : '#5B5B5B',
+                  }}
                 >
-                  < img
-                    src={blueCheckIcon}
-                    alt=""
-                  />
-                  <Typography
-                    display={'flex'}
-                    justifyContent={'left'}
-                    textAlign={'start'}
-                    width={{ xs: 'unset', md: 'max-content' }}
-                    sx={{
-                      fontFamily: 'Inter',
-                      fontStyle: 'normal',
-                      fontWeight: '700',
-                      fontSize: '20px',
-                      lineHeight: '24px',
-                      letterSpacing: '-0.01em',
-                      color: theme === 'dark-theme' ? 'white' : '#5B5B5B',
-                    }}
-                  >
-                    {item}
-                  </Typography>
-                </Box>
-              ))
-            }
+                  {item}
+                </Typography>
+              </Box>
+            ))}
           </Box>
         </Box>
 
@@ -166,7 +194,7 @@ const Pricing = () => {
           alignItems={'baseline'}
           p={'57px 20px'}
           gap={'42px'}
-          className='buy-option-component'
+          className="buy-option-component"
         >
           <Box>
             <Typography
@@ -205,9 +233,9 @@ const Pricing = () => {
             sx={{
               transform: 'rotate(180deg)',
             }}
-            alignItems='center'
+            alignItems="center"
             display={'flex'}
-            className='buy-option-toggle-wrapper'
+            className="buy-option-toggle-wrapper"
             pb={'5px'}
           >
             <Toggle
@@ -222,9 +250,7 @@ const Pricing = () => {
             />
           </Box>
 
-          <Box
-
-          >
+          <Box>
             <Typography
               display={'flex'}
               textAlign={'start'}
@@ -315,34 +341,28 @@ const Pricing = () => {
                 Per user, per month
               </Typography>
 
-              {
-                freeVersionDetails.map((item, index) => (
-                  <Typography
-                    display={'flex'}
-                    justifyContent={'center'}
-                    mt={'31px'}
-                    sx={{
-                      fontFamily: 'Inter',
-                      fontStyle: 'normal',
-                      fontWeight: '600',
-                      fontSize: '16px',
-                      lineHeight: '19px',
-                      letterSpacing: '-0.01em',
-                      color: '#626262',
-                    }}
-                    key={index}
-                  >
-                    {item}
-                  </Typography>
-                ))
-              }
+              {freeVersionDetails.map((item, index) => (
+                <Typography
+                  display={'flex'}
+                  justifyContent={'center'}
+                  mt={'31px'}
+                  sx={{
+                    fontFamily: 'Inter',
+                    fontStyle: 'normal',
+                    fontWeight: '600',
+                    fontSize: '16px',
+                    lineHeight: '19px',
+                    letterSpacing: '-0.01em',
+                    color: '#626262',
+                  }}
+                  key={index}
+                >
+                  {item}
+                </Typography>
+              ))}
 
-              <Box
-                display={'flex'}
-                justifyContent={'center'}
-                mt={'90px'}
-              >
-                <Button
+              <Box display={'flex'} justifyContent={'center'} mt={'90px'}>
+                <LoadingButton
                   display={'flex'}
                   sx={{
                     fontFamily: 'Inter',
@@ -359,9 +379,10 @@ const Pricing = () => {
                   }}
                   onClick={() => handleFreeSignUp()}
                   disabled={isAlreadySignedUp}
+                  loading={isProcessing === 'free'}
                 >
                   Free Sign-up
-                </Button >
+                </LoadingButton>
               </Box>
             </Box>
 
@@ -405,7 +426,7 @@ const Pricing = () => {
                   color: 'white',
                 }}
               >
-                $39
+                {isAnnualPay ? '$351' : '$39'}
               </Typography>
 
               <Typography
@@ -423,37 +444,31 @@ const Pricing = () => {
                   color: '#C5C5C5',
                 }}
               >
-                Per user, per month
+                Per user, per {isAnnualPay ? 'year' : 'month'}
               </Typography>
 
-              {
-                paidVersionDetails.map((item, index) => (
-                  <Typography
-                    display={'flex'}
-                    justifyContent={'center'}
-                    mt={'11px'}
-                    sx={{
-                      fontFamily: 'Inter',
-                      fontStyle: 'normal',
-                      fontWeight: '600',
-                      fontSize: '16px',
-                      lineHeight: '19px',
-                      letterSpacing: '-0.01em',
-                      color: 'white',
-                    }}
-                    key={index}
-                  >
-                    {item}
-                  </Typography>
-                ))
-              }
+              {paidVersionDetails.map((item, index) => (
+                <Typography
+                  display={'flex'}
+                  justifyContent={'center'}
+                  mt={'11px'}
+                  sx={{
+                    fontFamily: 'Inter',
+                    fontStyle: 'normal',
+                    fontWeight: '600',
+                    fontSize: '16px',
+                    lineHeight: '19px',
+                    letterSpacing: '-0.01em',
+                    color: 'white',
+                  }}
+                  key={index}
+                >
+                  {item}
+                </Typography>
+              ))}
 
-              <Box
-                display={'flex'}
-                justifyContent={'center'}
-                mt={'25px'}
-              >
-                <Button
+              <Box display={'flex'} justifyContent={'center'} mt={'25px'}>
+                <LoadingButton
                   display={'flex'}
                   sx={{
                     fontFamily: 'Inter',
@@ -469,17 +484,17 @@ const Pricing = () => {
                     border: '3px solid white',
                   }}
                   onClick={() => handleSecureSignUp()}
+                  loading={isProcessing === 'secure'}
                 >
                   Secure Sign-up
-                </Button >
+                </LoadingButton>
               </Box>
             </Box>
           </Box>
-
         </Box>
       </Box>
-    </Box >
+    </Box>
   );
-}
+};
 
 export default Pricing;

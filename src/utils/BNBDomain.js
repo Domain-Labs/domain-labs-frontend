@@ -7,9 +7,9 @@ import {
 import { BigNumber } from 'ethers';
 import { Buffer } from 'buffer';
 import Web3 from 'web3';
-import { duration } from 'moment';
 import { getTransactionReceiptMined } from './EtherUtils';
 import { labelhash } from './labelhash';
+import { namehash } from './namehash';
 
 // order is very important
 window.Buffer = window.Buffer || Buffer;
@@ -133,45 +133,100 @@ export const register = async (results, provider, signer) => {
       secret: item.secret,
     };
   });
-  const price = await getRentPrices(rlts, provider);
-  const permanantRegister = Register.connect(signer);
-  const regRlts = await permanantRegister[
-    'registerBnb((string,uint256,bytes32)[],address)'
-  ](rlts, SPACE_ID_RESOLVER_ADDR, {
-    value: BigNumber.from(price)
-      .mul(BigNumber.from(105))
-      .div(BigNumber.from(100)),
-    gasLimit: 500000 * rlts.length,
+  try {
+    const price = await getRentPrices(rlts, provider);
+    const permanantRegister = Register.connect(signer);
+    const regRlts = await permanantRegister[
+      'registerBnb((string,uint256,bytes32)[],address)'
+    ](rlts, SPACE_ID_RESOLVER_ADDR, {
+      value: BigNumber.from(price)
+        .mul(BigNumber.from(105))
+        .div(BigNumber.from(100)),
+      gasLimit: 500000 * rlts.length,
+    });
+    const web3 = new Web3(provider.connection.url);
+    const receipt = await getTransactionReceiptMined(web3, regRlts.hash);
+    if (receipt.status) {
+      return true;
+    } else return false;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+export const getExtendPrice = async (name, days, provider) => {
+  const Register = getBNBRegisterContract({
+    address: SPACE_ID_BNB_REGISTER_ADDR,
+    provider,
   });
+  const rentPrice = await Register['rentPrice(string,uint256)'](
+    name,
+    days * 24 * 3600,
+  );
+
   const web3 = new Web3(provider.connection.url);
-  const receipt = await getTransactionReceiptMined(web3, regRlts.hash);
-  if (receipt.status) {
-    return true;
-  } else return false;
+  const gasPrice = await web3.eth.getGasPrice();
+  const gasPriceInETH =
+    Math.round((gasPrice * 100000) / Math.pow(10, 14)) / 10000;
+  return {
+    price: Math.round(rentPrice['base'] / Math.pow(10, 14)) / 10000,
+    gasPrice: gasPriceInETH,
+  };
 };
 
 export const extend = async (result, provider, signer) => {
-  const Register = getDomainLabsBNBContract({
-    address: BNS_DOMAIN_LABS,
+  const Register = getBNBRegisterContract({
+    address: SPACE_ID_BNB_REGISTER_ADDR,
     provider,
   });
   const permanentRegister = Register.connect(signer);
-  // const priceObj = await getRentPrice(result.name, result.duration, provider);
-  // console.log(priceObj);
-  const rentPrice = await Register['rentPrice(string,uint256)'](
-    result.name,
-    result.duration * 24 * 3600,
-  );
+  try {
+    const rentPrice = await Register['rentPrice(string,uint256)'](
+      result.name,
+      result.duration * 24 * 3600,
+    );
+    const rlts = await permanentRegister['renewWithPoint(string,uint256,bool)'](
+      result.name,
+      result.duration,
+      false,
+      {
+        value: BigNumber.from(rentPrice['base'])
+          .mul(BigNumber.from(105))
+          .div(BigNumber.from(100)),
+        gasLimit: 200000,
+      },
+    );
+    console.log(rlts, 'rewnew results');
+    const web3 = new Web3(provider.connection.url);
+    const receipt = await getTransactionReceiptMined(web3, rlts.hash);
+    if (receipt.status) {
+      return true;
+    } else return false;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
 
-  const rlts = await permanentRegister['renewBnb(string,uint256)'](
-    result.name,
-    result.duration,
-    {
-      value: BigNumber.from(rentPrice)
-        .mul(BigNumber.from(105))
-        .div(BigNumber.from(100)),
-      gasLimit: 500000,
-    },
-  );
-  console.log(rlts, 'rewnew results');
+export const transfer = async (result, provider, signer) => {
+  const Register = getBaseRegisterContract({
+    address: SPACE_ID_BASE_REGISTER_ADDR,
+    provider,
+  });
+  const { from, to, name } = result;
+  const permanantRegister = Register.connect(signer);
+  try {
+    const transfer = await permanantRegister[
+      'safeTransferFrom(address,address,uint256)'
+    ](from, to, labelhash(name));
+    const web3 = new Web3(provider.connection.url);
+    const receipt = await getTransactionReceiptMined(web3, transfer.hash);
+    if (receipt.status) {
+      return true;
+    } else return false;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
 };

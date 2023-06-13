@@ -1,3 +1,6 @@
+import * as BNS from '../../../utils/BNBDomain';
+import * as ENS from '../../../utils/ENSDomain';
+
 import {
   Box,
   Button,
@@ -9,12 +12,53 @@ import {
   Typography,
 } from '@mui/material';
 
+import { LoadingButton } from '@mui/lab';
 import { RxCrossCircled } from 'react-icons/rx';
+import Web3 from 'web3';
+import { toast } from 'react-toastify';
+import { useDapp } from '../../../contexts/dapp';
+import { useState } from 'react';
+
+const web3 = new Web3();
 
 export default function TransferDialog(props) {
-  const { open, close } = props;
+  const { open, close, domain } = props;
+  const { networkId, address, provider, signer } = useDapp();
+  const [loading, setLoading] = useState(false);
+  const [toAddr, setToAddr] = useState('');
   const linearGradient =
     'linear-gradient(86.23deg, #4BD8D8 -48.31%, #146EB4 114.96%)';
+
+  const transferDomain = async () => {
+    const isValidAddr = web3.utils.isAddress(toAddr);
+    if (!isValidAddr || toAddr === address) {
+      toast.error('Input valid address');
+      return;
+    }
+    let domainFuncs;
+    if (networkId === 1 || networkId === 5) {
+      domainFuncs = ENS;
+    } else {
+      domainFuncs = BNS;
+    }
+    setLoading(true);
+    try {
+      const result = await domainFuncs.transfer(
+        { from: address, to: toAddr, name: domain.name },
+        provider,
+        signer,
+      );
+      if (result) {
+        toast.success('Successfully Transfered a domain');
+      } else {
+        toast.error('Failed to transfer');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    setLoading(false);
+    setTimeout(() => close(), 500);
+  };
 
   return (
     <Dialog
@@ -92,7 +136,9 @@ export default function TransferDialog(props) {
             border: 'none',
             color: 'white',
           }}
-          placeholder="0x5F5DD76D380da23CD5B8705852F67dDeb64C977b"
+          value={toAddr}
+          onChange={(e) => setToAddr(e.target.value)}
+          placeholder={address}
         />
       </DialogContent>
       <DialogActions
@@ -100,9 +146,10 @@ export default function TransferDialog(props) {
           padding: '16px 24px',
         }}
       >
-        <Button
+        <LoadingButton
           autoFocus
-          onClick={close}
+          onClick={transferDomain}
+          loading={loading}
           sx={{
             background: linearGradient,
             width: '100%',
@@ -110,7 +157,7 @@ export default function TransferDialog(props) {
           }}
         >
           Approve
-        </Button>
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );

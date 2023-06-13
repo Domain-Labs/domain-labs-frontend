@@ -11,6 +11,7 @@ export const getTransactionReceiptMined = (web3, txHash, interval) => {
           interval ? interval : 500,
         );
       } else {
+        console.log(receipt, 'receipt result');
         resolve(receipt);
       }
     });

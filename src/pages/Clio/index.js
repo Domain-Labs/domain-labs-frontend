@@ -4,49 +4,50 @@ import { Box, Button, Grid, Paper, TextField, Typography } from '@mui/material';
 import { clockLogo, lampLogo, lanLogo } from '../../utils/images';
 import { useEffect, useState } from 'react';
 
-import SearchResultComponent from '../../components/SearchResultComponent';
+import { BASE_API_URL } from '../../config';
+import CircularProgress from '@mui/material/CircularProgress/CircularProgress';
+// import SearchResultComponent from '../../components/SearchResultComponent';
 import axios from 'axios';
 import searchImage from '../../assets/image/search.png';
+import { setSearchListClio } from '../../redux/actions/domainActions';
 import { toast } from 'react-toastify';
-import { useAccount } from 'wagmi';
+import { useDapp } from '../../contexts/dapp';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../contexts/theme';
 
 const Clio = () => {
+  // const { cartStatus, setCartStatus, newCartStatus, setNewCartStatus } =
+  //   useDappContext();
+  const { address } = useDapp();
+  const dispatch = useDispatch();
   const { theme } = useTheme();
-
-  const { address } = useAccount();
   const [clioQuery, setClioQuery] = useState('');
   const navigate = useNavigate();
   const [top, setTop] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleSearch = async () => {
+  const handleClioQuery = async () => {
     // get name candidates from clio
     setIsProcessing(true);
 
     // check if signed up
-    const isAlreadySignedUp = (await axios.get(`/clios/is-signedUp/${address}`))
-      .data;
+    let isAlreadySignedUp = false;
+    try {
+      const res = await axios.post(`${BASE_API_URL}/getIsSubscribe`, {
+        address: address.toLowerCase(),
+      });
+      isAlreadySignedUp = res.data.subscribed;
+    } catch (error) {
+      console.log(error);
+    }
     console.log('is signed up: ', isAlreadySignedUp);
     if (!isAlreadySignedUp) {
-      setTimeout(() => {
-        toast.error('Please sign up at first!');
-        navigate('/pricing');
-        return;
-      }, 1000);
-    }
-
-    // check if it is possible to use clio
-    if (
-      isAlreadySignedUp.freeCount === 0 &&
-      isAlreadySignedUp.clioEndTimestamp < Math.round(Date.now() / 1000)
-    ) {
-      toast.error('You should pay to use clio!');
-      setTimeout(() => {
-        navigate('/pricing');
-        return;
-      }, 1000);
+      // setTimeout(() => {
+      toast.error('Please sign up at first!');
+      navigate('/pricing');
+      return;
+      // }, 1000);
     }
 
     if (clioQuery?.length === 0) {
@@ -55,16 +56,49 @@ const Clio = () => {
     }
 
     const postObject = {
-      wallet: address,
-      clioQuery:
-        (clioQuery ?? 'I am going to make shop site.') +
-        'How can I name that domain which ends with .eth? Please give me 10 domain names.',
+      address: address.toLowerCase(),
+      clioQuery,
     };
 
-    const result = (await axios.post(`/clios/request-clio/`, postObject)).data;
-    console.log('=========:  request clio', result);
+    try {
+      const result = (await axios.post(`${BASE_API_URL}/clio`, postObject))
+        .data;
+      console.log('=========:  request clio', result);
+      if (result.success) {
+        const domains = Object.keys(result.data).map((key) =>
+          result.data[key].toLowerCase(),
+        );
+        dispatch(setSearchListClio(domains));
+        setTimeout(() => {
+          navigate('/search-result');
+        }, 1000);
+        // setClioDomains(result.data);
+      }
+    } catch (error) {
+      console.log(error);
+      if (error.statusCode === 401) {
+        toast.error('You should pay to use clio!');
+        setTimeout(() => {
+          navigate('/pricing');
+          return;
+        }, 1000);
+      }
+      toast.error('Error: For best results, Clio needs more information.');
+    }
 
-    // setCartStatus({ names: result?.domainNames, cart: [] })
+    // setCartStatus({ names: result?.domainNames, cart: [] });
+
+    // const candidateDomainNames = result?.domainNames;
+
+    // const newCartStatus = (candidateDomainNames ?? []).map((item) => {
+    //   return {
+    //     name: item,
+    //     isRegistered: undefined,
+    //     isInCart: false,
+    //   };
+    // });
+    // console.log('///////////////////:   ', newCartStatus);
+    // setNewCartStatus(newCartStatus);
 
     setIsProcessing(false);
   };
@@ -81,7 +115,9 @@ const Clio = () => {
 
   const onKeyPressed = (e) => {
     if (e.code === 'Enter') {
-      handleSearch();
+      if (!isProcessing) {
+        handleClioQuery();
+      }
     }
   };
 
@@ -164,11 +200,14 @@ const Clio = () => {
                     style={{
                       width: '100%',
                     }}
+                    disabled={isProcessing}
                     variant="standard"
                   />
 
                   <Button
-                    onClick={handleSearch}
+                    onClick={() => {
+                      if (!isProcessing) handleClioQuery();
+                    }}
                     style={{
                       minWidth: '40px',
                     }}
@@ -177,21 +216,29 @@ const Clio = () => {
                       display={{ xs: 'flex', sm: 'none' }}
                       alignItems={'center'}
                     >
-                      <img
-                        style={{ width: '16px', height: '16px' }}
-                        src={searchImage}
-                        alt=""
-                      />
+                      {isProcessing ? (
+                        <CircularProgress size={16} />
+                      ) : (
+                        <img
+                          style={{ width: '16px', height: '16px' }}
+                          src={searchImage}
+                          alt="searchImage"
+                        />
+                      )}
                     </Box>
                     <Box
                       display={{ xs: 'none', sm: 'flex' }}
                       alignItems={'center'}
                     >
-                      <img
-                        style={{ width: '24', height: '24px' }}
-                        src={searchImage}
-                        alt=""
-                      />
+                      {isProcessing ? (
+                        <CircularProgress size={24} />
+                      ) : (
+                        <img
+                          style={{ width: '24', height: '24px' }}
+                          src={searchImage}
+                          alt="searchImage"
+                        />
+                      )}
                     </Box>
                   </Button>
                 </Paper>
@@ -262,13 +309,15 @@ const Clio = () => {
                         textAlign: 'center',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: theme === 'dark-theme' ? 'white' : 'black',
+                        color: theme === 'dark-theme' ? 'white' : '#666666',
                         lineHeight: '1',
                         fontWeight: '700',
                         whiteSpace: 'nowrap',
+                        cursor: 'pointer',
                       }}
                       fontWeight={400}
                       align="center"
+                      // onClick={() => navigate('/clio')}
                     >
                       {'Meet '}
                     </Typography>
@@ -276,7 +325,6 @@ const Clio = () => {
                       fontSize={{ xs: '25px', md: '33px' }}
                       mx={{ xs: '2px', sm: '10px' }}
                       style={{
-                        textTransform: 'uppercase',
                         color: '#513eff',
                         fontFamily: 'Inter',
                         fontWeight: '700',
@@ -285,6 +333,7 @@ const Clio = () => {
                           'linear-gradient(90deg,#4BD8D8,#146EB4,#4BD8D8,#146EB4,#4BD8D8,#146EB4,#4BD8D8,#146EB4,#4BD8D8,#146EB4,#4BD8D8,#146EB4)',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
+                        cursor: 'pointer',
                       }}
                     >
                       {/* -webkit-background-clip */}
@@ -298,7 +347,7 @@ const Clio = () => {
                         textAlign: 'center',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: theme === 'dark-theme' ? 'white' : 'black',
+                        color: theme === 'dark-theme' ? 'white' : '#666666',
                         lineHeight: '1',
                         fontWeight: '700',
                         whiteSpace: 'nowrap',
@@ -318,7 +367,7 @@ const Clio = () => {
                         textAlign: 'center',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: theme === 'dark-theme' ? 'white' : 'black',
+                        color: theme === 'dark-theme' ? 'white' : '#666666',
                         lineHeight: '1',
                         fontWeight: '700',
                         whiteSpace: 'nowrap',
@@ -340,7 +389,7 @@ const Clio = () => {
                       textAlign: 'center',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: theme === 'dark-theme' ? 'white' : 'black',
+                      color: theme === 'dark-theme' ? 'white' : '#666666',
                       lineHeight: '1',
                       fontWeight: '700',
                       whiteSpace: 'nowrap',
@@ -400,10 +449,7 @@ const Clio = () => {
                           mt={'37px'}
                         >
                           <Typography
-                            // display={'flex'}
                             justifyContent={'right'}
-                            // textAlign={'start'}
-                            // width={{ xs: 'unset', md: 'max-content' }}
                             sx={{
                               fontFamily: 'Inter',
                               fontStyle: 'normal',
@@ -426,8 +472,6 @@ const Clio = () => {
                           <Typography
                             display={'flex'}
                             justifyContent={'center'}
-                            // textAlign={'start'}
-                            // width={{ xs: 'unset', md: 'max-content' }}
                             sx={{
                               fontFamily: 'Inter',
                               fontStyle: 'normal',
@@ -456,9 +500,9 @@ const Clio = () => {
             sx={{
               backgroundColor: theme === 'dark-theme' ? '#2A2A2A' : 'white',
             }}
-            // display={cartStatus?.names?.length > 0 ? 'block' : 'none'}
+            // display={newCartStatus?.length > 0 ? 'block' : 'none'}
           >
-            <Box>
+            {/* <Box>
               <Typography
                 fontSize={{ xs: '25px', md: '33px' }}
                 my="25px"
@@ -477,9 +521,9 @@ const Clio = () => {
               >
                 {'Results'}
               </Typography>
-            </Box>
+            </Box> */}
 
-            <SearchResultComponent />
+            {/* <SearchResultComponent domains={clioDomains} /> */}
           </Box>
         )}
       </Box>

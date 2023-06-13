@@ -1,4 +1,5 @@
 import {
+  getBaseRegisterContract,
   getDomainLabsENSContract,
   getENSBaseRegisterContract,
   getENSRegisterContract,
@@ -129,39 +130,75 @@ export const register = async (results, provider, signer) => {
   }
 };
 
+export const getExtendPrice = async (name, days, provider) => {
+  const Register = getENSRegisterContract({
+    address: ENS_REGISTER_ADDR,
+    provider,
+  });
+  const rentPrice = await Register['rentPrice(string,uint256)'](
+    name,
+    days * 24 * 3600,
+  );
+
+  const web3 = new Web3(provider.connection.url);
+  const gasPrice = await web3.eth.getGasPrice();
+  const gasPriceInETH = Math.round((gasPrice * 0) / Math.pow(10, 14)) / 10000;
+  return {
+    price: Math.round(rentPrice / Math.pow(10, 14)) / 10000,
+    gasPrice: gasPriceInETH,
+  };
+};
+
 export const extend = async (result, provider, signer) => {
-  const Register = getDomainLabsENSContract({
-    address: ENS_DOMAIN_LABS,
+  const Register = getENSRegisterContract({
+    address: ENS_REGISTER_ADDR,
     provider,
   });
   const permanentRegister = Register.connect(signer);
-  // const priceObj = await getRentPrice(result.name, result.duration, provider);
-  // console.log(priceObj);
-  const rentPrice = await Register['rentPrice(string,uint256)'](
-    result.name,
-    result.duration * 24 * 3600,
-  );
-
-  const rlts = await permanentRegister['renewENS(string,uint256)'](
-    result.name,
-    result.duration,
-    {
-      value: BigNumber.from(rentPrice)
-        .mul(BigNumber.from(105))
-        .div(BigNumber.from(100)),
-      gasLimit: 500000,
-    },
-  );
-  console.log(rlts, 'rewnew results');
+  try {
+    const rentPrice = await Register['rentPrice(string,uint256)'](
+      result.name,
+      result.duration * 24 * 3600,
+    );
+    const rlts = await permanentRegister['renew(string,uint256)'](
+      result.name,
+      result.duration,
+      {
+        value: BigNumber.from(rentPrice)
+          .mul(BigNumber.from(105))
+          .div(BigNumber.from(100)),
+        gasLimit: 200000,
+      },
+    );
+    const web3 = new Web3(provider.connection.url);
+    const receipt = await getTransactionReceiptMined(web3, rlts.hash);
+    if (receipt.status) {
+      return true;
+    } else return false;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
 };
 
-// export const getNames = async (address, provider) => {
-//   const ENSInstance = new ENS();
-//   await ENSInstance.setProvider(provider);
-//   const names = await ENSInstance.getNames({
-//     address: address,
-//     type: 'resolvedAddress',
-//   });
-//   console.log(names, 'Resolved Names');
-//   return names;
-// };
+export const transfer = async (result, provider, signer) => {
+  const Register = getENSBaseRegisterContract({
+    address: ENS_BASE_REGISTER_ADDR,
+    provider,
+  });
+  const { from, to, name } = result;
+  const permanantRegister = Register.connect(signer);
+  try {
+    const transfer = await permanantRegister[
+      'safeTransferFrom(address,address,uint256)'
+    ](from, to, labelhash(name));
+    const web3 = new Web3(provider.connection.url);
+    const receipt = await getTransactionReceiptMined(web3, transfer.hash);
+    if (receipt.status) {
+      return true;
+    } else return false;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
