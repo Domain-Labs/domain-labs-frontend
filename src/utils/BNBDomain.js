@@ -28,6 +28,7 @@ export const checkAvailability = async (name, provider) => {
     address: SPACE_ID_BNB_REGISTER_ADDR,
     provider,
   });
+  console.log(name, 'name');
   const available = await Register['available(string)'](name);
   if (!available) {
     const sid = new SID({

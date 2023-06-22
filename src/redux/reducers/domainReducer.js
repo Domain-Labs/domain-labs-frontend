@@ -18,13 +18,14 @@ const domainReducer = (state = initialState, action) => {
         ...state,
         searchString: action.payload,
         isSingleSearch: true,
+        isClio: false,
       };
     case SET_SEARCH_LIST:
       return {
         ...state,
         searchList: action.payload,
         isSingleSearch: false,
-        isClio: true,
+        isClio: false,
       };
     case SET_SEARACH_LIST_CLIO:
       return {

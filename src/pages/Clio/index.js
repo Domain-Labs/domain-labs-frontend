@@ -1,7 +1,7 @@
 import './index.scss';
 
 import { Box, Button, Grid, Paper, TextField, Typography } from '@mui/material';
-import { clockLogo, lampLogo, lanLogo } from '../../utils/images';
+import { clioVid, clockLogo, lampLogo, lanLogo } from '../../utils/images';
 import { useEffect, useState } from 'react';
 
 import { BASE_API_URL } from '../../config';
@@ -19,7 +19,7 @@ import { useTheme } from '../../contexts/theme';
 const Clio = () => {
   // const { cartStatus, setCartStatus, newCartStatus, setNewCartStatus } =
   //   useDappContext();
-  const { address } = useDapp();
+  const { address, isConnected } = useDapp();
   const dispatch = useDispatch();
   const { theme } = useTheme();
   const [clioQuery, setClioQuery] = useState('');
@@ -28,6 +28,10 @@ const Clio = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleClioQuery = async () => {
+    if (!isConnected) {
+      toast.error('Connect your wallet to proceed!');
+      return;
+    }
     // get name candidates from clio
     setIsProcessing(true);
 
@@ -155,6 +159,9 @@ const Clio = () => {
     },
   ];
 
+  const linearGradient =
+    'linear-gradient(86.23deg, #4BD8D8 -48.31%, #146EB4 114.96%)';
+
   return (
     <Box>
       <Box style={styles.container} pb={'50px'}>
@@ -274,7 +281,7 @@ const Clio = () => {
                   }}
                   fontWeight={400}
                   align="center"
-                  onClick={() => navigate('/home')}
+                  onClick={() => navigate('/')}
                 >
                   {'regular search'}
                 </Typography>
@@ -401,6 +408,7 @@ const Clio = () => {
                 </Box>
               </Box>
 
+              {/** pros content */}
               <Box
                 display="flex"
                 justifyContent={'center'}
@@ -439,7 +447,7 @@ const Clio = () => {
                             src={item.image}
                             width={'100px'}
                             height={'100px'}
-                            alt=""
+                            alt="item"
                           />
                         </Box>
 
@@ -488,6 +496,73 @@ const Clio = () => {
                       </Box>
                     </Box>
                   ))}
+                </Box>
+              </Box>
+              {/** Video description */}
+              <Box
+                display="flex"
+                justifyContent={'center'}
+                alignItems={'center'}
+                p={'0 20px'}
+              >
+                <Box
+                  display="flex"
+                  justifyContent={'center'}
+                  alignItems={'center'}
+                  sx={{
+                    background: linearGradient,
+                    // borderRadius: '40px',
+                    padding: '1px',
+                    width: '1162px',
+                  }}
+                >
+                  <video
+                    src={clioVid}
+                    width={'100%'}
+                    autoPlay={true}
+                    controls={true}
+                  />
+                </Box>
+              </Box>
+              {/** OpenAI description */}
+              <Box
+                display="flex"
+                justifyContent={'center'}
+                alignItems={'center'}
+                p={'0 20px'}
+                marginTop={'40px'}
+              >
+                <Box
+                  display="flex"
+                  justifyContent={'center'}
+                  alignItems={'center'}
+                  sx={{
+                    background: linearGradient,
+                    borderRadius: '40px',
+                    padding: '40px',
+                    width: '1083px',
+                  }}
+                >
+                  <Typography
+                    component={'p'}
+                    sx={{
+                      fontSize: '18px',
+                      color: 'white',
+                      lineHeight: '22px',
+                      fontFamily: 'Inter',
+                    }}
+                  >
+                    Introducing Clio, your AI domain assistant powered by
+                    OpenAI, one of the top AI companies in the world. At Domain
+                    Labs, we believe in providing the best possible experience
+                    for our customers, and that's why we use OpenAI to power
+                    Clio. With Clio, you can save time and money on domain
+                    searches, with accurate and personalized recommendations
+                    based on your preferences. And with OpenAI powering Clio,
+                    you can trust that you're getting the most advanced AI
+                    technology available. Thank you for choosing Domain Labs and
+                    Clio for your domain search needs.
+                  </Typography>
                 </Box>
               </Box>
             </Grid>

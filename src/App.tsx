@@ -1,14 +1,14 @@
-import ContextWrapper from "./ContextWrapper";
 import 'react-toastify/dist/ReactToastify.css';
-import { Provider } from "react-redux";
-import { DappProvider } from "./contexts/dapp";
-import { ThemeProvider } from "./contexts/theme";
 
-import { persistor, store } from "./redux/store";
-import { PersistGate } from "redux-persist/integration/react";
+import { persistor, store } from './redux/store';
+
+import ContextWrapper from './ContextWrapper';
+import { DappProvider } from './contexts/dapp';
+import { PersistGate } from 'redux-persist/integration/react';
+import { Provider } from 'react-redux';
+import { ThemeProvider } from './contexts/theme';
 
 const App = () => {
-
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>

@@ -21,7 +21,7 @@ const Pricing = () => {
   const [isProcessing, setIsProcessing] = useState('');
   const [isAnnualPay, setIsAnnualPay] = useState(true);
   const [isAlreadySignedUp, setIsAlreadySignedUp] = useState(false);
-  const { provider, signer, networkId } = useDapp();
+  const { provider, signer, networkId, isConnected } = useDapp();
   const styles = {
     container: {
       backgroundColor: theme === 'dark-theme' ? '#2A2A2A' : 'white',
@@ -52,6 +52,9 @@ const Pricing = () => {
   ];
 
   useEffect(() => {
+    if (!isConnected) {
+      return;
+    }
     (async () => {
       // check if signed up
       let isAlreadySignedUp = false;
@@ -64,9 +67,13 @@ const Pricing = () => {
         setIsAlreadySignedUp(isAlreadySignedUp);
       }
     })();
-  }, [address]);
+  }, [address, isConnected]);
 
   const handleFreeSignUp = async () => {
+    if (!isConnected) {
+      toast.error('Connect your wallet to proceed!');
+      return;
+    }
     const postObject = {
       address: address.toLowerCase(),
       endTime:
@@ -90,6 +97,10 @@ const Pricing = () => {
   };
 
   const handleSecureSignUp = async () => {
+    if (!isConnected) {
+      toast.error('Connect your wallet to proceed!');
+      return;
+    }
     if (networkId !== 56) {
       toast.warn('Please change your network to BSC');
       return;
@@ -165,7 +176,7 @@ const Pricing = () => {
                 width={'100%'}
                 key={index}
               >
-                <img src={blueCheckIcon} alt="" />
+                <img src={blueCheckIcon} alt="check" />
                 <Typography
                   display={'flex'}
                   justifyContent={'left'}

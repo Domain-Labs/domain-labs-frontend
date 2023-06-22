@@ -62,6 +62,7 @@ export default function TransferDialog(props) {
 
   return (
     <Dialog
+      disableScrollLock
       sx={{
         '& .MuiDialog-paper': {
           width: '80%',

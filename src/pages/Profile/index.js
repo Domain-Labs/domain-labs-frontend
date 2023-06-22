@@ -41,7 +41,7 @@ const Profile = () => {
   const [totalPage, setTotalPage] = useState(0);
   const [onePageDomains, setOnePageDomains] = useState([]);
   const [selDomain, setSelDomain] = useState();
-  const { address, networkId } = useDapp();
+  const { address, networkId } = useDapp('');
   const { domains, loading } = useSelector((state) => state.profile);
 
   const navigate = useNavigate();
@@ -98,6 +98,9 @@ const Profile = () => {
       network = 0;
     } else if (networkId === 56) {
       network = 1;
+    } else {
+      setOnePageDomains([]);
+      return;
     }
     if (domains && domains.length) {
       const fDomains = domains.filter((domain) => domain.network === network);
@@ -217,7 +220,9 @@ const Profile = () => {
                 onCopy={() => window.alert('copied')}
               >
                 <Typography fontSize={{ xs: '15px', md: '20px' }}>
-                  {address.slice(0, 7) + '...' + address.slice(-7, -1)}
+                  {address
+                    ? address.slice(0, 7) + '...' + address.slice(-7, -1)
+                    : ''}
                 </Typography>
               </CopyToClipboard>
               <Typography fontWeight={900} marginTop={'30px'}>

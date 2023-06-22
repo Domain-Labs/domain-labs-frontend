@@ -28,6 +28,9 @@ const Footer = () => {
   const LeftComponent = () => (
     <Box display="flex" flexDirection={'column'} className="left-component">
       <Typography
+        component={'a'}
+        target="_"
+        href="https://domain-labs.gitbook.io/domain-labs-docs"
         color="white"
         sx={{
           fontFamily: 'Inter',
@@ -36,9 +39,10 @@ const Footer = () => {
           lineHeight: '22px',
           paddingTop: '20px',
           cursor: 'pointer',
+          textDecoration: 'none',
         }}
       >
-        Terms Of Service
+        Documentation
       </Typography>
       <Typography
         color="white"

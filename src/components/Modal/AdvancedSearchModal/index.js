@@ -32,7 +32,19 @@ function AdvancedSearchModal(props) {
 
   const advancedSearch = () => {
     if (names.length > 0) {
-      dispatch(setSearchList(names));
+      const searchList = names.map((searchStr) => {
+        let searchBuf = searchStr.toLowerCase();
+        const parts = searchBuf.split('.');
+        if (
+          parts[parts.length - 1] === 'eth' ||
+          parts[parts.length - 1] === 'bnb'
+        ) {
+          parts.splice(parts.length - 1, 1);
+          searchBuf = parts.join('.');
+        }
+        return searchBuf;
+      });
+      dispatch(setSearchList(searchList));
       navigate('/search-result');
     }
   };
@@ -43,6 +55,7 @@ function AdvancedSearchModal(props) {
 
   return (
     <Dialog
+      disableScrollLock
       open={open}
       color="primary"
       onClose={props.handleClose}
@@ -83,7 +96,7 @@ function AdvancedSearchModal(props) {
           cursor: 'pointer',
         }}
         onClick={props.handleClose}
-        alt=""
+        alt="cancel"
       />
 
       <DialogContent

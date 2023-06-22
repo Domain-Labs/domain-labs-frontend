@@ -17,6 +17,7 @@ import { domainLogoImages, domainNames, domainSuffixes } from '../../config';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { toast } from 'react-toastify';
 import { useDapp } from '../../contexts/dapp';
 import { useNavigate } from 'react-router';
 import { useTheme } from '../../contexts/theme';
@@ -25,11 +26,15 @@ const SearchResult = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { domain, cart } = useSelector((state) => state);
-  const { provider, signer, address, networkId } = useDapp();
+  const { provider, signer, address, networkId, isConnected } = useDapp();
   const { theme } = useTheme();
   const [results, setResults] = useState([]);
 
   const _addOrRemoveCart = (_domainName) => {
+    if (!isConnected) {
+      toast.error('Connect your wallet to proceed!');
+      return;
+    }
     const domainSuffix = domainSuffixes[networkId];
     const exist = cart.cart.findIndex((item) => item.name === _domainName);
     const idx = results.findIndex((item) => item.name === _domainName);
@@ -57,7 +62,7 @@ const SearchResult = () => {
   };
 
   const backHome = () => {
-    navigate('/home');
+    navigate('/');
   };
 
   const _checkAvailability = useCallback(async () => {
@@ -69,6 +74,7 @@ const SearchResult = () => {
     }
 
     if (domain.isSingleSearch) {
+      console.log(provider, 'availability');
       const availability = await domainFuncs.checkAvailability(
         domain.searchString,
         provider,
@@ -78,6 +84,7 @@ const SearchResult = () => {
       );
       setResults([{ ...availability, cart: exist > -1 }]);
     } else {
+      console.log(provider, 'availability');
       domain.searchList.map((searchString) => {
         if (searchString === '' || !searchString) return false;
         domainFuncs.checkAvailability(searchString, provider).then((rlt) => {
@@ -102,12 +109,11 @@ const SearchResult = () => {
   }, [domain, provider, cart.cart]);
 
   useEffect(() => {
-    if (provider && signer) {
-      console.log('check availability');
+    if (provider) {
       _checkAvailability();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [_checkAvailability, provider, signer]);
+  }, [_checkAvailability, provider]);
 
   return (
     <Box
@@ -126,7 +132,7 @@ const SearchResult = () => {
             height={'31px'}
             style={{ cursor: 'pointer' }}
             onClick={backHome}
-            alt=""
+            alt="back"
           />
           <Typography
             fontSize={{
@@ -272,7 +278,7 @@ const SearchResult = () => {
                           marginLeft: '5px',
                           cursor: 'pointer',
                         }}
-                        alt=""
+                        alt="logo"
                       />
                     </Box>
                     <Box
@@ -375,7 +381,7 @@ const SearchResult = () => {
                     {result.available ? (
                       <img
                         src={result.cart ? shoppingCartFull : shoppingCart}
-                        alt="bookmark"
+                        alt="shopping cart"
                         width={'25px'}
                         height={'25px'}
                         onClick={() => _addOrRemoveCart(result.name)}
@@ -383,7 +389,7 @@ const SearchResult = () => {
                     ) : (
                       <img
                         src={removeShoppingCartBlack}
-                        alt="bookmark"
+                        alt="remove shopping cart"
                         width={'25px'}
                         height={'25px'}
                       />

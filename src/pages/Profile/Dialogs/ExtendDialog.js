@@ -96,6 +96,7 @@ export default function ExtendDialog(props) {
 
   return (
     <Dialog
+      disableScrollLock
       sx={{
         '& .MuiDialog-paper': {
           width: '80%',

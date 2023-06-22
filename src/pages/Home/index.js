@@ -20,7 +20,6 @@ import binanceLogo from '../../assets/image/svgs/binance-logo.svg';
 import ensLogo from '../../assets/image/svgs/ens-logo.svg';
 import searchImage from '../../assets/image/search.png';
 import { setSearchString } from '../../redux/actions/domainActions';
-import { toast } from 'react-toastify';
 import { useDapp } from '../../contexts/dapp';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -28,41 +27,41 @@ import { useTheme } from '../../contexts/theme';
 
 const Home = () => {
   const { switchNetwork } = useSwitchNetwork();
-  const { chain } = useNetwork();
   const dispatch = useDispatch();
-  const { setNetworkId, isConnected } = useDapp();
+  const { setNetworkId, isConnected, networkId } = useDapp();
   const { theme } = useTheme();
-  const [, setChainId] = useState(chain ? chain.id : 5);
+  const [chainId, setChainId] = useState(networkId);
   const [isOpenAdvancedSearch, setIsOpenAdvancedSearch] = useState(false);
   const [searchStr, setSearchStr] = useState('');
   const navigate = useNavigate();
   const [top, setTop] = useState(0);
 
   const handleChainChange = (event) => {
-    if (!isConnected) {
-      toast.error('Please switch your chain');
-      return;
-    }
     const id = Number(event.target.value);
-    switchNetwork(`0x${id.toString(16)}`);
+    if (isConnected) {
+      switchNetwork(`0x${id.toString(16)}`);
+      // return;
+    }
     setChainId(id);
     setNetworkId(id);
   };
 
   const searchClicked = () => {
-    if (!isConnected) {
-      toast.error('Please switch your chain');
-      return;
+    let searchBuf = searchStr.toLowerCase();
+    const parts = searchBuf.split('.');
+    if (
+      parts[parts.length - 1] === 'eth' ||
+      parts[parts.length - 1] === 'bnb'
+    ) {
+      parts.splice(parts.length - 1, 1);
+      searchBuf = parts.join('.');
     }
-    dispatch(setSearchString(searchStr.toLowerCase()));
+    console.log(searchBuf, 'search Buf');
+    dispatch(setSearchString(searchBuf));
     navigate(`/search-result`);
   };
 
   const onKeyPressed = (e) => {
-    if (!isConnected) {
-      toast.error('Please switch your chain');
-      return;
-    }
     if (e.code === 'Enter') {
       searchClicked();
     }
@@ -82,7 +81,9 @@ const Home = () => {
     };
   }, [top]);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    setChainId(networkId);
+  }, [networkId]);
 
   const styles = {
     container: {
@@ -254,10 +255,6 @@ const Home = () => {
                         fontSize={{ xs: '12px', sm: ' 14px', md: '16px' }}
                         className="custom-font"
                         onClick={() => {
-                          if (!isConnected) {
-                            toast.error('Please switch your chain');
-                            return;
-                          }
                           setIsOpenAdvancedSearch(true);
                         }}
                       >
@@ -277,7 +274,7 @@ const Home = () => {
                           <img
                             style={{ width: '16px', height: '16px' }}
                             src={searchImage}
-                            alt=""
+                            alt="search"
                           />
                         </Box>
                         <Box
@@ -287,7 +284,7 @@ const Home = () => {
                           <img
                             style={{ width: '24', height: '24px' }}
                             src={searchImage}
-                            alt=""
+                            alt="search"
                           />
                         </Box>
                       </Button>
@@ -372,8 +369,7 @@ const Home = () => {
                     <Select
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
-                      value={chain ? chain.id : ethereumChain}
-                      label="Current Chain"
+                      value={chainId}
                       onChange={handleChainChange}
                       className="chain-select-menu"
                       style={{
@@ -391,7 +387,7 @@ const Home = () => {
                         <img
                           src={ensLogo}
                           style={{ marginRight: '10px' }}
-                          alt=""
+                          alt="ENS"
                         />
                         ENS - Ethereum Name Service
                       </MenuItem>
@@ -399,7 +395,7 @@ const Home = () => {
                         <img
                           src={binanceLogo}
                           style={{ marginRight: '10px' }}
-                          alt=""
+                          alt="BNS"
                         />
                         BNS - Binance Name Service
                       </MenuItem>

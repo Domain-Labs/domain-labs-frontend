@@ -85,7 +85,9 @@ const Header = (props) => {
     window !== undefined ? () => window().document.body : undefined;
   const { address } = useAccount();
   const toBuyPage = () => {
-    navigate('/cart');
+    if (isConnected) {
+      navigate('/cart');
+    }
   };
 
   const switchTheme = () => {
@@ -101,16 +103,17 @@ const Header = (props) => {
     const chainId = chain?.id;
     const pathname = location.pathname;
 
-    if (
-      !chainIds[process.env.REACT_APP_NET_TYPE].includes(chainId) &&
-      pathname !== '/home'
-    ) {
-      toast.error('Please switch your chain');
-      setTimeout(() => {
-        navigate('/home');
-      });
-      return;
-    }
+    // if (
+    //   !chainIds[process.env.REACT_APP_NET_TYPE].includes(chainId) &&
+    //   pathname !== '/home' &&
+    //   pathname !== '/team'
+    // ) {
+    //   toast.error('Please switch your chain');
+    //   setTimeout(() => {
+    //     navigate('/home');
+    //   });
+    //   return;
+    // }
 
     if (
       address === process.env.REACT_APP_ADMIN_WALLET_1 ||
@@ -154,7 +157,7 @@ const Header = (props) => {
           src={theme === 'dark-theme' ? darkSunImage : yellowSunImage}
           width={'22px'}
           height={'22px'}
-          alt=""
+          alt="sunImage"
         />
       </Box>
       <Box
@@ -185,7 +188,7 @@ const Header = (props) => {
         style={{
           height: '41px',
         }}
-        alt=""
+        alt="logo"
       />
       <Typography
         color={theme === 'dark-theme' ? 'white' : 'black'}
@@ -201,7 +204,15 @@ const Header = (props) => {
 
   const drawer = (
     <Box sx={{ textAlign: 'center' }} m={'30px'}>
-      <Box display={'flex'} justifyContent={'center'} position={'relative'}>
+      <Box
+        display={'flex'}
+        justifyContent={'center'}
+        position={'relative'}
+        onClick={() => {
+          navigate('/');
+          setMobileOpen(!mobileOpen);
+        }}
+      >
         <LogoComponent />
         <Box position={'absolute'} right={0} top={'15px'}>
           <RxCross1
@@ -309,7 +320,7 @@ const Header = (props) => {
                   src={darkCartImage}
                   width={'22.64px'}
                   height={'22.64px'}
-                  alt=""
+                  alt="cart"
                 />
 
                 <span
@@ -347,7 +358,7 @@ const Header = (props) => {
                   src={theme === 'dark-theme' ? darkCartImage : whiteCartImage}
                   width={'22.64px'}
                   height={'22.64px'}
-                  alt=""
+                  alt="cart"
                 />
               </Box>
             )}
@@ -390,7 +401,7 @@ const Header = (props) => {
 
   return (
     <React.Fragment>
-      <ElevationScroll {...props} px={'10px !important'} class>
+      <ElevationScroll {...props} px={'10px !important'}>
         <AppBar
           height={{ xs: '100px', sm: '60px' }}
           style={{
@@ -535,10 +546,14 @@ const Header = (props) => {
                     sx={{
                       padding: '2px 0px 3px 15px',
                       cursor:
-                        location.pathname === '/' ? 'not-allowed' : 'pointer',
+                        isConnected && availableCart && availableCart.length > 0
+                          ? 'pointer'
+                          : 'not-allowed',
                     }}
                     onClick={
-                      location.pathname === '/' ? () => {} : () => toBuyPage()
+                      isConnected && availableCart && availableCart.length > 0
+                        ? () => toBuyPage()
+                        : () => {}
                     }
                     display={'flex'}
                   >
@@ -562,7 +577,7 @@ const Header = (props) => {
                           src={darkCartImage}
                           width={'22.64px'}
                           height={'22.64px'}
-                          alt=""
+                          alt="cart"
                         />
 
                         <span
@@ -604,7 +619,7 @@ const Header = (props) => {
                           }
                           width={'22.64px'}
                           height={'22.64px'}
-                          alt=""
+                          alt="cart"
                         />
                       </Box>
                     )}

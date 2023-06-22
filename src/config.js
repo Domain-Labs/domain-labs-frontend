@@ -34,8 +34,8 @@ export const chainNames = {
 };
 
 export const rpcUrls = {
-  1: 'https://mainnet.infura.io/v3/',
-  5: 'https://goerli.infura.io/v3',
+  1: 'https://mainnet.infura.io/v3/610b716a2a894e6dad5ed94aa38e5c85',
+  5: 'https://goerli.infura.io/v3/610b716a2a894e6dad5ed94aa38e5c85',
   56: 'https://bsc-dataseed.binance.org',
   97: 'https://data-seed-prebsc-1-s3.binance.org:8545',
 };
@@ -70,16 +70,16 @@ export const domainNames = {
 
 export const linkArray = [
   {
-    name: 'Home',
-    link: '/home',
-  },
-  {
     name: 'Pricing',
     link: '/pricing',
   },
   {
     name: 'Clio',
     link: '/clio',
+  },
+  {
+    name: 'Team',
+    link: '/team',
   },
   {
     name: 'Profile',

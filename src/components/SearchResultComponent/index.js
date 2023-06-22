@@ -116,7 +116,7 @@ const SearchResultComponent = (props) => {
                       marginLeft: '5px',
                       cursor: 'pointer',
                     }}
-                    alt=""
+                    alt="logo"
                   />
                   <Typography
                     sx={{ opacity: '1' }}
@@ -164,7 +164,7 @@ const SearchResultComponent = (props) => {
                     style={{
                       cursor: 'pointer',
                     }}
-                    alt=""
+                    alt="bookmark"
                   />
                   <img
                     src={whiteOffShoppingImage}
@@ -172,7 +172,7 @@ const SearchResultComponent = (props) => {
                       cursor: 'pointer',
                     }}
                     onClick={() => removeFromCart(id)}
-                    alt=""
+                    alt="shopping"
                   />
 
                   {/* <img src={theme == 'dark-theme' ? whiteOffShoppingImage: blackOffshoppingImage}/>*/}
@@ -260,8 +260,8 @@ const SearchResultComponent = (props) => {
                 >
                   {result.status ? (
                     <>
-                      <img src={blackBookmarkImage} alt="" />
-                      <img src={blackOffshoppingImage} alt="" />
+                      <img src={blackBookmarkImage} alt="bookmark" />
+                      <img src={blackOffshoppingImage} alt="shopping" />
                     </>
                   ) : (
                     <>
@@ -271,7 +271,7 @@ const SearchResultComponent = (props) => {
                           opacity: '0.5',
                           cursor: 'pointer',
                         }}
-                        alt=""
+                        alt="bookmark"
                       />
                       <img
                         src={blackOnshoppingImage}
@@ -279,7 +279,7 @@ const SearchResultComponent = (props) => {
                           opacity: '0.5',
                           cursor: 'pointer',
                         }}
-                        alt=""
+                        alt="onShopping"
                         onClick={() => addToCart(id)}
                       />
                     </>

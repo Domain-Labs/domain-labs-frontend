@@ -63,11 +63,7 @@ const MarqueeComponent = () => {
         {exampleDomains.map((item, index) => (
           <Box padding={'0 50px'} display={'flex'} gap={'10px'} key={index}>
             <img src={item.logo} alt="logo" />
-            <h1
-              style={{
-                color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
-              }}
-            >
+            <h1 color={theme === 'dark-theme' ? 'white' : '#2A2A2A'}>
               {item.domain}
             </h1>
           </Box>

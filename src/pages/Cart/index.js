@@ -31,6 +31,7 @@ import { domainLogoImages } from '../../config';
 import { getPriceInUSD } from '../../utils/EtherUtils';
 import randomBytes from 'randombytes';
 import timer from '../../assets/image/timer.png';
+import { toast } from 'react-toastify';
 import { useDapp } from '../../contexts/dapp';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -68,10 +69,17 @@ const Cart = () => {
   );
 
   const backHome = () => {
-    navigate('/home');
+    navigate('/');
   };
 
   const _requestDomain = async () => {
+    console.log(results, 'results');
+    const exist = results.findIndex((item) => item.year === 0);
+    console.log(exist, 'exist');
+    if (exist !== -1) {
+      toast.error('Error: Select Domain Duration To Proceed');
+      return;
+    }
     dispatch(
       requestDomain({
         network: networkId === 1 ? 'ENS' : 'BNS',
@@ -217,7 +225,7 @@ const Cart = () => {
               height={'31px'}
               style={{ cursor: 'pointer' }}
               onClick={backHome}
-              alt=""
+              alt="backHome"
             />
             <Typography
               fontSize={{
@@ -380,7 +388,7 @@ const Cart = () => {
           <Box>
             <LoadingButton
               loading={loading}
-              disabled={step === 1}
+              disabled={step === 1 || !cart || !cart.length}
               sx={{
                 background:
                   'linear-gradient(86.23deg, #4BD8D8 -48.31%, #146EB4 114.96%)',
@@ -496,7 +504,7 @@ const Cart = () => {
                       style={{
                         cursor: 'pointer',
                       }}
-                      alt=""
+                      alt={networkId === 1 ? 'ENS Logo' : 'BNS Logo'}
                     />
                     <Typography
                       sx={{ opacity: '1' }}
@@ -560,6 +568,9 @@ const Cart = () => {
                             padding: '5px 32px 5px 12px',
                           },
                         }}
+                        MenuProps={{
+                          disableScrollLock: true,
+                        }}
                       >
                         <MenuItem value={0} disabled={true}>
                           <Box
@@ -592,12 +603,12 @@ const Cart = () => {
                       <img
                         src={whiteBookmarkImage}
                         style={{ cursor: 'pointer' }}
-                        alt=""
+                        alt="bookmark"
                       />
                       <img
                         src={whiteOffShoppingImage}
                         style={{ cursor: 'pointer' }}
-                        alt=""
+                        alt="off shopping"
                         onClick={() => _removeCart(item.name, item.domain)}
                       />
                       {/* <img src={theme == 'dark-theme' ? whiteOffShoppingImage: blackOffshopping}/>*/}

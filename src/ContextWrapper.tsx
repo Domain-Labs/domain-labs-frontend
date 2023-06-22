@@ -3,18 +3,22 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import Admin from './pages/Admin';
 import Cart from './pages/Cart';
 import Clio from './pages/Clio';
-import ComingSoon from './pages/ComingSoon';
 import Faqs from './pages/Faqs';
 import Home from './pages/Home';
 import Layout from './Layout';
 import Pricing from './pages/Pricing';
 import Profile from './pages/Profile';
 import SearchResult from './pages/SearchResult';
+import Team from './pages/Team';
+import { toast } from 'react-toastify';
 import { useDapp } from './contexts/dapp';
 
 function PrivateRoute(props: any) {
   const { isConnected } = useDapp();
-  if (!isConnected) return <Navigate to="/home" />;
+  if (!isConnected) {
+    toast.warning('Connect your wallet to proceed');
+    return <Navigate to="/" />;
+  }
   return props.children;
 }
 
@@ -23,37 +27,37 @@ const ContextWrapper = () => {
     <BrowserRouter>
       <Layout>
         <Routes>
-          <Route path="/home" element={<Home />} />
+          <Route path="/" element={<Home />} />
           <Route
             path="/pricing"
             element={
-              <PrivateRoute>
-                <Pricing />
-              </PrivateRoute>
+              // <PrivateRoute>
+              <Pricing />
+              // </PrivateRoute>
             }
           />
           <Route
             path="/search-result"
             element={
-              <PrivateRoute>
-                <SearchResult />
-              </PrivateRoute>
+              // <PrivateRoute>
+              <SearchResult />
+              // </PrivateRoute>
             }
           />
           <Route
             path="/clio"
             element={
-              <PrivateRoute>
-                <Clio />
-              </PrivateRoute>
+              // <PrivateRoute>
+              <Clio />
+              // </PrivateRoute>
             }
           />
           <Route
             path="/faqs"
             element={
-              <PrivateRoute>
-                <Faqs />
-              </PrivateRoute>
+              // <PrivateRoute>
+              <Faqs />
+              // </PrivateRoute>
             }
           />
           <Route
@@ -80,7 +84,8 @@ const ContextWrapper = () => {
               </PrivateRoute>
             }
           />
-          <Route path="/" element={<Navigate to={'/home'} />} />
+          <Route path="/team" element={<Team />} />
+          <Route path="/" element={<Navigate to={'/'} />} />
         </Routes>
       </Layout>
     </BrowserRouter>
