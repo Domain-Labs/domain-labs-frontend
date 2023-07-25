@@ -1,12 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
-<url> <loc>https://domainlabs.app/</loc> </url>
-<url> <loc>https://domainlabs.app/pricing</loc> </url>
-<url> <loc>https://domainlabs.app/search-result</loc> </url>
-<url> <loc>https://domainlabs.app/clio</loc> </url>
-<url> <loc>https://domainlabs.app/faqs</loc> </url>
-<url> <loc>https://domainlabs.app/cart</loc> </url>
-<url> <loc>https://domainlabs.app/admin</loc> </url>
-<url> <loc>https://domainlabs.app/profile</loc> </url>
-<url> <loc>https://domainlabs.app/team</loc> </url>
+		<!--	created with www.mysitemapgenerator.com	-->
+		<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url>
+	<loc>https://domainlabs.app</loc>
+	<priority>0.75</priority>
+</url>
+<url>
+	<loc>https://domainlabs.app/blog</loc>
+	<priority>0.5</priority>
+</url>
+<url>
+	<loc>https://domainlabs.app/pricing</loc>
+	<priority>0.5</priority>
+</url>
+<url>
+	<loc>https://domainlabs.app/clio</loc>
+	<priority>0.5</priority>
+</url>
+<url>
+	<loc>https://domainlabs.app/faqs</loc>
+	<priority>0.5</priority>
+</url>
+<url>
+	<loc>https://domainlabs.app/team</loc>
+	<priority>0.5</priority>
+</url>
+<url>
+	<loc>https://domainlabs.app/contact</loc>
+	<priority>0.5</priority>
+</url>
+<url>
+	<loc>https://domainlabs.app/terms-of-service</loc>
+	<priority>0.5</priority>
+</url>
 </urlset>

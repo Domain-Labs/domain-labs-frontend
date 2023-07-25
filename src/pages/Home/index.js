@@ -16,6 +16,7 @@ import { useNetwork, useSwitchNetwork } from 'wagmi';
 
 import AdvancedSearchModal from '../../components/Modal/AdvancedSearchModal';
 import MarqueeComponent from '../../components/MarqueeComponent';
+import MetaTags from 'react-meta-tags';
 import binanceLogo from '../../assets/image/svgs/binance-logo.svg';
 import ensLogo from '../../assets/image/svgs/ens-logo.svg';
 import searchImage from '../../assets/image/search.png';
@@ -97,6 +98,17 @@ const Home = () => {
 
   return (
     <Box>
+      <MetaTags>
+        <title>Domain Labs - Web3 Domains, ENS Domains, BNB Domains</title>
+        <meta
+          name="og:description"
+          content="Empowering the Web3 era with cutting-edge solutions. Explore ENS domains, BNB domains, and more to unlocak the full potential of your online presence."
+        />
+        <meta
+          name="description"
+          content="Empowering the Web3 era with cutting-edge solutions. Explore ENS domains, BNB domains, and more to unlocak the full potential of your online presence."
+        />
+      </MetaTags>
       <Box style={styles.container}>
         <Box
           position="relative"

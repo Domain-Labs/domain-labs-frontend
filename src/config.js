@@ -70,9 +70,17 @@ export const domainNames = {
 
 export const linkArray = [
   {
-    name: 'Pricing',
-    link: '/pricing',
+    name: 'Home',
+    link: '/',
   },
+  {
+    name: 'Blog',
+    link: '/blog',
+  },
+  // {
+  //   name: 'Pricing',
+  //   link: '/pricing',
+  // },
   {
     name: 'Clio',
     link: '/clio',

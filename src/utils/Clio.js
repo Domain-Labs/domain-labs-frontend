@@ -3,7 +3,7 @@ import Web3 from 'web3';
 import { getClioContract } from './Contracts';
 import { getTransactionReceiptMined } from './EtherUtils';
 
-const clioContractAddress = '0x231DbB70E2AdA60A16A0273626BbbF47c8D76F00'; // contract address BSC Testnet
+const clioContractAddress = '0x5d79F2f9b10432B87094653df59Bdc0D1423F13a'; // contract address BSC Testnet
 
 export const getPrice = async (isYearly, provider) => {
   const clio = getClioContract({ address: clioContractAddress, provider });

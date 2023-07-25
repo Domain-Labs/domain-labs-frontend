@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 
 import { BASE_API_URL } from '../../config';
 import CircularProgress from '@mui/material/CircularProgress/CircularProgress';
+import MetaTags from 'react-meta-tags';
 // import SearchResultComponent from '../../components/SearchResultComponent';
 import axios from 'axios';
 import searchImage from '../../assets/image/search.png';
@@ -35,24 +36,24 @@ const Clio = () => {
     // get name candidates from clio
     setIsProcessing(true);
 
-    // check if signed up
-    let isAlreadySignedUp = false;
-    try {
-      const res = await axios.post(`${BASE_API_URL}/getIsSubscribe`, {
-        address: address.toLowerCase(),
-      });
-      isAlreadySignedUp = res.data.subscribed;
-    } catch (error) {
-      console.log(error);
-    }
-    console.log('is signed up: ', isAlreadySignedUp);
-    if (!isAlreadySignedUp) {
-      // setTimeout(() => {
-      toast.error('Please sign up at first!');
-      navigate('/pricing');
-      return;
-      // }, 1000);
-    }
+    // check if signed up ** will uncomment later
+    // let isAlreadySignedUp = false;
+    // try {
+    //   const res = await axios.post(`${BASE_API_URL}/getIsSubscribe`, {
+    //     address: address.toLowerCase(),
+    //   });
+    //   isAlreadySignedUp = res.data.subscribed;
+    // } catch (error) {
+    //   console.log(error);
+    // }
+    // console.log('is signed up: ', isAlreadySignedUp);
+    // if (!isAlreadySignedUp) {
+    //   // setTimeout(() => {
+    //   toast.error('Please sign up at first!');
+    //   navigate('/pricing');
+    //   return;
+    //   // }, 1000);
+    // }
 
     if (clioQuery?.length === 0) {
       toast.error('Please type your clio query');
@@ -164,6 +165,17 @@ const Clio = () => {
 
   return (
     <Box>
+      <MetaTags>
+        <title>Clio - AI Powered Domain Search Assistant, Web3 Domains</title>
+        <meta
+          name="og:description"
+          content="Personalized domain suggestion via Clio, an AI powered domain search assistant. Providing relevant and creative options tailored to your preferences."
+        />
+        <meta
+          name="description"
+          content="Personalized domain suggestion via Clio, an AI powered domain search assistant. Providing relevant and creative options tailored to your preferences."
+        />
+      </MetaTags>
       <Box style={styles.container} pb={'50px'}>
         <Box overflow="hidden" px={{ md: 10, xs: 5 }} pt={25}>
           <Grid
@@ -519,7 +531,7 @@ const Clio = () => {
                   <video
                     src={clioVid}
                     width={'100%'}
-                    autoPlay={true}
+                    autoPlay={false}
                     controls={true}
                   />
                 </Box>

@@ -4,6 +4,7 @@ import { Box, Button, Typography } from '@mui/material';
 
 import { BASE_API_URL } from '../../config';
 import { LoadingButton } from '@mui/lab';
+import MetaTags from 'react-meta-tags';
 import Toggle from 'react-toggle';
 import axios from 'axios';
 import { blueCheckIcon } from '../../utils/images';
@@ -19,7 +20,7 @@ const Pricing = () => {
   const { theme } = useTheme();
   const { address } = useAccount();
   const [isProcessing, setIsProcessing] = useState('');
-  const [isAnnualPay, setIsAnnualPay] = useState(true);
+  const [isAnnualPay, setIsAnnualPay] = useState(false);
   const [isAlreadySignedUp, setIsAlreadySignedUp] = useState(false);
   const { provider, signer, networkId, isConnected } = useDapp();
   const styles = {
@@ -134,6 +135,18 @@ const Pricing = () => {
 
   return (
     <Box style={styles.container}>
+      <MetaTags>
+        <title>Clio Pricing - AI Domain Recommendations, ENS, BNB</title>
+        <meta
+          name="og:description"
+          content="Discover your perfect domain with AI Domain Recommendations. Unlimited searches provide you with algorithmic AI accuracy, helping you find valuable domains"
+        />
+        <meta
+          name="description"
+          content="Discover your perfect domain with AI Domain Recommendations. Unlimited searches provide you with algorithmic AI accuracy, helping you find valuable domains"
+        />
+      </MetaTags>
+
       <Box mt={'90px'} pt={'60px'}>
         <Typography
           display={'flex'}
@@ -437,7 +450,7 @@ const Pricing = () => {
                   color: 'white',
                 }}
               >
-                {isAnnualPay ? '$351' : '$39'}
+                {isAnnualPay ? '$350' : '$39'}
               </Typography>
 
               <Typography

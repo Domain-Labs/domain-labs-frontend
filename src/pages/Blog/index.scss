@@ -1,0 +1,17 @@
+.gradient-border {
+  position: relative;
+  padding: 10px;
+  display: inline-block;
+}
+
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  z-index: -1;
+  background: linear-gradient(87.95deg, #4BD8D8 -3.28%, #146EB4 106.25%);
+  border-radius: 5px;
+}

@@ -3,6 +3,14 @@ import blackBookmarkImage from '../assets/image/bookmark_white_mode.png';
 import blackOffshoppingImage from '../assets/image/remove_shopping_cart_white_mode.png';
 import blackOnshoppingImage from '../assets/image/shopping_cart_white_mode.png';
 import blackVectorImage from '../assets/image/vector_white_mode.png';
+import blog1 from '../assets/image/blog/blog_1.png';
+import blog2 from '../assets/image/blog/blog_2.png';
+import blog3 from '../assets/image/blog/blog_3.png';
+import blog4 from '../assets/image/blog/blog_4.png';
+import blog5 from '../assets/image/blog/blog_5.png';
+import blog6 from '../assets/image/blog/blog_6.png';
+import blog7 from '../assets/image/blog/blog_7.png';
+import blog8 from '../assets/image/blog/blog_8.svg';
 import blueCheckIcon from '../assets/image/svgs/blue-check-icon.svg';
 import cancelImage from '../assets/image/cancel.png';
 import clioVid from '../assets/clio.MP4';
@@ -13,6 +21,7 @@ import lanLogo from '../assets/image/svgs/clio-page/lan-logo.svg';
 import picImage from '../assets/image/svgs/ens-logo.svg';
 import removeShoppingCartBlack from '../assets/image/remove_shopping_cart.png';
 import sampleAvatar from '../assets/image/profile_avatar.png';
+import searchImage from '../assets/image/search.png';
 import shoppingCart from '../assets/image/shopping_cart_white.png';
 import shoppingCartFull from '../assets/image/shopping_cart_full.png';
 import teamBryan from '../assets/image/team/bryan_big.png';
@@ -64,4 +73,13 @@ export {
   utopiaBlack,
   utopiaWhite,
   clioVid,
+  searchImage,
+  blog1,
+  blog2,
+  blog3,
+  blog4,
+  blog5,
+  blog6,
+  blog7,
+  blog8,
 };

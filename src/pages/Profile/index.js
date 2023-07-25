@@ -22,6 +22,7 @@ import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import ExtendDialog from './Dialogs/ExtendDialog';
 import { FaArrowCircleUp } from 'react-icons/fa';
+import MetaTags from 'react-meta-tags';
 import { RxPlusCircled } from 'react-icons/rx';
 import TransferDialog from './Dialogs/TransferDialog';
 import { getDomainsByAddress } from '../../redux/actions/profileActions';
@@ -125,6 +126,10 @@ const Profile = () => {
         minHeight: 'calc(100vh - 328px)',
       }}
     >
+      <MetaTags>
+        <title>Domain Labs - Profile</title>
+      </MetaTags>
+
       <Box
         display={{ xs: 'block', sm: 'flex' }}
         alignItems={'center'}

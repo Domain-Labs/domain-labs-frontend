@@ -27,6 +27,7 @@ import {
 
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { LoadingButton } from '@mui/lab';
+import MetaTags from 'react-meta-tags';
 import { domainLogoImages } from '../../config';
 import { getPriceInUSD } from '../../utils/EtherUtils';
 import randomBytes from 'randombytes';
@@ -133,11 +134,11 @@ const Cart = () => {
 
   const buttonText = () => {
     if (step === 0) {
-      return 'Request Domains';
+      return 'Secure Domains';
     } else if (step === 1) {
       return `Waiting for ${waitingTime}s`;
     } else if (step === 2) {
-      return 'Buy Domains';
+      return 'Confirm Purchase';
     }
   };
 
@@ -211,6 +212,9 @@ const Cart = () => {
         minHeight: 'calc(100vh - 328px)',
       }}
     >
+      <MetaTags>
+        <title>Domain Labs - Cart</title>
+      </MetaTags>
       <Box
         display={{ xs: 'block', md: 'flex' }}
         sx={{

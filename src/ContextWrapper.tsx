@@ -1,12 +1,13 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
 import Admin from './pages/Admin';
+import Blog from './pages/Blog';
 import Cart from './pages/Cart';
 import Clio from './pages/Clio';
 import Faqs from './pages/Faqs';
 import Home from './pages/Home';
 import Layout from './Layout';
-import Pricing from './pages/Pricing';
+// import Pricing from './pages/Pricing';
 import Profile from './pages/Profile';
 import SearchResult from './pages/SearchResult';
 import Team from './pages/Team';
@@ -29,13 +30,21 @@ const ContextWrapper = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route
+            path="/blog"
+            element={
+              // <PrivateRoute>
+              <Blog />
+              // </PrivateRoute>
+            }
+          />
+          {/* <Route
             path="/pricing"
             element={
               // <PrivateRoute>
               <Pricing />
               // </PrivateRoute>
             }
-          />
+          /> */}
           <Route
             path="/search-result"
             element={

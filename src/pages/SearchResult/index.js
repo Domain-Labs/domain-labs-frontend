@@ -17,6 +17,7 @@ import { domainLogoImages, domainNames, domainSuffixes } from '../../config';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import MetaTags from 'react-meta-tags';
 import { toast } from 'react-toastify';
 import { useDapp } from '../../contexts/dapp';
 import { useNavigate } from 'react-router';
@@ -62,7 +63,8 @@ const SearchResult = () => {
   };
 
   const backHome = () => {
-    navigate('/');
+    // history.goBack();
+    navigate(-1);
   };
 
   const _checkAvailability = useCallback(async () => {
@@ -124,6 +126,10 @@ const SearchResult = () => {
         minHeight: 'calc(100vh - 328px)',
       }}
     >
+      <MetaTags>
+        <title>Domain Labs</title>
+      </MetaTags>
+
       <Box display={{ xs: 'block', sm: 'flex' }} alignItems={'center'}>
         <Box display={'flex'} alignItems={'center'}>
           <img

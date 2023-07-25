@@ -13,6 +13,7 @@ import {
 } from '../../utils/images';
 import { useEffect, useState } from 'react';
 
+import MetaTags from 'react-meta-tags';
 import { useTheme } from '../../contexts/theme';
 import useWindowDimensions from '../../hooks/useDimension';
 
@@ -94,6 +95,10 @@ const Team = () => {
         minHeight: 'calc(100vh - 328px)',
       }}
     >
+      <MetaTags>
+        <title>Domain Labs - Dream Team</title>
+      </MetaTags>
+
       <Box
         display={{ xs: 'block', sm: 'flex' }}
         alignItems={'center'}
