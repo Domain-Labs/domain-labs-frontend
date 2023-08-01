@@ -1,5 +1,6 @@
 import binanceImage from './assets/image/svgs/binance-logo.svg';
 import ensImage from './assets/image/svgs/ens-logo.svg';
+import { solLogo } from './utils/images';
 
 export const BASE_API_URL =
   'https://tuy2zvjt24.execute-api.us-east-1.amazonaws.com';
@@ -9,7 +10,7 @@ export const BASE_API_URL =
 
 export const ethereumChain = 1;
 export const bscChain = 56;
-
+export const solChain = 101;
 /**
  * "5": ethereum chain
  * "97": bsc chain
@@ -45,6 +46,7 @@ export const domainSuffixes = {
   5: 'eth',
   56: 'bnb',
   97: 'bnb',
+  101: 'sol',
 };
 
 export const domainExtensions = {
@@ -52,6 +54,7 @@ export const domainExtensions = {
   5: 'ETH',
   56: 'BNB',
   97: 'BNB',
+  101: 'SOL',
 };
 
 export const domainLogoImages = {
@@ -59,6 +62,7 @@ export const domainLogoImages = {
   5: ensImage,
   56: binanceImage,
   97: binanceImage,
+  101: solLogo,
 };
 
 export const domainNames = {
@@ -66,6 +70,7 @@ export const domainNames = {
   5: 'ENS',
   56: 'BNB',
   97: 'BNB',
+  101: 'SOL',
 };
 
 export const linkArray = [

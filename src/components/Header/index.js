@@ -13,6 +13,10 @@ import {
   Typography,
   useScrollTrigger,
 } from '@mui/material';
+import {
+  WalletModalProvider,
+  WalletMultiButton,
+} from '@solana/wallet-adapter-react-ui';
 import { useAccount, useNetwork } from 'wagmi';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -32,6 +36,7 @@ import { toast } from 'react-toastify';
 import { useDapp } from '../../contexts/dapp';
 import { useSelector } from 'react-redux';
 import { useTheme } from '../../contexts/theme';
+import { useWallet } from '@solana/wallet-adapter-react';
 import useWindowDimensions from '../../hooks/useDimension';
 import whiteCartImage from '../../assets/image/shopping_cart_white_mode.png';
 import whiteLogoImage from '../../assets/image/logo_white_mode.png';
@@ -79,13 +84,15 @@ const Header = (props) => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const { cart } = useSelector((state) => state.cart);
   const [availableCart, setAvailableCart] = useState([]);
-  const { isConnected, networkId } = useDapp();
+  const { publicKey } = useWallet();
+  // const { isConnected, networkId } = useDapp();
+  const networkId = 101;
   const { window } = props;
   const container =
     window !== undefined ? () => window().document.body : undefined;
   const { address } = useAccount();
   const toBuyPage = () => {
-    if (isConnected) {
+    if (publicKey) {
       navigate('/cart');
     }
   };
@@ -302,7 +309,7 @@ const Header = (props) => {
             }}
             onClick={location.pathname === '/' ? () => {} : () => toBuyPage()}
           >
-            {isConnected && availableCart && availableCart.length > 0 ? (
+            {publicKey && availableCart && availableCart.length > 0 ? (
               <Box
                 sx={{
                   display: 'flex',
@@ -392,6 +399,13 @@ const Header = (props) => {
             chainStatus={{
               smallScreen: 'full',
               largeScreen: 'full',
+            }}
+          />
+          <WalletMultiButton
+            // className="solana-button"
+            style={{
+              marginTop: '10px',
+              borderRadius: '12px',
             }}
           />
         </Box>
@@ -546,20 +560,18 @@ const Header = (props) => {
                     sx={{
                       padding: '2px 0px 3px 15px',
                       cursor:
-                        isConnected && availableCart && availableCart.length > 0
+                        publicKey && availableCart && availableCart.length > 0
                           ? 'pointer'
                           : 'not-allowed',
                     }}
                     onClick={
-                      isConnected && availableCart && availableCart.length > 0
+                      publicKey && availableCart && availableCart.length > 0
                         ? () => toBuyPage()
                         : () => {}
                     }
                     display={'flex'}
                   >
-                    {isConnected &&
-                    availableCart &&
-                    availableCart.length > 0 ? (
+                    {publicKey && availableCart && availableCart.length > 0 ? (
                       <Box
                         sx={{
                           display: 'flex',
@@ -636,6 +648,15 @@ const Header = (props) => {
                     chainStatus={{
                       smallScreen: 'full',
                       largeScreen: 'full',
+                    }}
+                  />
+                  <WalletMultiButton
+                    // className="solana-button"
+                    style={{
+                      marginLeft: '10px',
+                      borderRadius: '12px',
+                      lineHeight: 'normal',
+                      height: '39px',
                     }}
                   />
                 </Box>

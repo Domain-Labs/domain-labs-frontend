@@ -1,5 +1,6 @@
 import './index.scss';
 
+import { BN, Program, Provider, web3 } from '@project-serum/anchor';
 import {
   Box,
   Button,
@@ -10,7 +11,13 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { bscChain, ethereumChain } from '../../config';
+import { Connection, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
+import {
+  ConnectionProvider,
+  WalletProvider,
+  useWallet,
+} from '@solana/wallet-adapter-react';
+import { bscChain, ethereumChain, solChain } from '../../config';
 import { useEffect, useState } from 'react';
 import { useNetwork, useSwitchNetwork } from 'wagmi';
 
@@ -21,6 +28,7 @@ import binanceLogo from '../../assets/image/svgs/binance-logo.svg';
 import ensLogo from '../../assets/image/svgs/ens-logo.svg';
 import searchImage from '../../assets/image/search.png';
 import { setSearchString } from '../../redux/actions/domainActions';
+import { solLogo } from '../../utils/images';
 import { useDapp } from '../../contexts/dapp';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -31,7 +39,9 @@ const Home = () => {
   const dispatch = useDispatch();
   const { setNetworkId, isConnected, networkId } = useDapp();
   const { theme } = useTheme();
-  const [chainId, setChainId] = useState(networkId);
+  // const [chainId, setChainId] = useState(networkId);
+  //testing purpose only for solana
+  const [chainId, setChainId] = useState(101);
   const [isOpenAdvancedSearch, setIsOpenAdvancedSearch] = useState(false);
   const [searchStr, setSearchStr] = useState('');
   const navigate = useNavigate();
@@ -39,12 +49,14 @@ const Home = () => {
 
   const handleChainChange = (event) => {
     const id = Number(event.target.value);
+    // if (id !== 101) {
     if (isConnected) {
       switchNetwork(`0x${id.toString(16)}`);
       // return;
     }
-    setChainId(id);
     setNetworkId(id);
+    // setChainId(id);
+    // }
   };
 
   const searchClicked = () => {
@@ -52,12 +64,12 @@ const Home = () => {
     const parts = searchBuf.split('.');
     if (
       parts[parts.length - 1] === 'eth' ||
-      parts[parts.length - 1] === 'bnb'
+      parts[parts.length - 1] === 'bnb' ||
+      parts[parts.length - 1] === 'sol'
     ) {
       parts.splice(parts.length - 1, 1);
       searchBuf = parts.join('.');
     }
-    console.log(searchBuf, 'search Buf');
     dispatch(setSearchString(searchBuf));
     navigate(`/search-result`);
   };
@@ -83,7 +95,7 @@ const Home = () => {
   }, [top]);
 
   useEffect(() => {
-    setChainId(networkId);
+    // setChainId(networkId);
   }, [networkId]);
 
   const styles = {
@@ -98,7 +110,7 @@ const Home = () => {
 
   return (
     <Box>
-      <MetaTags>
+      {/* <MetaTags>
         <title>Domain Labs - Web3 Domains, ENS Domains, BNB Domains</title>
         <meta
           name="og:description"
@@ -108,7 +120,7 @@ const Home = () => {
           name="description"
           content="Empowering the Web3 era with cutting-edge solutions. Explore ENS domains, BNB domains, and more to unlocak the full potential of your online presence."
         />
-      </MetaTags>
+      </MetaTags> */}
       <Box style={styles.container}>
         <Box
           position="relative"
@@ -410,6 +422,14 @@ const Home = () => {
                           alt="BNS"
                         />
                         BNS - Binance Name Service
+                      </MenuItem>
+                      <MenuItem value={solChain}>
+                        <img
+                          src={solLogo}
+                          style={{ marginRight: '10px', width: '20px' }}
+                          alt="SOL"
+                        />
+                        SNS - Solana Name Service
                       </MenuItem>
                     </Select>
                   </Box>

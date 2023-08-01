@@ -1,58 +1,61 @@
 import 'react-toastify/dist/ReactToastify.css';
 
-import * as BNS from '../../utils/BNBDomain';
-import * as ENS from '../../utils/ENSDomain';
-
 import {
-  Box,
-  MenuItem,
-  OutlinedInput,
-  Select,
-  Typography,
-} from '@mui/material';
-import React, { useEffect, useMemo, useState } from 'react';
-import {
-  blackVectorImage,
-  whiteBookmarkImage,
-  whiteOffShoppingImage,
-  whiteVectorImage,
-} from '../../utils/images';
-import { domainExtensions, domainNames, domainSuffixes } from '../../config';
+  BASE_API_URL,
+  domainExtensions,
+  domainNames,
+  domainSuffixes,
+} from '../../config';
+import { BN, Program, web3 } from '@project-serum/anchor';
+import { Box, Typography } from '@mui/material';
+import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
+import React, { useEffect, useState } from 'react';
+import { blackVectorImage, whiteVectorImage } from '../../utils/images';
 import {
   removeAll,
   removeCart,
-  requestDomain,
   setStep,
 } from '../../redux/actions/cartActions';
 
+import CartComponent from './CartComponent';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { LoadingButton } from '@mui/lab';
-import MetaTags from 'react-meta-tags';
-import { domainLogoImages } from '../../config';
+import axios from 'axios';
 import { getPriceInUSD } from '../../utils/EtherUtils';
+import { getProvider } from '../../utils/SolUtils';
+import idl from '../../assets/abi/idl.json';
 import randomBytes from 'randombytes';
-import timer from '../../assets/image/timer.png';
 import { toast } from 'react-toastify';
-import { useDapp } from '../../contexts/dapp';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useTheme } from '../../contexts/theme';
+import { useWallet } from '@solana/wallet-adapter-react';
+
+const program_id = new PublicKey(
+  '44mDRYJXCK8DWe6hShk319g8nFmihCXk5BS1YWoLe1rR',
+);
+const toWalletPubKey = new PublicKey(
+  'BurUDeKQKrSWW8U8GoHXHfoS6gqDV4VmcyEHUhNTCWJ4',
+);
+//   '8A8tSuP251g56s41s8YYp3NKgqLYFqaTrdnTr1q9aScE',
 
 const Cart = () => {
-  const { address, provider, signer, networkId } = useDapp();
+  const networkId = 101; //for solana purpose
   const { cart } = useSelector((state) => state.cart);
   const [results, setResults] = useState([]);
-  // const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [waitingTime, setWaitingTime] = useState(60);
   const [price, setPrice] = useState(0);
-  const [priceInUsd, setPriceInUsd] = useState(0);
+  const [priceInUsd, setPriceInUsd] = useState(1);
   // const [step, setStep] = useState(0);
   const [gasPrice, setGasPrice] = useState(0);
   const navigate = useNavigate();
   const { theme } = useTheme();
   const dispatch = useDispatch();
-  const { loading, step, waiting } = useSelector((state) => {
+  const { publicKey } = useWallet();
+  const wallet = useWallet();
+  const { step, waiting } = useSelector((state) => {
     return state.cart;
   });
 
@@ -60,119 +63,246 @@ const Cart = () => {
     dispatch(removeCart({ name: _domainName, domain: domain }));
   };
 
-  const options = useMemo(
-    () => [
-      { label: '1 Year', value: 365 },
-      { label: '3 Years', value: 1095 },
-      { label: '5 Years', value: 1825 },
-    ],
-    [],
-  );
+  // const options = useMemo(
+  //   () => [
+  //     { label: '1 Year', value: 365 },
+  //     { label: '3 Years', value: 1095 },
+  //     { label: '5 Years', value: 1825 },
+  //   ],
+  //   [],
+  // );
 
   const backHome = () => {
     navigate('/');
   };
 
-  const _requestDomain = async () => {
-    console.log(results, 'results');
-    const exist = results.findIndex((item) => item.year === 0);
-    console.log(exist, 'exist');
-    if (exist !== -1) {
-      toast.error('Error: Select Domain Duration To Proceed');
+  const purchaseDomain = async () => {
+    if (!publicKey) {
+      toast.warning('Please connect your solana wallet');
       return;
     }
-    dispatch(
-      requestDomain({
-        network: networkId === 1 ? 'ENS' : 'BNS',
-        results,
-        provider,
-        signer,
-      }),
-    );
-  };
-
-  const buyDomain = async () => {
-    let domainFuncs;
-    if (networkId === 1 || networkId === 5) {
-      domainFuncs = ENS;
-    } else {
-      domainFuncs = BNS;
-    }
-    // setLoading(true);
-
+    // await paySol(0.05);
+    setLoading(true);
+    let tx;
     try {
-      await domainFuncs.register(results, provider, signer);
-      const domainSuffix = domainSuffixes[networkId];
-      dispatch(removeAll({ domain: domainSuffix }));
-    } catch (err) {
-      console.log(err, 'error from buyDomain');
+      tx = await paySol(price + gasPrice);
+    } catch (error) {
+      toast.error('Failed to purchase domain');
+      setLoading(false);
+      return;
     }
-    // setStep(0);
-    // setLoading(false);
+    const domainSuffix = domainSuffixes[networkId];
+    const domains = cart
+      .filter((_item) => _item.domain === domainSuffix)
+      .map((item) => {
+        return item.name;
+      });
+    console.log('buy domains');
+    setTimeout(async () => {
+      console.log('buy domains 1');
+      try {
+        const res = await axios.post(`${BASE_API_URL}/purchase-domains`, {
+          tx: tx,
+          domains: domains,
+        });
+        if (res.data.success) {
+        } else {
+          console.log(res.data.message, 'error message from server');
+          toast.error(`Error: ${res.data.message}`);
+          setLoading(false);
+          return;
+        }
+      } catch (error) {
+        console.log(error, 'error while purchasing');
+        toast.error(`Error: ${error}`);
+        setLoading(false);
+        return;
+      }
+      setLoading(false);
+      toast.success('Successfully purchased domains');
+      setTimeout(() => {
+        const domainSuffix = domainSuffixes[networkId];
+        dispatch(removeAll({ domain: domainSuffix }));
+        navigate('/');
+      }, 2000);
+    }, 20000);
   };
 
-  const timeSelect = async (idx, value) => {
-    const nResults = [...results];
-    nResults[idx].year = value;
-    nResults[idx].duration = value * 24 * 3600;
-    let domainFuncs;
-    if (networkId === 1 || networkId === 5) {
-      domainFuncs = ENS;
-    } else {
-      domainFuncs = BNS;
-    }
-    const result = await domainFuncs.getRentPrice(
-      nResults[idx].name,
-      nResults[idx].year,
-      provider,
-    );
-    nResults[idx].price = result.price;
-    nResults[idx].gasPrice = result.gasPrice;
+  const paySol = async (_amount) => {
+    const a = JSON.stringify(idl);
+    const idl_json = JSON.parse(a);
+    const provider = getProvider(wallet);
+    const program = new Program(idl_json, program_id, provider);
+    const amount = _amount * LAMPORTS_PER_SOL;
+    try {
+      const tx = await program.methods
+        .transferLamports(new BN(amount))
+        .accounts({
+          from: provider.wallet.publicKey,
+          to: toWalletPubKey,
+          systemProgram: web3.SystemProgram.programId,
+        })
+        .rpc();
 
-    setResults(nResults);
+      const latestBlockHash = await provider.connection.getLatestBlockhash(
+        'finalized',
+      );
+
+      // tx.recentBlockhash = latestBlockHash.blockhash;
+      // tx.feePayer = provider?.wallet.publicKey;
+      // let signed = await provider?.wallet.signTransaction(tx);
+
+      await provider.connection.confirmTransaction({
+        signature: tx,
+        blockhash: latestBlockHash.blockhash,
+        lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+      });
+      console.log(`https://explorer.solana.com/tx/${tx}?cluster=mainnet-beta`);
+      return tx;
+      // console.log(signed);
+    } catch (e) {
+      console.log(e, 'error');
+      throw e;
+    }
   };
 
-  const buttonText = () => {
-    if (step === 0) {
-      return 'Secure Domains';
-    } else if (step === 1) {
-      return `Waiting for ${waitingTime}s`;
-    } else if (step === 2) {
-      return 'Confirm Purchase';
-    }
-  };
+  // const _requestDomain = async () => {
+  //   console.log(results, 'results');
+  //   const exist = results.findIndex((item) => item.year === 0);
+  //   console.log(exist, 'exist');
+  //   if (exist !== -1) {
+  //     toast.error('Error: Select Domain Duration To Proceed');
+  //     return;
+  //   }
+  //   dispatch(
+  //     requestDomain({
+  //       network: networkId === 1 ? 'ENS' : 'BNS',
+  //       results,
+  //       provider,
+  //       signer,
+  //     }),
+  //   );
+  // };
+
+  // const buyDomain = async () => {
+  //   let domainFuncs;
+  //   if (networkId === 1 || networkId === 5) {
+  //     domainFuncs = ENS;
+  //   } else {
+  //     domainFuncs = BNS;
+  //   }
+  //   // setLoading(true);
+
+  //   try {
+  //     await domainFuncs.register(results, provider, signer);
+  //     const domainSuffix = domainSuffixes[networkId];
+  //     dispatch(removeAll({ domain: domainSuffix }));
+  //   } catch (err) {
+  //     console.log(err, 'error from buyDomain');
+  //   }
+  //   // setStep(0);
+  //   // setLoading(false);
+  // };
+
+  // const timeSelect = async (idx, value) => {
+  //   const nResults = [...results];
+  //   nResults[idx].year = value;
+  //   nResults[idx].duration = value * 24 * 3600;
+  //   let domainFuncs;
+  //   if (networkId === 1 || networkId === 5) {
+  //     domainFuncs = ENS;
+  //   } else {
+  //     domainFuncs = BNS;
+  //   }
+  //   const result = await domainFuncs.getRentPrice(
+  //     nResults[idx].name,
+  //     nResults[idx].year,
+  //     provider,
+  //   );
+  //   nResults[idx].price = result.price;
+  //   nResults[idx].gasPrice = result.gasPrice;
+
+  //   setResults(nResults);
+  // };
+
+  // const buttonText = () => {
+  //   if (step === 0) {
+  //     return 'Secure Domains';
+  //   } else if (step === 1) {
+  //     return `Waiting for ${waitingTime}s`;
+  //   } else if (step === 2) {
+  //     return 'Confirm Purchase';
+  //   }
+  // };
 
   useEffect(() => {
     const domainSuffix = domainSuffixes[networkId];
-    const domainName = domainExtensions[networkId];
-    getPriceInUSD(domainName)
-      .then((res) => {
-        setPriceInUsd(res);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    const pricingTable = {
+      5: 22, //20
+      4: 176, //160
+      3: 704, //640
+      2: 770, //700
+      1: 825, //750
+    };
+    const pricingInSolTable = {
+      5: 0,
+      4: 0,
+      3: 0,
+      2: 0,
+      1: 0,
+    };
+    Object.keys(pricingTable).map((key) => {
+      pricingInSolTable[key] = pricingTable[key] / priceInUsd;
+      return true;
+    });
+    console.log(pricingInSolTable, priceInUsd, '---');
+
+    // const tmps = cart
+    //   .filter((_item) => _item.domain === domainSuffix)
+    //   .map((item) => {
+    //     const exist = results.findIndex(
+    //       (data) => data.name === item.name && data.domain === item.domain,
+    //     );
+    //     if (exist > -1) {
+    //       return results[exist];
+    //     }
+    //     return {
+    //       name: item.name,
+    //       domain: item.domain,
+    //       year: 0,
+    //       duration: 0,
+    //       price: price,
+    //       gasPrice: gasPrice,
+    //       secret: '0x' + randomBytes(32).toString('hex'),
+    //     };
+    //   });
     const tmps = cart
       .filter((_item) => _item.domain === domainSuffix)
       .map((item) => {
         const exist = results.findIndex(
           (data) => data.name === item.name && data.domain === item.domain,
         );
+        const length = Number(item.name.length >= 5 ? 5 : item.name.length);
         if (exist > -1) {
-          return results[exist];
+          return {
+            ...results[exist],
+            price: pricingInSolTable[length],
+            gasPrice: 0.001,
+          };
         }
         return {
           name: item.name,
           domain: item.domain,
           year: 0,
           duration: 0,
-          price: price,
-          gasPrice: gasPrice,
+          price: pricingInSolTable[length],
+          gasPrice: 0.001,
           secret: '0x' + randomBytes(32).toString('hex'),
         };
       });
     setResults(tmps);
-  }, [cart, networkId, price]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cart, priceInUsd]);
 
   useEffect(() => {
     let _price = 0;
@@ -183,6 +313,7 @@ const Cart = () => {
     });
     setPrice(_price);
     setGasPrice(_gas);
+    console.log(_gas, 'gas');
     dispatch(setStep(0));
   }, [dispatch, results]);
 
@@ -203,6 +334,17 @@ const Cart = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, step]);
 
+  useEffect(() => {
+    const domainName = domainExtensions[networkId];
+    getPriceInUSD(domainName)
+      .then((res) => {
+        setPriceInUsd(res);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
   return (
     <Box
       pt={20}
@@ -212,9 +354,9 @@ const Cart = () => {
         minHeight: 'calc(100vh - 328px)',
       }}
     >
-      <MetaTags>
+      {/* <MetaTags>
         <title>Domain Labs - Cart</title>
-      </MetaTags>
+      </MetaTags> */}
       <Box
         display={{ xs: 'block', md: 'flex' }}
         sx={{
@@ -367,7 +509,7 @@ const Cart = () => {
           >
             <Typography>Gas Price</Typography>
             <Typography>
-              {Math.floor(gasPrice * priceInUsd * 100) / 100}
+              {Math.floor(gasPrice * priceInUsd * 100000) / 100000}
             </Typography>
           </Box>
           <Box
@@ -386,13 +528,13 @@ const Cart = () => {
               Grand total($)
             </Typography>
             <Typography fontSize={'24px'} fontWeight={'700'}>
-              {Math.floor((price + gasPrice) * priceInUsd * 100) / 100}
+              {Math.floor((price + gasPrice) * priceInUsd * 100000) / 100000}
             </Typography>
           </Box>
           <Box>
             <LoadingButton
               loading={loading}
-              disabled={step === 1 || !cart || !cart.length}
+              disabled={!cart || !cart.length}
               sx={{
                 background:
                   'linear-gradient(86.23deg, #4BD8D8 -48.31%, #146EB4 114.96%)',
@@ -403,10 +545,12 @@ const Cart = () => {
                 px: '40px',
               }}
               onClick={() => {
-                step === 0 ? _requestDomain() : buyDomain();
+                // step === 0 ? _requestDomain() : buyDomain();
+                purchaseDomain();
               }}
             >
-              {buttonText()}
+              {/* {buttonText()} */}
+              {'Purchase Domains'}
             </LoadingButton>
           </Box>
         </Box>
@@ -449,10 +593,13 @@ const Cart = () => {
             color={'black'}
             display={{ xs: 'none', md: 'flex' }}
           >
-            {address}
+            {publicKey ? publicKey.toString() : ''}
           </Typography>
 
-          <CopyToClipboard text={address} onCopy={() => window.alert('copied')}>
+          <CopyToClipboard
+            text={publicKey ? publicKey.toString() : ''}
+            onCopy={() => window.alert('copied')}
+          >
             <Typography
               fontSize={'20px'}
               lineHeight={'24px'}
@@ -460,7 +607,11 @@ const Cart = () => {
               color={'black'}
               display={{ xs: 'flex', md: 'none' }}
             >
-              {address.slice(0, 10) + '...' + address.slice(-10, -1)}
+              {publicKey
+                ? publicKey.toString().slice(0, 10) +
+                  '...' +
+                  publicKey.toString().slice(-10, -1)
+                : ''}
             </Typography>
           </CopyToClipboard>
         </Box>
@@ -481,144 +632,151 @@ const Cart = () => {
           {results.length > 0 &&
             results.map((item, idx) => {
               return (
-                <Box
+                // <Box
+                //   key={idx}
+                //   sx={{
+                //     padding: '15px 10px',
+                //     boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+                //     borderRadius: '16px',
+                //     position: 'relative',
+                //     width: 'calc(100%-60px)/3',
+                //     marginBottom: '8px',
+                //     background:
+                //       'linear-gradient(79.42deg, #4BD8D8 -28.43%, #146EB4 125.83%)',
+                //   }}
+                // >
+                //   <Box
+                //     justifyContent="center"
+                //     display="inline-flex"
+                //     gap={'5px'}
+                //     alignItems={'center'}
+                //     textAlign={'left'}
+                //   >
+                //     <img
+                //       src={domainLogoImages[networkId]}
+                //       width={'21px'}
+                //       height={'24px'}
+                //       style={{
+                //         cursor: 'pointer',
+                //       }}
+                //       alt={networkId === 1 ? 'ENS Logo' : 'BNS Logo'}
+                //     />
+                //     <Typography
+                //       sx={{ opacity: '1' }}
+                //       fontSize={{
+                //         md: '1.8vw',
+                //         sm: '25px',
+                //       }}
+                //       fontWeight={'700'}
+                //       variant="h5"
+                //       color="white"
+                //     >
+                //       {item.name}.{item.domain}
+                //     </Typography>
+                //   </Box>
+                //   <Box>
+                //     <Box
+                //       display="flex"
+                //       sx={{ width: 1 }}
+                //       justifyContent="space-between"
+                //     >
+                //       <Typography
+                //         sx={{ ml: '30px' }}
+                //         fontSize={{
+                //           md: '1vw',
+                //           sm: '18px',
+                //         }}
+                //         color="white"
+                //       >
+                //         {`${domainNames[networkId]} extension`}
+                //       </Typography>
+                //     </Box>
+                //   </Box>
+                //   <Box
+                //     sx={{
+                //       justifyContent: 'space-between',
+                //       display: 'flex',
+                //       marginTop: '8px',
+                //       marginLeft: '30px',
+                //       alignItems: 'center',
+                //       position: 'relative',
+                //     }}
+                //   >
+                //     <Box>
+                //       <Select
+                //         value={
+                //           results[idx] && results[idx].year
+                //             ? results[idx].year
+                //             : ''
+                //         }
+                //         onChange={(event) =>
+                //           timeSelect(idx, event.target.value)
+                //         }
+                //         input={<OutlinedInput />}
+                //         inputProps={{ 'aria-label': 'Without label' }}
+                //         sx={{
+                //           borderRadius: '20px',
+                //           width: '150px',
+                //           '& .MuiSelect-select, & .MuiSelect-select:focus ': {
+                //             borderRadius: '20px',
+                //             background: 'white',
+                //             padding: '5px 32px 5px 12px',
+                //           },
+                //         }}
+                //         MenuProps={{
+                //           disableScrollLock: true,
+                //         }}
+                //       >
+                //         <MenuItem value={0} disabled={true}>
+                //           <Box
+                //             alignItems="center"
+                //             display={'flex'}
+                //             justifyContent={'center'}
+                //           ></Box>
+                //         </MenuItem>
+                //         {options.map((option) => (
+                //           <MenuItem key={option.label} value={option.value}>
+                //             <Box
+                //               alignItems="center"
+                //               display={'flex'}
+                //               justifyContent={'center'}
+                //             >
+                //               <img src={timer} alt="timer" /> &nbsp;{' '}
+                //               {option.label}
+                //             </Box>
+                //           </MenuItem>
+                //         ))}
+                //       </Select>
+                //     </Box>
+                //     <Box
+                //       sx={{
+                //         display: 'flex',
+                //         justifyContent: 'flex-end',
+                //         gap: '20px',
+                //       }}
+                //     >
+                //       <img
+                //         src={whiteBookmarkImage}
+                //         style={{ cursor: 'pointer' }}
+                //         alt="bookmark"
+                //       />
+                //       <img
+                //         src={whiteOffShoppingImage}
+                //         style={{ cursor: 'pointer' }}
+                //         alt="off shopping"
+                //         onClick={() => _removeCart(item.name, item.domain)}
+                //       />
+                //       {/* <img src={theme == 'dark-theme' ? whiteOffShoppingImage: blackOffshopping}/>*/}
+                //     </Box>
+                //   </Box>
+                // </Box>
+                <CartComponent
                   key={idx}
-                  sx={{
-                    padding: '15px 10px',
-                    boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
-                    borderRadius: '16px',
-                    position: 'relative',
-                    width: 'calc(100%-60px)/3',
-                    marginBottom: '8px',
-                    background:
-                      'linear-gradient(79.42deg, #4BD8D8 -28.43%, #146EB4 125.83%)',
-                  }}
-                >
-                  <Box
-                    justifyContent="center"
-                    display="inline-flex"
-                    gap={'5px'}
-                    alignItems={'center'}
-                    textAlign={'left'}
-                  >
-                    <img
-                      src={domainLogoImages[networkId]}
-                      width={'21px'}
-                      height={'24px'}
-                      style={{
-                        cursor: 'pointer',
-                      }}
-                      alt={networkId === 1 ? 'ENS Logo' : 'BNS Logo'}
-                    />
-                    <Typography
-                      sx={{ opacity: '1' }}
-                      fontSize={{
-                        md: '1.8vw',
-                        sm: '25px',
-                      }}
-                      fontWeight={'700'}
-                      variant="h5"
-                      color="white"
-                    >
-                      {item.name}.{item.domain}
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Box
-                      display="flex"
-                      sx={{ width: 1 }}
-                      justifyContent="space-between"
-                    >
-                      <Typography
-                        sx={{ ml: '30px' }}
-                        fontSize={{
-                          md: '1vw',
-                          sm: '18px',
-                        }}
-                        color="white"
-                      >
-                        {`${domainNames[networkId]} extension`}
-                      </Typography>
-                    </Box>
-                  </Box>
-                  <Box
-                    sx={{
-                      justifyContent: 'space-between',
-                      display: 'flex',
-                      marginTop: '8px',
-                      marginLeft: '30px',
-                      alignItems: 'center',
-                      position: 'relative',
-                    }}
-                  >
-                    <Box>
-                      <Select
-                        value={
-                          results[idx] && results[idx].year
-                            ? results[idx].year
-                            : ''
-                        }
-                        onChange={(event) =>
-                          timeSelect(idx, event.target.value)
-                        }
-                        input={<OutlinedInput />}
-                        inputProps={{ 'aria-label': 'Without label' }}
-                        sx={{
-                          borderRadius: '20px',
-                          width: '150px',
-                          '& .MuiSelect-select, & .MuiSelect-select:focus ': {
-                            borderRadius: '20px',
-                            background: 'white',
-                            padding: '5px 32px 5px 12px',
-                          },
-                        }}
-                        MenuProps={{
-                          disableScrollLock: true,
-                        }}
-                      >
-                        <MenuItem value={0} disabled={true}>
-                          <Box
-                            alignItems="center"
-                            display={'flex'}
-                            justifyContent={'center'}
-                          ></Box>
-                        </MenuItem>
-                        {options.map((option) => (
-                          <MenuItem key={option.label} value={option.value}>
-                            <Box
-                              alignItems="center"
-                              display={'flex'}
-                              justifyContent={'center'}
-                            >
-                              <img src={timer} alt="timer" /> &nbsp;{' '}
-                              {option.label}
-                            </Box>
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </Box>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'flex-end',
-                        gap: '20px',
-                      }}
-                    >
-                      <img
-                        src={whiteBookmarkImage}
-                        style={{ cursor: 'pointer' }}
-                        alt="bookmark"
-                      />
-                      <img
-                        src={whiteOffShoppingImage}
-                        style={{ cursor: 'pointer' }}
-                        alt="off shopping"
-                        onClick={() => _removeCart(item.name, item.domain)}
-                      />
-                      {/* <img src={theme == 'dark-theme' ? whiteOffShoppingImage: blackOffshopping}/>*/}
-                    </Box>
-                  </Box>
-                </Box>
+                  _removeCart={_removeCart}
+                  networkId={networkId}
+                  name={item.name}
+                  domain={item.domain}
+                />
               );
             })}
         </Box>

@@ -13,13 +13,15 @@ import SearchResult from './pages/SearchResult';
 import Team from './pages/Team';
 import { toast } from 'react-toastify';
 import { useDapp } from './contexts/dapp';
+import { useWallet } from '@solana/wallet-adapter-react';
 
 function PrivateRoute(props: any) {
   const { isConnected } = useDapp();
-  if (!isConnected) {
-    toast.warning('Connect your wallet to proceed');
-    return <Navigate to="/" />;
-  }
+  const { publicKey } = useWallet();
+  // if (!publicKey) {
+  //   toast.warning('Connect your wallet to proceed');
+  //   return <Navigate to="/" />;
+  // }
   return props.children;
 }
 

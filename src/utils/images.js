@@ -24,6 +24,7 @@ import sampleAvatar from '../assets/image/profile_avatar.png';
 import searchImage from '../assets/image/search.png';
 import shoppingCart from '../assets/image/shopping_cart_white.png';
 import shoppingCartFull from '../assets/image/shopping_cart_full.png';
+import solLogo from '../assets/image/svgs/sol-logo.svg';
 import teamBryan from '../assets/image/team/bryan_big.png';
 import teamBryan_sm from '../assets/image/team/bryan_small.png';
 import teamKrik from '../assets/image/team/krik.png';
@@ -82,4 +83,5 @@ export {
   blog6,
   blog7,
   blog8,
+  solLogo,
 };

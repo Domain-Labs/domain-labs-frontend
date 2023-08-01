@@ -29,10 +29,10 @@ const Clio = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleClioQuery = async () => {
-    if (!isConnected) {
-      toast.error('Connect your wallet to proceed!');
-      return;
-    }
+    // if (!isConnected) {
+    //   toast.error('Connect your wallet to proceed!');
+    //   return;
+    // }
     // get name candidates from clio
     setIsProcessing(true);
 
@@ -61,10 +61,11 @@ const Clio = () => {
     }
 
     const postObject = {
-      address: address.toLowerCase(),
+      // address: address.toLowerCase(),
       clioQuery,
     };
 
+    console.log('clio start');
     try {
       const result = (await axios.post(`${BASE_API_URL}/clio`, postObject))
         .data;
@@ -165,7 +166,7 @@ const Clio = () => {
 
   return (
     <Box>
-      <MetaTags>
+      {/* <MetaTags>
         <title>Clio - AI Powered Domain Search Assistant, Web3 Domains</title>
         <meta
           name="og:description"
@@ -175,7 +176,7 @@ const Clio = () => {
           name="description"
           content="Personalized domain suggestion via Clio, an AI powered domain search assistant. Providing relevant and creative options tailored to your preferences."
         />
-      </MetaTags>
+      </MetaTags> */}
       <Box style={styles.container} pb={'50px'}>
         <Box overflow="hidden" px={{ md: 10, xs: 5 }} pt={25}>
           <Grid
