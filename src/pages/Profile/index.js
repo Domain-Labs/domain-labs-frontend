@@ -2,7 +2,6 @@ import {
   Avatar,
   Box,
   Button,
-  Checkbox,
   Pagination,
   PaginationItem,
   Paper,
@@ -10,31 +9,28 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableFooter,
   TableHead,
-  TablePagination,
   TableRow,
   Typography,
 } from '@mui/material';
-import { binanceImage, ensImage, sampleAvatar } from '../../utils/images';
+import { binanceImage, ensImage, sampleAvatar } from 'utils/images';
 import { useEffect, useState } from 'react';
 
+import Container from 'components/Container';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import ExtendDialog from './Dialogs/ExtendDialog';
-import { FaArrowCircleUp } from 'react-icons/fa';
-import MetaTags from 'react-meta-tags';
-import { RxPlusCircled } from 'react-icons/rx';
 import TransferDialog from './Dialogs/TransferDialog';
-import { getDomainsByAddress } from '../../redux/actions/profileActions';
+import { getDomainsByAddress } from 'redux/actions/profileActions';
 import moment from 'moment';
-import { useDapp } from '../../contexts/dapp';
+import { useDapp } from 'contexts/dapp';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { useSelector } from 'react-redux';
-import { useTheme } from '../../contexts/theme';
+import { useTheme } from 'contexts/theme';
+import useTitle from 'hooks/useTitle';
 
 const Profile = () => {
-  const { theme } = useTheme();
+  const { theme, color, bgColor } = useTheme();
   const dispatch = useDispatch();
   // const [domains, setDomains] = useState([]);
   const [modal, setModal] = useState('');
@@ -53,15 +49,6 @@ const Profile = () => {
     navigate('/');
   };
 
-  const styles = {
-    container: {
-      backgroundColor: theme === 'dark-theme' ? '#2A2A2A' : 'white',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
-      backgroundSize: 'cover',
-      minHeight: '100vh',
-    },
-  };
   const linearGradient =
     'linear-gradient(86.23deg, #4BD8D8 -48.31%, #146EB4 114.96%)';
 
@@ -87,6 +74,8 @@ const Profile = () => {
     setSelDomain(domain);
     setModal('transfer');
   };
+
+  useTitle('Domain Labs - Profile');
 
   useEffect(() => {
     dispatch(getDomainsByAddress(address));
@@ -115,47 +104,34 @@ const Profile = () => {
   }, [currentPage, domains, networkId]);
 
   return (
-    <Box
-      style={styles.container}
-      pt={20}
-      px={{ xs: '30px', sm: '40px' }}
-      sx={{
-        marginTop: '100px',
-        padding: '20px',
-        backgroundColor: theme === 'night' ? '#2A2A2A' : 'white',
-        minHeight: 'calc(100vh - 328px)',
-      }}
-    >
-      <MetaTags>
-        <title>Domain Labs - Profile</title>
-      </MetaTags>
-
-      <Box
-        display={{ xs: 'block', sm: 'flex' }}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-      >
-        <Box display={'flex'} alignItems={'center'}>
-          <Typography
-            fontSize={{
-              md: '24px',
-              xs: '18px',
-            }}
-            fontWeight={700}
-            sx={{
-              fontFamily: 'Inter',
-              fontWeight: '600',
-              color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
-              fontSize: '32px',
-              lineHeight: '48px',
-              letterSpacing: '-0.01rem',
-            }}
-            onClick={backHome}
-          >
-            Profile
-          </Typography>
-        </Box>
-        {/* <Box display={'flex'} alignItems={'center'}>
+    <Container>
+      <Box pt={10} px={{ xs: '30px', sm: '40px' }}>
+        <Box
+          display={{ xs: 'block', sm: 'flex' }}
+          alignItems={'center'}
+          justifyContent={'space-between'}
+        >
+          <Box display={'flex'} alignItems={'center'}>
+            <Typography
+              fontSize={{
+                md: '24px',
+                xs: '18px',
+              }}
+              fontWeight={700}
+              sx={{
+                fontFamily: 'Inter',
+                fontWeight: '600',
+                color: color,
+                fontSize: '32px',
+                lineHeight: '48px',
+                letterSpacing: '-0.01rem',
+              }}
+              onClick={backHome}
+            >
+              Profile
+            </Typography>
+          </Box>
+          {/* <Box display={'flex'} alignItems={'center'}>
           <Button
             variant="contained"
             color="inherit"
@@ -173,72 +149,75 @@ const Profile = () => {
             &nbsp;Domain Transfer
           </Button>
         </Box> */}
-      </Box>
-      <Box
-        display={{ xs: 'block', sm: 'flex' }}
-        sx={{
-          marginTop: '30px',
-          // boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
-          //   borderRadius: "16px",
-          //   marginBottom: "8px",
-          minHeight: '300px',
-        }}
-      >
-        <Box width={{ xs: 'auto', sm: '20%' }} margin={'10px'}>
-          <Box
-            borderRadius="16px"
-            minHeight={'100px'}
-            sx={{
-              boxShadow: '0px 2px 4px 0px rgba(0, 0, 0, 0.25)',
-              padding: '20px',
-            }}
-          >
+        </Box>
+        <Box
+          display={{ xs: 'block', sm: 'flex' }}
+          sx={{
+            marginTop: '30px',
+            // boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+            //   borderRadius: "16px",
+            //   marginBottom: "8px",
+            minHeight: '300px',
+          }}
+        >
+          <Box width={{ xs: 'auto', sm: '20%' }} margin={'10px'}>
             <Box
+              borderRadius="16px"
+              minHeight={'100px'}
               sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                textAlign: 'center',
-                alignItems: 'center',
-                cursor: 'pointer',
+                background: 'rgba(255,255,255,0.01)',
+                boxShadow:
+                  '0px 1px 40px 0px rgba(13, 137, 207, 0.15) inset, 0px 4px 18px 0px rgba(8, 59, 88, 0.30) inset, 0px 0px 15px -6px #0D89CF inset, 0px 4px 50px 20px rgba(13, 137, 207, 0.02) inset',
+                backdropFilter: 'blur(12.5px)',
+                padding: '20px',
               }}
             >
-              <Avatar
-                src={sampleAvatar}
-                alt="avatar"
-                variant="circular"
+              <Box
                 sx={{
-                  border: '1px solid white',
-                  width: '100px',
-                  height: '100px',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  textAlign: 'center',
+                  alignItems: 'center',
+                  cursor: 'pointer',
                 }}
-              />
-            </Box>
-            <Box
-              sx={{
-                marginTop: '20px',
-              }}
-              color={theme === 'dark-theme' ? 'white' : '#2A2A2A'}
-            >
-              {/* <Typography fontWeight={700}>Wang JunDong</Typography> */}
-              <CopyToClipboard
-                text={address}
-                onCopy={() => window.alert('copied')}
               >
-                <Typography fontSize={{ xs: '15px', md: '20px' }}>
-                  {address
-                    ? address.slice(0, 7) + '...' + address.slice(-7, -1)
-                    : ''}
+                <Avatar
+                  src={sampleAvatar}
+                  alt="avatar"
+                  variant="circular"
+                  sx={{
+                    border: '1px solid white',
+                    width: '100px',
+                    height: '100px',
+                  }}
+                />
+              </Box>
+              <Box
+                sx={{
+                  marginTop: '20px',
+                }}
+                color={color}
+              >
+                {/* <Typography fontWeight={700}>Wang JunDong</Typography> */}
+                <CopyToClipboard
+                  text={address}
+                  onCopy={() => window.alert('copied')}
+                >
+                  <Typography fontSize={{ xs: '15px', md: '20px' }}>
+                    {address
+                      ? address.slice(0, 7) + '...' + address.slice(-7, -1)
+                      : ''}
+                  </Typography>
+                </CopyToClipboard>
+                <Typography fontWeight={900} marginTop={'30px'}>
+                  Member Since
                 </Typography>
-              </CopyToClipboard>
-              <Typography fontWeight={900} marginTop={'30px'}>
-                Member Since
-              </Typography>
-              <Typography marginTop={'5px'}>
-                {new Date().toDateString()}
-              </Typography>
+                <Typography marginTop={'5px'}>
+                  {new Date().toDateString()}
+                </Typography>
+              </Box>
             </Box>
-          </Box>
-          {/* <Box
+            {/* <Box
             display={'flex'}
             alignItems={'center'}
             alignSelf={'center'}
@@ -256,194 +235,199 @@ const Profile = () => {
             <FaArrowCircleUp />
             &nbsp;Domain Renew
           </Box> */}
-        </Box>
-        <TableContainer
-          component={Paper}
-          width={{ xs: 'auto', sm: '80%' }}
-          minHeight={'200px'}
-          fontWeight={700}
-          sx={{
-            background: theme === 'dark-theme' ? '#2A2A2A' : 'white',
-            boxShadow: '0px 2px 4px 0px rgba(0, 0, 0, 0.25) !important',
-            borderRadius: '16px !important',
-            padding: '20px',
-            margin: '10px',
-            width: {
-              xs: 'auto',
-              sm: '80%',
-            },
-          }}
-        >
-          <Table size="small" aria-label="Domain table">
-            <TableHead>
-              <TableRow>
-                <TableCell></TableCell>
-                <TableCell
-                  sx={{
-                    fontWeight: 700,
-                    color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
-                  }}
-                >
-                  Domain
-                </TableCell>
-                <TableCell
-                  align="right"
-                  sx={{
-                    fontWeight: 700,
-                    color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
-                  }}
-                >
-                  Expiration Date
-                </TableCell>
-                <TableCell
-                  align="right"
-                  sx={{
-                    fontWeight: 700,
-                    color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
-                  }}
-                ></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody
-              sx={{
-                borderBottom: `2px solid #146EB4`,
-              }}
-            >
-              {onePageDomains.map((row, index) => (
-                <TableRow
-                  key={index}
-                  sx={{
-                    '&:last-child td, &:last-child th': { border: 0 },
-                    cursor: 'pointer',
-                  }}
-                >
+          </Box>
+          <TableContainer
+            component={Paper}
+            width={{ xs: 'auto', sm: '80%' }}
+            minHeight={'200px'}
+            fontWeight={700}
+            sx={{
+              // background: bgColor,
+              // boxShadow: '0px 2px 4px 0px rgba(0, 0, 0, 0.25) !important',
+              background: 'rgba(255,255,255,0.01)',
+              boxShadow:
+                '0px 1px 40px 0px rgba(13, 137, 207, 0.15) inset, 0px 4px 18px 0px rgba(8, 59, 88, 0.30) inset, 0px 0px 15px -6px #0D89CF inset, 0px 4px 50px 20px rgba(13, 137, 207, 0.02) inset',
+              backdropFilter: 'blur(12.5px)',
+              borderRadius: '16px !important',
+              padding: '20px',
+              margin: '10px',
+              width: {
+                xs: 'auto',
+                sm: '80%',
+              },
+            }}
+          >
+            <Table size="small" aria-label="Domain table">
+              <TableHead>
+                <TableRow>
+                  <TableCell></TableCell>
                   <TableCell
                     sx={{
                       fontWeight: 700,
-                      color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
-                      width: '30px',
+                      color: color,
                     }}
                   >
-                    {/* <Checkbox
+                    Domain
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{
+                      fontWeight: 700,
+                      color: color,
+                    }}
+                  >
+                    Expiration Date
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{
+                      fontWeight: 700,
+                      color: color,
+                    }}
+                  ></TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody
+                sx={{
+                  borderBottom: `2px solid #146EB4`,
+                }}
+              >
+                {onePageDomains.map((row, index) => (
+                  <TableRow
+                    key={index}
+                    sx={{
+                      '&:last-child td, &:last-child th': { border: 0 },
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <TableCell
+                      sx={{
+                        fontWeight: 700,
+                        color: color,
+                        width: '30px',
+                      }}
+                    >
+                      {/* <Checkbox
                       sx={{
                         fontWeight: 700,
                         color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
                       }}
                     /> */}
-                  </TableCell>
-                  <TableCell
-                    component="td"
-                    scope="row"
-                    sx={{
-                      fontWeight: 700,
-                      color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
-                    }}
-                  >
-                    <Box
+                    </TableCell>
+                    <TableCell
+                      component="td"
+                      scope="row"
                       sx={{
-                        display: 'flex',
-                        alignContent: 'center',
-                        alignSelf: 'center',
-                        alignItems: 'center',
+                        fontWeight: 700,
+                        color: color,
                       }}
                     >
-                      <img src={domainLogos[row.network]} alt="logo" />
-                      <Typography
+                      <Box
                         sx={{
-                          marginLeft: 1,
+                          display: 'flex',
+                          alignContent: 'center',
+                          alignSelf: 'center',
+                          alignItems: 'center',
                         }}
                       >
-                        {row.name}.{domainSuffixes[row.network]}
-                      </Typography>
-                    </Box>
-                  </TableCell>
-                  <TableCell
-                    align="right"
-                    sx={{
-                      fontWeight: 700,
-                      color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
-                    }}
-                  >
-                    {calcExpiration(row.expirationDate)}
-                  </TableCell>
-                  <TableCell
-                    align="right"
-                    sx={{
-                      color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
-                    }}
-                  >
-                    <Button
-                      variant="contained"
-                      color="inherit"
+                        <img src={domainLogos[row.network]} alt="logo" />
+                        <Typography
+                          sx={{
+                            marginLeft: 1,
+                          }}
+                        >
+                          {row.name}.{domainSuffixes[row.network]}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell
+                      align="right"
                       sx={{
-                        background:
-                          theme === 'dark-theme' ? '#AAA' : linearGradient,
-                        color: 'white',
-                        ':hover': {
-                          color: 'white',
-                          backgroundColor: '#AAA',
-                        },
+                        fontWeight: 700,
+                        color: color,
                       }}
-                      onClick={() => handleTransfer(row)}
                     >
-                      Transfer
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="inherit"
+                      {calcExpiration(row.expirationDate)}
+                    </TableCell>
+                    <TableCell
+                      align="right"
                       sx={{
-                        background:
-                          theme === 'dark-theme' ? '#AAA' : linearGradient,
-                        color: 'white',
-                        ':hover': {
-                          color: 'white',
-                          backgroundColor: '#AAA',
-                        },
-                        marginLeft: 1,
+                        color: color,
                       }}
-                      onClick={() => handleExtend(row)}
                     >
-                      Extend
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <Pagination
-            count={totalPage}
-            color="primary"
-            onChange={(e, value) => {
-              setCurrentPage(value);
-            }}
-            renderItem={(item) => (
-              <PaginationItem
-                sx={{
-                  color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
-                }}
-                {...item}
-              />
-            )}
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignContent: 'center',
-              marginTop: '10px',
-            }}
-          />
-        </TableContainer>
+                      <Button
+                        variant="contained"
+                        color="inherit"
+                        sx={{
+                          background:
+                            theme === 'dark-theme' ? '#AAA' : linearGradient,
+                          color: 'white',
+                          ':hover': {
+                            color: 'white',
+                            backgroundColor: '#AAA',
+                          },
+                        }}
+                        onClick={() => handleTransfer(row)}
+                      >
+                        Transfer
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="inherit"
+                        sx={{
+                          background:
+                            theme === 'dark-theme' ? '#AAA' : linearGradient,
+                          color: 'white',
+                          ':hover': {
+                            color: 'white',
+                            backgroundColor: '#AAA',
+                          },
+                          marginLeft: 1,
+                        }}
+                        onClick={() => handleExtend(row)}
+                      >
+                        Extend
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            <Pagination
+              count={totalPage}
+              color="primary"
+              onChange={(e, value) => {
+                setCurrentPage(value);
+              }}
+              renderItem={(item) => (
+                <PaginationItem
+                  sx={{
+                    color: color,
+                  }}
+                  {...item}
+                />
+              )}
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignContent: 'center',
+                marginTop: '10px',
+              }}
+            />
+          </TableContainer>
+        </Box>
+        <TransferDialog
+          open={modal === 'transfer'}
+          close={() => setModal('')}
+          domain={selDomain}
+        />
+        <ExtendDialog
+          open={modal === 'extend'}
+          close={() => setModal('')}
+          domain={selDomain}
+        />
       </Box>
-      <TransferDialog
-        open={modal === 'transfer'}
-        close={() => setModal('')}
-        domain={selDomain}
-      />
-      <ExtendDialog
-        open={modal === 'extend'}
-        close={() => setModal('')}
-        domain={selDomain}
-      />
-    </Box>
+    </Container>
   );
 };
 

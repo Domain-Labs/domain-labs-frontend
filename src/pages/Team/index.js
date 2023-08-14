@@ -10,64 +10,19 @@ import {
   teamWang,
   utopiaBlack,
   utopiaWhite,
-} from '../../utils/images';
+} from 'utils/images';
 import { useEffect, useState } from 'react';
 
-import MetaTags from 'react-meta-tags';
-import { useTheme } from '../../contexts/theme';
-import useWindowDimensions from '../../hooks/useDimension';
+import Container from 'components/Container';
+import NameLabel from './Components/NameLabel';
+import { useTheme } from 'contexts/theme';
+import useTitle from 'hooks/useTitle';
+import useWindowDimensions from 'hooks/useDimension';
 
-const NameLabel = (props) => {
-  return (
-    <Box
-      sx={{
-        marginTop: 'auto',
-        marginLeft: '10px',
-        marginBottom: '10px',
-      }}
-    >
-      <Box
-        fontSize={{
-          md: '36px',
-          xs: '24px',
-        }}
-        sx={{
-          fontFamily: 'Inter',
-          color: 'white',
-          textTransform: 'uppercase',
-        }}
-      >
-        {props.name}
-      </Box>
-      <Box
-        fontSize={{
-          md: '20px',
-          xs: '16px',
-        }}
-        sx={{
-          fontFamily: 'Inter',
-          color: 'white',
-        }}
-      >
-        {props.job}
-      </Box>
-    </Box>
-  );
-};
 const Team = () => {
-  const { theme } = useTheme();
+  const { theme, color } = useTheme();
   const { width } = useWindowDimensions();
   const [iDimens, setIDimens] = useState({});
-
-  const styles = {
-    container: {
-      backgroundColor: theme === 'dark-theme' ? '#2A2A2A' : 'white',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
-      backgroundSize: 'cover',
-      minHeight: '100vh',
-    },
-  };
 
   useEffect(() => {
     const itemWidth =
@@ -78,7 +33,7 @@ const Team = () => {
         : Math.floor((itemWidth / 325) * 261);
     const itemHeight =
       width > 900 ? Math.floor(itemLgHeight / 2 - 10) : itemLgHeight;
-    console.log(itemWidth, itemHeight, itemLgHeight);
+
     setIDimens({
       itemWidth,
       itemHeight,
@@ -86,19 +41,10 @@ const Team = () => {
     });
   }, [width]);
 
-  return (
-    <Box
-      style={styles.container}
-      sx={{
-        marginTop: '100px',
-        backgroundColor: theme === 'night' ? '#2A2A2A' : 'white',
-        minHeight: 'calc(100vh - 328px)',
-      }}
-    >
-      <MetaTags>
-        <title>Domain Labs - Dream Team</title>
-      </MetaTags>
+  useTitle('Domain Labs - Dream Team');
 
+  return (
+    <Container>
       <Box
         display={{ xs: 'block', sm: 'flex' }}
         alignItems={'center'}
@@ -123,7 +69,7 @@ const Team = () => {
             sx={{
               fontFamily: 'Inter',
               fontWeight: '600',
-              color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
+              color: color,
               lineHeight: '48px',
               letterSpacing: '-0.01rem',
             }}
@@ -139,7 +85,7 @@ const Team = () => {
             fontWeight={400}
             sx={{
               fontFamily: 'Inter',
-              color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
+              color: color,
               lineHeight: '32px',
               letterSpacing: '-0.01rem',
             }}
@@ -320,7 +266,7 @@ const Team = () => {
           }}
           component={'a'}
           href="https://www.utopia513.com/"
-          target="blank"
+          target="_blank"
         >
           Partnership:{' '}
           <img
@@ -331,7 +277,7 @@ const Team = () => {
           3D Graphics Studio
         </Typography>
       </Box>
-    </Box>
+    </Container>
   );
 };
 

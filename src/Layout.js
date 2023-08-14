@@ -4,7 +4,7 @@ import Header from './components/Header';
 import { useTheme } from './contexts/theme';
 
 const Layout = ({ children }) => {
-  const { theme } = useTheme();
+  const { bgColor } = useTheme();
 
   return (
     <>
@@ -12,7 +12,7 @@ const Layout = ({ children }) => {
       <Box
         className="main-component"
         style={{
-          backgroundColor: theme === 'dark-theme' ? '#2A2A2A' : 'white',
+          backgroundColor: bgColor,
           minHeight: 'calc(100vh - 302px)',
         }}
       >

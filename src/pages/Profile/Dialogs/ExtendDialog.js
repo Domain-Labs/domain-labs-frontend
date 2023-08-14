@@ -3,7 +3,6 @@ import * as ENS from '../../../utils/ENSDomain';
 
 import {
   Box,
-  Button,
   Dialog,
   DialogActions,
   DialogContent,

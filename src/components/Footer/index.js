@@ -1,237 +1,268 @@
-import { Box, Typography } from '@mui/material';
+import './index.scss';
 
-import MuiAlert from '@mui/material/Alert';
-import React from 'react';
-import Snackbar from '@mui/material/Snackbar';
-import discussImage from '../../assets/image/hub.png';
-import docImage from '../../assets/image/icons8-ethereum-name-service-64-2 1.png';
-import ecoImage from '../../assets/image/add_chart.png';
-import twitterImage from '../../assets/image/Twitter-icon-circle-logo-WHITE 1.png';
+import { Box, Link, Typography } from '@mui/material';
+import { footer_side_1, footer_side_2, twitterImage } from 'utils/images';
+import { resource1, resource2 } from 'utils/images';
+
+import { colors } from 'config';
+import footerSperator from 'assets/image/footer-seperator.png';
 import { useNavigate } from 'react-router-dom';
-
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
+import { useTheme } from 'contexts/theme';
+import whiteLogoImage from 'assets/image/logo_white_mode.png';
 
 const Footer = () => {
   const navigate = useNavigate();
-  const [open, setOpen] = React.useState(false);
-
-  const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    setOpen(false);
-  };
-
-  const LeftComponent = () => (
-    <Box display="flex" flexDirection={'column'} className="left-component">
-      <Typography
-        component={'a'}
-        target="_"
-        href="https://domain-labs.gitbook.io/domain-labs-docs"
-        color="white"
-        sx={{
-          fontFamily: 'Inter',
-          fontWeight: '900',
-          fontSize: '18px',
-          lineHeight: '22px',
-          paddingTop: '20px',
-          cursor: 'pointer',
-          textDecoration: 'none',
-        }}
-      >
-        Documentation
-      </Typography>
-      <Typography
-        color="white"
-        sx={{
-          fontFamily: 'Inter',
-          fontWeight: '900',
-          fontSize: '18px',
-          lineHeight: '22px',
-          paddingTop: '20px',
-          cursor: 'pointer',
-        }}
-      >
-        Contact
-      </Typography>
-      <Typography
-        color="white"
-        sx={{
-          fontFamily: 'Inter',
-          fontWeight: '900',
-          fontSize: '18px',
-          lineHeight: '22px',
-          paddingTop: '20px',
-          cursor: 'pointer',
-        }}
-        onClick={() => navigate('/faqs')}
-      >
-        FAQs
-      </Typography>
-      <Typography
-        color="white"
-        sx={{
-          fontFamily: 'Inter',
-          fontWeight: '900',
-          fontSize: '18px',
-          lineHeight: '22px',
-          paddingTop: '20px',
-          cursor: 'pointer',
-        }}
-      >
-        Domain Labs all rights reserved {new Date().getFullYear()}
-      </Typography>
-    </Box>
-  );
-
-  const CenterComponent = () => (
-    <Box
-      display="flex"
-      justifyContent={'flex-end'}
-      flexDirection={'column'}
-      alignItems={'start'}
-      pt={'40px'}
-      width={'max-content'}
-      className="center-component"
-    >
-      <Box
-        display="flex"
-        justifyContent={'center'}
-        gap={'27px'}
-        alignItems={'center'}
-        width={'100%'}
-      >
-        <a
-          href="https://docs.ens.domains"
-          style={{ cursor: 'pointer' }}
-          target="blank"
-        >
-          <img src={docImage} width={'32px'} height={'32px'} alt="docImage" />
-        </a>
-        <a
-          href="https://dune.com/makoto/ens"
-          style={{ cursor: 'pointer' }}
-          target="blank"
-        >
-          <img src={ecoImage} width={'24px'} height={'24px'} alt="ecoImage" />
-        </a>
-        <a
-          href="https://discuss.ens.domains"
-          style={{ cursor: 'pointer' }}
-          target="blank"
-        >
-          <img
-            src={discussImage}
-            width={'32px'}
-            height={'30.67px'}
-            alt="discussImage"
-          />
-        </a>
-      </Box>
-      <Typography
-        color="white"
-        sx={{
-          marginTop: '16px',
-          fontSize: '18px',
-          fontWeight: '900',
-          lineHeight: '22px',
-        }}
-      >
-        Web 3 links & Resources
-      </Typography>
-    </Box>
-  );
-
-  const RightComponent = () => (
-    <Box
-      display="flex"
-      justifyContent={{ xs: 'start', md: 'flex-end' }}
-      alignItems={'end'}
-      pt={'40px'}
-      className="right-component"
-    >
-      <Box textAlign={'right'}>
-        <Typography
-          color="white"
-          sx={{
-            fontSize: '18px',
-            fontWeight: '900',
-            lineHeight: '22px',
-          }}
-        >
-          Keep up with conversation
-        </Typography>
-        <a
-          href="https://twitter.com/domain_labs/status/1580022791067533312?s=46&t=H4ch0l4nzGEEWYSxh2SPjw"
-          style={{
-            cursor: 'pointer',
-          }}
-          target="blank"
-        >
-          <img
-            src={twitterImage}
-            style={{
-              marginTop: '22px',
-            }}
-            alt="twitterImage"
-          />
-        </a>
-      </Box>
-    </Box>
-  );
+  const { theme, bgColor } = useTheme();
 
   return (
     <Box
-      px={5}
-      py={5}
       sx={{
-        background: 'linear-gradient(180deg, #146EB4 -8.71%, #000000 166.67%)',
+        background: bgColor,
+        position: 'relative',
       }}
     >
+      <img alt="footer seprator" src={footerSperator} width={'100%'} />
       <Box
-        display={{ xs: 'flex', sm: 'block' }}
-        justifyContent={{ xs: 'center' }}
+        sx={{
+          my: '100px',
+        }}
+        px={{ md: 10, xs: 5 }}
       >
         <Box
-          display={{ xs: 'block', sm: 'flex' }}
-          justifyContent={{ xs: 'left', sm: 'space-between' }}
-          width={{ xs: 'max-content', sm: 'unset' }}
-          flexDirection={{ xs: 'column', sm: 'row' }}
+          sx={{
+            maxWidth: '960px',
+            mt: '50px',
+            mx: 'auto',
+          }}
         >
           <Box
-            display={'flex'}
-            alignItems={{ xs: 'start', md: 'end' }}
-            pt={'80px'}
+            display={{
+              xs: 'block',
+              sm: 'flex',
+            }}
+            padding={{
+              xs: '40px',
+              sm: '80px',
+            }}
+            sx={{
+              justifyContent: 'space-between',
+              borderRadius: '35px',
+              background: 'rgba(255,255,255,0.01)',
+              boxShadow:
+                '0px 1px 40px 0px rgba(13, 137, 207, 0.15) inset, 0px 4px 18px 0px rgba(8, 59, 88, 0.30) inset, 0px 0px 15px -6px #0D89CF inset, 0px 4px 50px 20px rgba(13, 137, 207, 0.02) inset',
+              backdropFilter: 'blur(12.5px)',
+            }}
           >
-            <LeftComponent />
+            <Box>
+              <Typography
+                fontSize={{ xs: '25px', md: '33px' }}
+                sx={{
+                  fontWeight: '700',
+                  color: theme === 'dark-theme' ? 'white' : 'black',
+                }}
+              >
+                {' '}
+                Keep up the conversation{' '}
+              </Typography>
+              <Typography
+                fontSize={{ xs: '14px', md: '16px' }}
+                sx={{
+                  fontWeight: '400',
+                  color:
+                    theme === 'dark-theme' ? colors.lightGray : colors.darkGray,
+                }}
+              >
+                Stay in the loop, share your thoughts, and join the
+                conversation. Follow us <br /> and be part of our vibrant
+                community. Engage, discuss, and get the latest updates <br /> in
+                real-time. We can't wait to hear from you!
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                padding: '10px',
+                borderRadius: '50%',
+                width: '130px',
+                height: '130px',
+              }}
+              className={
+                theme === 'dark-theme'
+                  ? 'footer_twitter_anim_dark'
+                  : 'footer_twitter_anim'
+              }
+            >
+              <Box
+                sx={{
+                  display: 'block',
+                  borderRadius: '50%',
+                }}
+                textAlign={'center'}
+                mt={{
+                  // xs: '20px',
+                  sm: '0',
+                }}
+              >
+                {' '}
+                <Link href="https://twitter.com/domain_labs" target="_blank">
+                  <img
+                    src={twitterImage}
+                    width={'100%'}
+                    height={'100%'}
+                    alt="twitter"
+                  />
+                </Link>
+              </Box>
+            </Box>
           </Box>
-
-          {/* > 900px*/}
-          <Box display={{ xs: 'none', md: 'flex' }}>
-            <CenterComponent />
-          </Box>
-
-          {/* > 900px*/}
-          <Box display={{ xs: 'none', md: 'flex' }}>
-            <RightComponent />
-          </Box>
-
-          {/* 600px ~  900px*/}
-          <Box display={{ xs: 'block', sm: 'block', md: 'none' }}>
-            <CenterComponent />
-            <RightComponent />
+          <Box
+            display={{
+              xs: 'block',
+              sm: 'flex',
+            }}
+            justifyContent={{
+              xs: 'center',
+              sm: 'space-between',
+            }}
+            sx={{
+              // maxWidth: '960px',
+              mt: '80px',
+              mx: 'auto',
+            }}
+          >
+            <Box display={'flex'} alignItems={'center'}>
+              <img
+                src={whiteLogoImage}
+                style={{
+                  height: '41px',
+                }}
+                alt="logo"
+              />
+              <Typography
+                color={theme === 'dark-theme' ? 'white' : 'black'}
+                fontSize={'32px'}
+                ml={'17px'}
+                display={'flex'}
+                fontFamily={'Inter'}
+              >
+                Domain Labs
+              </Typography>
+            </Box>
+            <Box
+              display={{
+                xs: 'block',
+                sm: 'flex',
+              }}
+              sx={{
+                gap: 2,
+                alignContent: 'center',
+                alignItems: 'center',
+              }}
+              mt={{
+                xs: '20px',
+                sm: '0px',
+              }}
+            >
+              <Link
+                sx={{
+                  textDecoration: 'none',
+                  cursor: 'pointer',
+                  color:
+                    theme === 'dark-theme' ? colors.whiteSmoke : colors.primary,
+                }}
+                target="_blank"
+                href="https://domain-labs.gitbook.io/domain-labs-docs"
+              >
+                <Typography>Documentation</Typography>
+              </Link>
+              <Link
+                sx={{
+                  textDecoration: 'none',
+                  cursor: 'pointer',
+                  color:
+                    theme === 'dark-theme' ? colors.whiteSmoke : colors.primary,
+                }}
+                // target="blank"
+                // href="https://domain-labs.gitbook.io/domain-labs-docs"
+                href="mailto:contact@domainlabs.app"
+              >
+                <Typography>Contact</Typography>
+              </Link>
+              <Link
+                sx={{
+                  textDecoration: 'none',
+                  cursor: 'pointer',
+                  color:
+                    theme === 'dark-theme' ? colors.whiteSmoke : colors.primary,
+                }}
+                target="_blank"
+                href="/faqs"
+              >
+                <Typography>FAQs</Typography>
+              </Link>
+              <Link
+                sx={{
+                  textDecoration: 'none',
+                  cursor: 'pointer',
+                  color:
+                    theme === 'dark-theme' ? colors.whiteSmoke : colors.primary,
+                }}
+                target="_blank"
+                href="https://docs.ens.domains"
+              >
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  Resources
+                  <img src={resource1} alt="resource1" width={'23px'} />
+                  <img src={resource2} alt="resource2" width={'23px'} />
+                </Box>
+              </Link>
+            </Box>
           </Box>
         </Box>
       </Box>
-
-      <Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
-        <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>
-          Email address copied
-        </Alert>
-      </Snackbar>
+      <Box
+        sx={{
+          width: '100%',
+          height: '1px',
+          mb: '20px',
+          background:
+            theme === 'dark-theme' ? colors.darkGray : colors.lightGray,
+        }}
+      ></Box>
+      <Typography
+        fontSize={{
+          xs: '14px',
+          sm: '16px',
+        }}
+        sx={{
+          color: theme === 'dark-theme' ? colors.darkGray : colors.lightGray,
+          fontWeight: 600,
+          textAlign: 'center',
+          mb: '20px',
+        }}
+      >
+        {' '}
+        © {new Date().getFullYear()} DomainLabs. All rights reserved.
+      </Typography>
+      <Box
+        sx={{
+          position: 'absolute',
+          left: 0,
+          bottom: '-30px',
+          width: '400px',
+        }}
+      >
+        <img src={footer_side_1} width={'100%'} alt="" />
+      </Box>
+      <Box
+        sx={{
+          position: 'absolute',
+          right: 0,
+          top: '-300px',
+          width: '400px',
+        }}
+      >
+        <img src={footer_side_2} width={'100%'} alt="" />
+      </Box>{' '}
     </Box>
   );
 };

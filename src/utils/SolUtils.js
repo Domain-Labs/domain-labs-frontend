@@ -9,14 +9,14 @@ import axios from 'axios';
 // import Provider from '@project-serum/anchor';
 
 const opts = {
-  preflightCommitment: 'processed',
+  preflightCommitment: 'finalized',
 };
 
 export const getProvider = (wallet) => {
   const connection = new Connection(
     // clusterApiUrl('mainnet-beta'),
-    clusterApiUrl('devnet'),
-    // 'https://red-bitter-brook.solana-mainnet.discover.quiknode.pro/6ef6b38be9eb778256aafcd3e4907da03585b0d2/',
+    // clusterApiUrl('devnet'),
+    'https://red-bitter-brook.solana-mainnet.discover.quiknode.pro/6ef6b38be9eb778256aafcd3e4907da03585b0d2/',
     opts.preflightCommitment,
   );
 

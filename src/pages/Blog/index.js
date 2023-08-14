@@ -8,9 +8,11 @@ import {
 import { blog8, searchImage } from '../../utils/images';
 import { useEffect, useState } from 'react';
 
+import Container from 'components/Container';
 import MetaTags from 'react-meta-tags';
 import htmlparser from 'react-html-parser';
 import { useTheme } from '../../contexts/theme';
+import useTitle from 'hooks/useTitle';
 import useWindowDimensions from '../../hooks/useDimension';
 
 const BlogCard = ({ img, title, content, date, sx, theme, ...other }) => {
@@ -161,149 +163,137 @@ const Blog = () => {
   const { width } = useWindowDimensions();
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const styles = {
-    container: {
-      backgroundColor: theme === 'dark-theme' ? '#2A2A2A' : 'white',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
-      backgroundSize: 'cover',
-    },
-  };
-
+  useTitle('Domain Labs - Blog');
   useEffect(() => {}, [width]);
 
   return (
-    <Box
-      style={styles.container}
-      sx={{
-        marginTop: '100px',
-        minHeight: 'calc(100vh - 328px)',
-      }}
-      px={'40px'}
-    >
-      <MetaTags>
-        <title>Domain Labs - Blogs</title>
-      </MetaTags>
+    <Container>
       <Box
-        display={{ xs: 'block', sm: 'flex' }}
-        alignItems={'center'}
-        justifyContent={'center'}
-        pt={4}
-      >
-        <Box
-          position={{
-            xs: 'relative',
-            sm: 'absolute',
-          }}
-          left={{
-            sm: '40px',
-          }}
-          textAlign={{
-            xs: 'center',
-            sm: 'center',
-          }}
-        >
-          <Typography
-            fontSize={{
-              sm: '32px',
-              xs: '24px',
-            }}
-            fontWeight={700}
-            sx={{
-              fontFamily: 'Inter',
-              fontWeight: '600',
-              color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
-              lineHeight: '48px',
-              letterSpacing: '-0.01rem',
-            }}
-          >
-            Blog
-          </Typography>
-        </Box>
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          width={'100%'}
-        >
-          <Box
-            width={{ xs: '100%', sm: '50%' }}
-            sx={{
-              maxWidth: '960px',
-              display: 'flex',
-              backgroundColor: '#F7F7F7',
-              height: '42px',
-              alignItems: 'center',
-              justify: 'center',
-              paddingLeft: '24px',
-              paddingRight: '10px',
-              borderRadius: '16px',
-              boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
-            }}
-          >
-            <TextField
-              placeholder={'Search for Blog'}
-              InputProps={{
-                border: 'none',
-                disableUnderline: true,
-                color: '#4BD8D8 !important',
-              }}
-              style={{
-                width: '100%',
-              }}
-              disabled={isProcessing}
-              variant="standard"
-            />
-
-            <Button
-              style={{
-                minWidth: '40px',
-              }}
-            >
-              <Box display={{ xs: 'flex', sm: 'none' }} alignItems={'center'}>
-                {isProcessing ? (
-                  <CircularProgress size={16} />
-                ) : (
-                  <img
-                    style={{ width: '16px', height: '16px' }}
-                    src={searchImage}
-                    alt="searchImage"
-                  />
-                )}
-              </Box>
-              <Box display={{ xs: 'none', sm: 'flex' }} alignItems={'center'}>
-                {isProcessing ? (
-                  <CircularProgress size={24} />
-                ) : (
-                  <img
-                    style={{ width: '24', height: '24px' }}
-                    src={searchImage}
-                    alt="searchImage"
-                  />
-                )}
-              </Box>
-            </Button>
-          </Box>
-        </Box>
-      </Box>
-      <Typography
         sx={{
-          marginTop: '20px',
-          fontWeight: 700,
-          color: theme === 'dark-theme' ? 'white' : '#282828',
-          fontSize: '21px',
+          px: '40px',
         }}
       >
-        Category
-      </Typography>
-      <BlogCard
-        img={blog8}
-        title={demo.title}
-        content={demo.content}
-        date={demo.date}
-        theme={theme}
-      />
-    </Box>
+        <Box
+          display={{ xs: 'block', sm: 'flex' }}
+          alignItems={'center'}
+          justifyContent={'center'}
+          pt={4}
+        >
+          <Box
+            position={{
+              xs: 'relative',
+              sm: 'absolute',
+            }}
+            left={{
+              sm: '40px',
+            }}
+            textAlign={{
+              xs: 'center',
+              sm: 'center',
+            }}
+          >
+            <Typography
+              fontSize={{
+                sm: '32px',
+                xs: '24px',
+              }}
+              fontWeight={700}
+              sx={{
+                fontFamily: 'Inter',
+                fontWeight: '600',
+                color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
+                lineHeight: '48px',
+                letterSpacing: '-0.01rem',
+              }}
+            >
+              Blog
+            </Typography>
+          </Box>
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            width={'100%'}
+          >
+            <Box
+              width={{ xs: '100%', sm: '50%' }}
+              sx={{
+                maxWidth: '960px',
+                display: 'flex',
+                backgroundColor: '#F7F7F7',
+                height: '42px',
+                alignItems: 'center',
+                justify: 'center',
+                paddingLeft: '24px',
+                paddingRight: '10px',
+                borderRadius: '16px',
+                boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+              }}
+            >
+              <TextField
+                placeholder={'Search for Blog'}
+                InputProps={{
+                  border: 'none',
+                  disableUnderline: true,
+                  color: '#4BD8D8 !important',
+                }}
+                style={{
+                  width: '100%',
+                }}
+                disabled={isProcessing}
+                variant="standard"
+              />
+
+              <Button
+                style={{
+                  minWidth: '40px',
+                }}
+              >
+                <Box display={{ xs: 'flex', sm: 'none' }} alignItems={'center'}>
+                  {isProcessing ? (
+                    <CircularProgress size={16} />
+                  ) : (
+                    <img
+                      style={{ width: '16px', height: '16px' }}
+                      src={searchImage}
+                      alt="searchImage"
+                    />
+                  )}
+                </Box>
+                <Box display={{ xs: 'none', sm: 'flex' }} alignItems={'center'}>
+                  {isProcessing ? (
+                    <CircularProgress size={24} />
+                  ) : (
+                    <img
+                      style={{ width: '24', height: '24px' }}
+                      src={searchImage}
+                      alt="searchImage"
+                    />
+                  )}
+                </Box>
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+        <Typography
+          sx={{
+            marginTop: '20px',
+            fontWeight: 700,
+            color: theme === 'dark-theme' ? 'white' : '#282828',
+            fontSize: '21px',
+          }}
+        >
+          Category
+        </Typography>
+        <BlogCard
+          img={blog8}
+          title={demo.title}
+          content={demo.content}
+          date={demo.date}
+          theme={theme}
+        />
+      </Box>
+    </Container>
   );
 };
 

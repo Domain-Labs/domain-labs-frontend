@@ -113,3 +113,11 @@ export const chainIds = {
   testnet: [goerliChainId, bscTestnetChainId],
   all: [goerliChainId, bscTestnetChainId, ethereumChainId, bscChainId],
 };
+
+export const colors = {
+  secondary: '#111023',
+  primary: '#146EB4',
+  darkGray: '#515151',
+  lightGray: '#BABABA',
+  whiteSmoke: '#F8F8F8',
+};

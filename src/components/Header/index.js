@@ -6,6 +6,7 @@ import * as React from 'react';
 import {
   AppBar,
   Box,
+  Button,
   Divider,
   Drawer,
   IconButton,
@@ -18,32 +19,29 @@ import {
   WalletMultiButton,
 } from '@solana/wallet-adapter-react-ui';
 import { useAccount, useNetwork } from 'wagmi';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { AiOutlineMenu } from 'react-icons/ai';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import PropTypes from 'prop-types';
 import { RxCross1 } from 'react-icons/rx';
-import Toggle from 'react-toggle';
-import { chainIds } from '../../config';
-import darkCartImage from '../../assets/image/shopping_cart_dark_mode.png';
-import darkLogoImage from '../../assets/image/logo_dark_mode.png';
-import darkSunImage from '../../assets/image/dark_mode.png';
-import { domainSuffixes } from '../../config';
-import { linkArray } from '../../config';
+import SwitchBox from 'components/SwitchBox';
+import WalletSelectModal from 'components/Modal/WalletSelectModal';
+import { colors } from 'config';
+import { domainSuffixes } from 'config';
+import { linkArray } from 'config';
 import { toast } from 'react-toastify';
-import { useDapp } from '../../contexts/dapp';
+import { useDapp } from 'contexts/dapp';
 import { useSelector } from 'react-redux';
-import { useTheme } from '../../contexts/theme';
+import { useTheme } from 'contexts/theme';
 import { useWallet } from '@solana/wallet-adapter-react';
-import useWindowDimensions from '../../hooks/useDimension';
-import whiteCartImage from '../../assets/image/shopping_cart_white_mode.png';
-import whiteLogoImage from '../../assets/image/logo_white_mode.png';
-import yellowSunImage from '../../assets/image/light_mode.png';
+import useWindowDimensions from 'hooks/useDimension';
+import { whiteCart } from 'utils/images';
+import whiteLogoImage from 'assets/image/logo_white_mode.png';
 
 const ElevationScroll = (props) => {
-  const { theme } = useTheme();
+  const { theme, color, bgColor } = useTheme();
   const { width } = useWindowDimensions();
   const { children } = props;
 
@@ -55,15 +53,8 @@ const ElevationScroll = (props) => {
   return React.cloneElement(children, {
     elevation: trigger ? 4 : 0,
     style: {
-      backgroundColor:
-        theme === 'dark-theme'
-          ? trigger
-            ? '#2A2A2A'
-            : '#2A2A2A'
-          : trigger
-          ? 'white'
-          : 'white',
-      color: theme === 'dark-theme' ? 'white' : '#2A2A2A',
+      backgroundColor: bgColor,
+      color: color,
       transition: trigger ? '0.3s' : '0.5s',
       boxShadow: 'none',
       padding: width > 500 ? '15px 20px' : '0',
@@ -76,20 +67,22 @@ ElevationScroll.propTypes = {
 };
 
 const Header = (props) => {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, bgColor, color } = useTheme();
   const { chain } = useNetwork();
   const navigate = useNavigate();
   const location = useLocation();
   const [isSwitchOn, setIsSwitchOn] = useState(true);
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const { cart } = useSelector((state) => state.cart);
+  const [walletModalOpen, setWalletModalOpen] = React.useState(false);
   const [availableCart, setAvailableCart] = useState([]);
+  const headerRef = useRef();
+  const menuRef = useRef();
+  const { cart } = useSelector((state) => state.cart);
   const { publicKey } = useWallet();
   // const { isConnected, networkId } = useDapp();
   const networkId = 101;
-  const { window } = props;
   const container =
-    window !== undefined ? () => window().document.body : undefined;
+    props.window !== undefined ? () => props.window().document.body : undefined;
   const { address } = useAccount();
   const toBuyPage = () => {
     if (publicKey) {
@@ -99,12 +92,25 @@ const Header = (props) => {
 
   const switchTheme = () => {
     setIsSwitchOn(!isSwitchOn);
-    theme === 'dark-theme' ? setTheme('day-theme') : setTheme('dark-theme');
+    theme === 'dark-theme' ? setTheme('light-theme') : setTheme('dark-theme');
   };
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
+
+  const handleScroll = useCallback(
+    (event) => {
+      if (window.scrollY > 100) {
+        headerRef.current.style.background = bgColor;
+        // menuRef.current.style.color = color;
+      } else {
+        // menuRef.current.style.color = 'black';
+        headerRef.current.style.background = '#00000000';
+      }
+    },
+    [bgColor],
+  );
 
   useEffect(() => {
     const chainId = chain?.id;
@@ -151,22 +157,25 @@ const Header = (props) => {
     setAvailableCart(_availableCart);
   }, [cart, networkId]);
 
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [handleScroll]);
+
+  useEffect(() => {
+    if (window.scrollY > 100) {
+      headerRef.current.style.background = bgColor;
+      // menuRef.current.style.color = color;
+    } else {
+      headerRef.current.style.background = '#00000000';
+      // menuRef.current.style.color = 'black';
+    }
+  }, [bgColor, color]);
+
   const ThemeSwitchComponent = () => (
     <Box className="theme-switch-component" display={'flex'}>
-      <Box
-        sx={{
-          padding: '4px 5px',
-        }}
-        alignItems="center"
-        display={'flex'}
-      >
-        <img
-          src={theme === 'dark-theme' ? darkSunImage : yellowSunImage}
-          width={'22px'}
-          height={'22px'}
-          alt="sunImage"
-        />
-      </Box>
       <Box
         sx={{
           padding: '4px 10px',
@@ -176,14 +185,15 @@ const Header = (props) => {
         display={'flex'}
         className="toggle-wrapper"
       >
-        <Toggle
+        {/* <Toggle
           defaultChecked={isSwitchOn}
           icons={false}
           onChange={() => switchTheme()}
           sx={{
             color: '#D9D9D9',
           }}
-        />
+        /> */}
+        <SwitchBox defaultChecked={isSwitchOn} onChange={() => switchTheme()} />
       </Box>
     </Box>
   );
@@ -191,7 +201,7 @@ const Header = (props) => {
   const LogoComponent = () => (
     <Box display={'flex'} alignItems={'center'}>
       <img
-        src={theme === 'dark-theme' ? darkLogoImage : whiteLogoImage}
+        src={whiteLogoImage}
         style={{
           height: '41px',
         }}
@@ -281,7 +291,7 @@ const Header = (props) => {
       </Box>
 
       <Box>
-        <Box display={'flex'} alignItems={'center'} mx={'30px'} my={'20px'}>
+        <Box display={'flex'} alignItems={'center'} mx={'15px'} my={'20px'}>
           <ThemeSwitchComponent />
           <Typography
             fontFamily={'Inter'}
@@ -319,12 +329,11 @@ const Header = (props) => {
                   alignItems: 'center',
                   position: 'relative',
                   borderRadius: '50%',
-                  background:
-                    'linear-gradient(86.23deg, #4BD8D8 -48.31%, #146EB4 114.96%)',
+                  background: '#146EB4',
                 }}
               >
                 <img
-                  src={darkCartImage}
+                  src={whiteCart}
                   width={'22.64px'}
                   height={'22.64px'}
                   alt="cart"
@@ -359,10 +368,11 @@ const Header = (props) => {
                   height: '36px',
                   alignItems: 'center',
                   borderRadius: '50%',
+                  background: '#146EB4',
                 }}
               >
                 <img
-                  src={theme === 'dark-theme' ? darkCartImage : whiteCartImage}
+                  src={whiteCart}
                   width={'22.64px'}
                   height={'22.64px'}
                   alt="cart"
@@ -418,8 +428,10 @@ const Header = (props) => {
       <ElevationScroll {...props} px={'10px !important'}>
         <AppBar
           height={{ xs: '100px', sm: '60px' }}
-          style={{
+          ref={headerRef}
+          sx={{
             padding: '0 20px !important',
+            background: '#00000000',
           }}
         >
           <Toolbar
@@ -432,76 +444,40 @@ const Header = (props) => {
             }}
           >
             <Box
-              style={{
-                backgroundRepeat: 'no-repeat',
-                zIndex: '9999',
-                cursor: 'pointer',
-              }}
-              sx={{ display: 'flex' }}
-              mr={'17px'}
-              alignItems={'center'}
-              onClick={() => navigate('/')}
-            >
-              <LogoComponent />
-            </Box>
-
-            <Box
-              display={{ xs: 'flex', lg: 'none' }}
-              position={'absolute'}
-              right={0}
-              className="outline-menu-wrapper"
-            >
-              <IconButton
-                size="large"
-                edge="start"
-                color="inherit"
-                aria-label="menu"
-                sx={{
-                  mr: 2,
-                }}
-                onClick={handleDrawerToggle}
-              >
-                <AiOutlineMenu />
-              </IconButton>
-            </Box>
-
-            <Box component="nav">
-              <Drawer
-                container={container}
-                anchor={'right'}
-                variant="temporary"
-                open={mobileOpen}
-                onClose={handleDrawerToggle}
-                ModalProps={{
-                  keepMounted: true, // Better open performance on mobile.
-                }}
-                sx={{
-                  display: { xs: 'block', lg: 'none' },
-                }}
-              >
-                {drawer}
-              </Drawer>
-            </Box>
-
-            <Box
               sx={{
-                right: { md: '10px', xs: '10px' },
-              }}
-              style={{
-                zIndex: '10000',
-              }}
-              display={{
-                xs: 'none',
-                lg: 'flex',
+                justifyContent: 'space-between',
+                display: 'flex',
+                width: '100%',
+                position: 'relative',
               }}
             >
               <Box
+                style={{
+                  backgroundRepeat: 'no-repeat',
+                  zIndex: '9999',
+                  cursor: 'pointer',
+                }}
+                sx={{ display: 'flex' }}
+                mr={'17px'}
+                alignItems={'center'}
+                onClick={() => navigate('/')}
+              >
+                <LogoComponent />
+              </Box>
+
+              <Box
                 mr={'10.93px'}
-                display={{ xs: 'block', sm: 'flex' }}
+                display={{
+                  xs: 'none',
+                  lg: 'flex',
+                }}
                 sx={{
                   alignItems: 'center',
-                  position: 'relative',
+                  position: 'absolute',
                   justifyContent: 'center',
+                  left: '50%',
+                  top: '50%',
+                  transform: 'translate(-50%, -50%)',
                 }}
                 gap={'20px'}
               >
@@ -509,10 +485,11 @@ const Header = (props) => {
                   flexDirection={'row'}
                   display={'flex'}
                   justifyContent={'center'}
+                  color={color}
+                  ref={menuRef}
                 >
                   {linkArray.map((item, index) => (
                     <Typography
-                      color={theme === 'dark-theme' ? 'white' : 'black'}
                       fontSize={'18.4px'}
                       fontWeight={'700'}
                       fontStyle={'normal'}
@@ -550,6 +527,19 @@ const Header = (props) => {
                     </Typography>
                   ))}
                 </Box>
+              </Box>
+              <Box
+                display={{
+                  xs: 'none',
+                  lg: 'flex',
+                }}
+                sx={{
+                  alignItems: 'center',
+                  position: 'relative',
+                  justifyContent: 'center',
+                }}
+                gap={'20px'}
+              >
                 <Box
                   flexDirection={'row'}
                   display={'flex'}
@@ -559,6 +549,7 @@ const Header = (props) => {
                   <Box
                     sx={{
                       padding: '2px 0px 3px 15px',
+                      alignItems: 'center',
                       cursor:
                         publicKey && availableCart && availableCart.length > 0
                           ? 'pointer'
@@ -581,14 +572,13 @@ const Header = (props) => {
                           alignItems: 'center',
                           position: 'relative',
                           borderRadius: '50%',
-                          background:
-                            'linear-gradient(86.23deg, #4BD8D8 -48.31%, #146EB4 114.96%)',
+                          background: colors.primary,
                         }}
                       >
                         <img
-                          src={darkCartImage}
-                          width={'22.64px'}
-                          height={'22.64px'}
+                          src={whiteCart}
+                          width={'23px'}
+                          height={'23px'}
                           alt="cart"
                         />
 
@@ -621,24 +611,27 @@ const Header = (props) => {
                           height: '36px',
                           alignItems: 'center',
                           borderRadius: '50%',
+                          background: colors.primary,
                         }}
                       >
                         <img
-                          src={
-                            theme === 'dark-theme'
-                              ? darkCartImage
-                              : whiteCartImage
-                          }
-                          width={'22.64px'}
-                          height={'22.64px'}
+                          src={whiteCart}
+                          width={'23px'}
+                          height={'23px'}
                           alt="cart"
                         />
                       </Box>
                     )}
                   </Box>
                 </Box>
-
                 <Box className="connect-button-wrapper">
+                  {/* <Button
+                    sx={{}}
+                    onClick={() => setWalletModalOpen(true)}
+                    variant="contained"
+                  >
+                    Connect
+                  </Button> */}
                   <ConnectButton
                     showBalance={false}
                     accountStatus={{
@@ -661,6 +654,54 @@ const Header = (props) => {
                   />
                 </Box>
               </Box>
+            </Box>
+            <Box
+              display={{ xs: 'flex', lg: 'none' }}
+              position={'absolute'}
+              right={0}
+              className="outline-menu-wrapper"
+            >
+              <IconButton
+                size="large"
+                edge="start"
+                color="inherit"
+                aria-label="menu"
+                sx={{
+                  mr: 2,
+                }}
+                onClick={handleDrawerToggle}
+              >
+                <AiOutlineMenu />
+              </IconButton>
+            </Box>
+
+            <Box
+              component="nav"
+              sx={{
+                position: 'absolute',
+              }}
+            >
+              <Drawer
+                container={container}
+                anchor={'right'}
+                variant="temporary"
+                open={mobileOpen}
+                onClose={handleDrawerToggle}
+                ModalProps={{
+                  keepMounted: true, // Better open performance on mobile.
+                }}
+                sx={{
+                  display: { xs: 'block', lg: 'none' },
+                }}
+              >
+                {drawer}
+              </Drawer>
+            </Box>
+            <Box>
+              <WalletSelectModal
+                open={walletModalOpen}
+                handleClose={() => setWalletModalOpen(false)}
+              />
             </Box>
           </Toolbar>
         </AppBar>

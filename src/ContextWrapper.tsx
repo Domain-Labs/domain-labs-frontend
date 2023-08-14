@@ -1,11 +1,11 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
-import Admin from './pages/Admin';
-import Blog from './pages/Blog';
-import Cart from './pages/Cart';
-import Clio from './pages/Clio';
-import Faqs from './pages/Faqs';
-import Home from './pages/Home';
+import Admin from 'pages/Admin';
+import Blog from 'pages/Blog';
+import Cart from 'pages/Cart';
+import Clio from 'pages/Clio';
+import Faqs from 'pages/Faqs';
+import Home from 'pages/Home';
 import Layout from './Layout';
 // import Pricing from './pages/Pricing';
 import Profile from './pages/Profile';

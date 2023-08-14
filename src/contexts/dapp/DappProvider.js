@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useAccount, useProvider, useSigner, useSwitchNetwork } from 'wagmi';
+import {
+  useAccount,
+  usePublicClient,
+  useSwitchNetwork,
+  useWalletClient,
+} from 'wagmi';
 
 import { DappContext } from './DappContext';
 import PropTypes from 'prop-types';
@@ -12,8 +17,8 @@ const DappProvider = ({ children }) => {
   const [provider, setProvider] = useState();
   const [networkId, setNetwork] = useState(1);
   const { switchNetwork } = useSwitchNetwork();
-  const { data: signer } = useSigner();
-  const web3Provider = useProvider();
+  const { data: signer } = useWalletClient();
+  const web3Provider = usePublicClient();
 
   const setNetworkId = async (id) => {
     setNetwork(id);
@@ -27,11 +32,11 @@ const DappProvider = ({ children }) => {
     // setProvider((signer?.provider).provider)
 
     async function setChainId() {
-      const chainId = (await web3Provider.getNetwork()).chainId;
-      if (networkId !== chainId && switchNetwork) {
-        switchNetwork(`0x${networkId.toString(16)}`);
-      } else {
-      }
+      // const chainId = (await web3Provider.getNetwork()).chainId;
+      // if (networkId !== chainId && switchNetwork) {
+      //   switchNetwork(`0x${networkId.toString(16)}`);
+      // } else {
+      // }
     }
     setChainId();
   }, [networkId, signer]);
@@ -41,7 +46,6 @@ const DappProvider = ({ children }) => {
       setProvider(web3Provider);
     } else {
       const provider = new ethers.providers.JsonRpcProvider(rpcUrls[networkId]);
-      console.log(provider, rpcUrls[networkId], '----------');
       setProvider(provider);
     }
   }, [isConnected, networkId, web3Provider]);
@@ -51,10 +55,8 @@ const DappProvider = ({ children }) => {
       const data = await localStorage.getItem('networkId');
 
       if (data) {
-        console.log(data, 'networkId 2----');
         setNetwork(Number(data));
       } else {
-        console.log(data, 'networkId 1----');
         setNetwork(1);
       }
     };

@@ -1,7 +1,9 @@
-import { createContext } from "react";
+import { createContext } from 'react';
 
 const initialState = {
-  theme: "day-theme",
+  theme: 'light-theme',
+  bgColor: '#F8F8F8',
+  color: '#2A2A2A',
   setTheme: () => {},
 };
 

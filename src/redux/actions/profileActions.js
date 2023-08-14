@@ -17,7 +17,7 @@ export const getDomainsByAddress = (address, pubkey) => {
           pubkey: pubkey,
         },
       );
-      const domains = rlts.data.data.domains.list;
+      // const domains = rlts.data.data.domains.list;
       const solDomains = rlts.data.solData;
       dispatch({
         type: FETCH_DATA_SUCCESS,
