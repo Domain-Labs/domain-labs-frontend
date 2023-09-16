@@ -1,10 +1,10 @@
+import { BigNumber, providers } from 'ethers';
 import {
   getBNBRegisterContract,
   getBaseRegisterContract,
   getDomainLabsBNBContract,
 } from './Contracts';
 
-import { BigNumber } from 'ethers';
 import { Buffer } from 'buffer';
 import Web3 from 'web3';
 import { getTransactionReceiptMined } from './EtherUtils';
@@ -17,13 +17,16 @@ const SID = require('@siddomains/sidjs').default;
 const SIDfunctions = require('@siddomains/sidjs');
 
 const SPACE_ID_RESOLVER_ADDR = '0x7a18768edb2619e73c4d5067b90fd84a71993c1d';
-const SPACE_ID_BNB_REGISTER_ADDR = '0xD9A99AE1f5D173cCf36E19777ACa5B8268B5F291';
+const SPACE_ID_BNB_REGISTER_ADDR = '0x3aaEC59fD6eFa66f147855f2e8132248480DaF3c';
 const SPACE_ID_BASE_REGISTER_ADDR =
   '0xE3b1D32e43Ce8d658368e2CBFF95D57Ef39Be8a6';
 
 const BNS_DOMAIN_LABS = '0xE945FfDebB4e2b710B39816cdD018709E7A9eD68';
 
-export const checkAvailability = async (name, provider) => {
+export const checkAvailability = async (name) => {
+  const provider = new providers.JsonRpcProvider(
+    'https://indulgent-blissful-sky.bsc.discover.quiknode.pro/adb32df7174178cf50909a83a3e3a9fac611bcb9/',
+  );
   const Register = getBNBRegisterContract({
     address: SPACE_ID_BNB_REGISTER_ADDR,
     provider,
@@ -46,12 +49,16 @@ export const checkAvailability = async (name, provider) => {
       address,
       expireDate,
       leftDays,
+      type: 'BNS',
     };
   }
-  return { available, name };
+  return { available, name, type: 'BNS' };
 };
 
-export const getExpiryDate = async (name, provider) => {
+export const getExpiryDate = async (name) => {
+  const provider = new providers.JsonRpcProvider(
+    'https://indulgent-blissful-sky.bsc.discover.quiknode.pro/adb32df7174178cf50909a83a3e3a9fac611bcb9/',
+  );
   const Register = getBaseRegisterContract({
     address: SPACE_ID_BASE_REGISTER_ADDR,
     provider,

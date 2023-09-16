@@ -11,12 +11,14 @@ import PropTypes from 'prop-types';
 import { ethers } from 'ethers';
 import localStorage from 'redux-persist/es/storage';
 import { rpcUrls } from '../../config';
+import { useWallet } from '@solana/wallet-adapter-react';
 
 const DappProvider = ({ children }) => {
   const { address, isConnected } = useAccount();
+  const { publicKey, connected } = useWallet();
   const [provider, setProvider] = useState();
   const [networkId, setNetwork] = useState(1);
-  const { switchNetwork } = useSwitchNetwork();
+  const [networkType, setNetworkType] = useState('');
   const { data: signer } = useWalletClient();
   const web3Provider = usePublicClient();
 
@@ -42,10 +44,19 @@ const DappProvider = ({ children }) => {
   }, [networkId, signer]);
 
   useEffect(() => {
+    if (networkType === 'Solana') {
+    } else if (networkType === 'Ethereum') {
+    }
+  }, [networkType]);
+
+  useEffect(() => {
     if (isConnected) {
       setProvider(web3Provider);
     } else {
-      const provider = new ethers.providers.JsonRpcProvider(rpcUrls[networkId]);
+      const provider = new ethers.providers.AlchemyProvider(
+        1,
+        '8MZNUTLCQugMhLsclCvpCahkvf2TmKun',
+      );
       setProvider(provider);
     }
   }, [isConnected, networkId, web3Provider]);
@@ -66,12 +77,13 @@ const DappProvider = ({ children }) => {
   return (
     <DappContext.Provider
       value={{
-        address,
-        isConnected,
+        address: address ? address : publicKey ? publicKey.toString() : '',
+        isConnected: isConnected | connected,
         provider,
         signer,
         networkId,
-        setNetworkId,
+        setNetworkType,
+        networkType,
       }}
     >
       {children}

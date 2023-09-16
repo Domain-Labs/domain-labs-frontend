@@ -34,7 +34,7 @@ import reportWebVitals from './reportWebVitals';
 require('@solana/wallet-adapter-react-ui/styles.css');
 
 const solana_network =
-  process.env.SOLANA_NETWORK ||
+  // process.env.SOLANA_NETWORK ||
   'https://red-bitter-brook.solana-mainnet.discover.quiknode.pro/6ef6b38be9eb778256aafcd3e4907da03585b0d2/';
 const { chains, publicClient } = configureChains(
   [mainnet, bsc],
@@ -51,7 +51,7 @@ const connectors = connectorsForWallets([
       phantomWallet({ chains }),
       metaMaskWallet({ chains, projectId: 'domainlabs' }),
       injectedWallet({ chains }),
-      trustWallet({ chains, projectId: 'domainlabs' }),
+      // trustWallet({ chains, projectId: 'domainlabs' }),
     ],
   },
 ]);

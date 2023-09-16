@@ -7,10 +7,12 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { Box } from '@mui/material';
 import Container from 'components/Container';
+import SearchItem from './Components/SearchItem';
 import SearchTitle from './Components/SearchTitle';
 import SolComponent from './Components/SolanaItem';
 import SolanaItem from './Components/SolanaItem';
 import { checkAvailability } from 'utils/SolUtils';
+import { checkDomainAvailability } from 'services/APIService';
 import { domainSuffixes } from 'config';
 import { toast } from 'react-toastify';
 import { useDapp } from 'contexts/dapp';
@@ -26,7 +28,7 @@ const SearchResult = () => {
   const { publicKey } = useWallet();
   // const { provider, signer, address, networkId, isConnected } = useDapp();
   //testing purpose only
-  const { provider, signer, address, isConnected } = useDapp();
+  const { isConnected } = useDapp();
   const { theme } = useTheme();
   const [results, setResults] = useState([]);
   const networkId = 101;
@@ -103,68 +105,78 @@ const SearchResult = () => {
     let domains = domain.isSingleSearch
       ? [domain.searchString]
       : domain.searchList;
+    console.log(domains, 'domains');
     const availabilities = await checkAvailability(domains);
-    const nRlts = availabilities.map((availability) => {
+    availabilities.map((availability) => {
       const exist = cart.cart.findIndex(
-        (item) => item.name === availability.name,
+        (item) => item.name === availability.name && item.type === 'SOL',
       );
-      return {
-        ...availability,
-        cart: exist > -1,
-      };
+
+      const exist1 = results.findIndex(
+        (item) => item.name === availability.name && item.type === 'SOL',
+      );
+      console.log(exist, exist1, '---');
+      if (exist1 === -1) {
+        setResults((prev) => {
+          const nRlts = [...prev];
+          nRlts.push({
+            ...availability,
+            type: 'SOL',
+            cart: exist > -1,
+          });
+          return nRlts;
+        });
+      }
     });
-    setResults(nRlts);
+    // setResults(nRlts);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [domain]);
 
   const _checkAvailability = useCallback(async () => {
-    let domainFuncs;
-    if (networkId === 1 || networkId === 5) {
-      domainFuncs = ENS;
+    // let domainFuncs;
+    const types = ['BNB', 'ETH', 'SOL'];
+    let availabilities;
+    if (domain.isSingleSearch) {
+      availabilities = await checkDomainAvailability(
+        types.map((type) => {
+          return { name: domain.searchString, type: type };
+        }),
+      );
     } else {
-      domainFuncs = BNS;
+      const names = [];
+      domain.searchList.forEach((searchStr) => {
+        types.forEach((type) =>
+          names.push({
+            name: searchStr,
+            type: type,
+          }),
+        );
+      });
+      availabilities = await checkDomainAvailability(names);
     }
 
-    if (domain.isSingleSearch) {
-      const availability = await domainFuncs.checkAvailability(
-        domain.searchString,
-        provider,
-      );
+    console.log(availabilities, 'availabilities');
+    availabilities.forEach((rlt) => {
       const exist = cart.cart.findIndex(
-        (item) => item.name === availability.name,
+        (item) => item.name === rlt.name && item.type === rlt.type,
       );
-      setResults([{ ...availability, cart: exist > -1 }]);
-    } else {
-      domain.searchList.map((searchString) => {
-        if (searchString === '' || !searchString) return false;
-        domainFuncs.checkAvailability(searchString, provider).then((rlt) => {
-          if (domain.isClio && !rlt.available) {
-            return false;
-          } else {
-            const exist = cart.cart.findIndex((item) => item.name === rlt.name);
-            const exist1 = results.findIndex((item) => item.name === rlt.name);
-            if (exist1 === -1) {
-              setResults((prev) => {
-                const nRlts = [...prev];
-                nRlts.push({ ...rlt, cart: exist > -1 });
-                return nRlts;
-              });
-            }
-          }
+      const exist1 = results.findIndex(
+        (item) => item.name === rlt.name && item.type === rlt.type,
+      );
+      if (exist1 === -1) {
+        setResults((prev) => {
+          const nRlts = [...prev];
+          nRlts.push({ ...rlt, cart: exist > -1 });
+          return nRlts;
         });
-        return true;
-      });
-    }
+      }
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domain, provider, cart.cart]);
+  }, [domain, cart.cart]);
 
   useEffect(() => {
-    _checkSolAvailability();
-    // if (provider) {
-    //   _checkAvailability();
-    // }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [_checkSolAvailability]);
+    _checkAvailability();
+  }, [_checkAvailability]);
 
   return (
     <Container>
@@ -188,23 +200,27 @@ const SearchResult = () => {
             {}
             {results.length > 0 &&
               results.map((result, idx) => {
-                return (
-                  // <SearchItem
-                  //   result={result}
-                  //   networkId={networkId}
-                  //   addOrRemoveCart={_addOrRemoveCart}
-                  //   key={idx}
-                  // />
-                  <SolanaItem
-                    name={result.name}
-                    cart={result.cart}
-                    address={result.owner}
-                    key={idx}
-                    networkId={networkId}
-                    addOrRemoveCart={_solAddOrRemoveCart}
-                    available={!result.registered}
-                  />
-                );
+                if (result.type !== 'SOL') {
+                  return (
+                    <SearchItem
+                      result={result}
+                      addOrRemoveCart={_addOrRemoveCart}
+                      key={idx}
+                    />
+                  );
+                } else {
+                  return (
+                    <SolanaItem
+                      name={result.name}
+                      cart={result.cart}
+                      address={result.owner}
+                      key={idx}
+                      networkId={networkId}
+                      addOrRemoveCart={_solAddOrRemoveCart}
+                      available={!result.registered}
+                    />
+                  );
+                }
               })}
           </Box>
         </Box>

@@ -1,3 +1,4 @@
+import { BigNumber, providers } from 'ethers';
 import {
   getBaseRegisterContract,
   getDomainLabsENSContract,
@@ -5,44 +6,46 @@ import {
   getENSRegisterContract,
 } from './Contracts';
 
-import { BigNumber } from 'ethers';
 import { ENS } from '@ensdomains/ensjs';
 import Web3 from 'web3';
 import { getTransactionReceiptMined } from '../utils/EtherUtils';
 import { labelhash } from './labelhash';
 
 const ENS_RESOLVER_ADDR = '0x231b0ee14048e9dccd1d247744d114a4eb5e8e63';
-const ENS_REGISTER_ADDR = '0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5';
+const ENS_REGISTER_ADDR = '0x253553366Da8546fC250F225fe3d25d0C782303b';
 const ENS_BASE_REGISTER_ADDR = '0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85';
 const ENS_DOMAIN_LABS = '0x84f742dCF445ed7e7Dce82Ae084936E489B53BA3';
+const ALCHEMY_KEY = '8MZNUTLCQugMhLsclCvpCahkvf2TmKun';
 
-export const checkAvailability = async (name, provider) => {
+export const checkAvailability = async (name) => {
+  const provider = new providers.AlchemyProvider(1, ALCHEMY_KEY);
   const ENSInstance = new ENS();
   await ENSInstance.setProvider(provider);
   const Register = getENSRegisterContract({
     address: ENS_REGISTER_ADDR,
     provider,
   });
-
   const available = await Register['available(string)'](name);
   if (!available) {
     const address = await ENSInstance.getAddr(`${name}.eth`);
-    const expiry = await getExpiryDate(name, provider);
+    const expiry = await getExpiryDate(name);
     const timeLeft = expiry * 1000 - Date.now();
     const leftDays = (timeLeft / 1000 / 3600 / 24).toFixed(0);
     const expireDate = new Date(expiry * 1000).toUTCString();
     return {
       name,
       available,
+      type: 'ETH',
       address,
       expireDate,
       leftDays,
     };
   }
-  return { available, name };
+  return { available, name, type: 'ETH' };
 };
 
-export const getExpiryDate = async (name, provider) => {
+export const getExpiryDate = async (name) => {
+  const provider = new providers.AlchemyProvider(1, ALCHEMY_KEY);
   const Register = getENSBaseRegisterContract({
     address: ENS_BASE_REGISTER_ADDR,
     provider,

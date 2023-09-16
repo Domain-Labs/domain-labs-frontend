@@ -14,6 +14,7 @@ import {
   Typography,
   useScrollTrigger,
 } from '@mui/material';
+import { ConnectButton, useConnectModal } from '@rainbow-me/rainbowkit';
 import {
   WalletModalProvider,
   WalletMultiButton,
@@ -23,10 +24,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { AiOutlineMenu } from 'react-icons/ai';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
 import PropTypes from 'prop-types';
 import { RxCross1 } from 'react-icons/rx';
 import SwitchBox from 'components/SwitchBox';
+import WalletConnectButton from 'components/WalletConnectButton';
 import WalletSelectModal from 'components/Modal/WalletSelectModal';
 import { colors } from 'config';
 import { domainSuffixes } from 'config';
@@ -625,14 +626,8 @@ const Header = (props) => {
                   </Box>
                 </Box>
                 <Box className="connect-button-wrapper">
-                  {/* <Button
-                    sx={{}}
-                    onClick={() => setWalletModalOpen(true)}
-                    variant="contained"
-                  >
-                    Connect
-                  </Button> */}
-                  <ConnectButton
+                  <WalletConnectButton />
+                  {/* <ConnectButton
                     showBalance={false}
                     accountStatus={{
                       smallScreen: 'full',
@@ -651,7 +646,7 @@ const Header = (props) => {
                       lineHeight: 'normal',
                       height: '39px',
                     }}
-                  />
+                  /> */}
                 </Box>
               </Box>
             </Box>
@@ -692,6 +687,7 @@ const Header = (props) => {
                 }}
                 sx={{
                   display: { xs: 'block', lg: 'none' },
+                  zIndex: 1040, //important
                 }}
               >
                 {drawer}

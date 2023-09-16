@@ -9,7 +9,16 @@ import {
 } from 'utils/images';
 import { domainLogoImages, domainNames, domainSuffixes } from 'config';
 
-const SearchItem = ({ result, networkId, addOrRemoveCart }) => {
+const SearchItem = ({ result, addOrRemoveCart }) => {
+  const type = result.type;
+  const networkId = type === 'ETH' ? 1 : 56;
+  const calculateLeftDays = (expiry) => {
+    const timeLeft = expiry * 1000 - Date.now();
+    const leftDays = (timeLeft / 1000 / 3600 / 24).toFixed(0);
+    const expireDate = new Date(expiry * 1000).toUTCString();
+    return { leftDays, expireDate };
+  };
+
   return (
     <Box
       sx={{
@@ -18,13 +27,13 @@ const SearchItem = ({ result, networkId, addOrRemoveCart }) => {
         borderRadius: '16px',
         marginBottom: '8px',
         background: `${
-          !result.available
+          result.registered
             ? '#D2EBFF'
             : 'linear-gradient(79.42deg, #4BD8D8 -28.43%, #146EB4 125.83%)'
         }`,
       }}
     >
-      {!result.available && (
+      {result.registered && (
         <Box display={'flex'} justifyContent={'flex-end'} alignItems="center">
           <Typography
             fontSize={{
@@ -35,7 +44,8 @@ const SearchItem = ({ result, networkId, addOrRemoveCart }) => {
             fontWeight={'700'}
             marginRight="5px"
           >
-            {result.leftDays} days left
+            {calculateLeftDays(Number(result.expiration.hex)).leftDays} days
+            left
           </Typography>
           <img src={timeLeftClock} alt="timeLeftClock" />
         </Box>
@@ -66,7 +76,7 @@ const SearchItem = ({ result, networkId, addOrRemoveCart }) => {
             sm: '25px',
           }}
           fontWeight={'700'}
-          color={result.available ? 'white' : '#868686'}
+          color={!result.registered ? 'white' : '#868686'}
         >
           {result.name}.{domainSuffixes[networkId]}
           <Box
@@ -88,14 +98,14 @@ const SearchItem = ({ result, networkId, addOrRemoveCart }) => {
             md: '1.3vw',
             sm: '18px',
           }}
-          color={!result.available ? '#C84141' : 'white'}
+          color={result.registered ? '#C84141' : 'white'}
         >
-          {`Domain ${result.available ? 'is available' : 'not available'}.`}
+          {`Domain ${!result.registered ? 'is available' : 'not available'}.`}
         </Typography>
       </Box>
-      {!result.available && (
+      {result.registered && (
         <Box
-          color={result.available ? 'white' : '#868686'}
+          color={!result.registered ? 'white' : '#868686'}
           sx={{ paddingLeft: '5px' }}
         >
           <Box
@@ -116,7 +126,7 @@ const SearchItem = ({ result, networkId, addOrRemoveCart }) => {
             }}
             fontWeight={'400'}
           >
-            {`Owner: ${result.address}`}
+            {`Owner: ${result.owner}`}
           </Box>
           <Box
             sx={{ opacity: '1' }}
@@ -126,7 +136,7 @@ const SearchItem = ({ result, networkId, addOrRemoveCart }) => {
             }}
             fontWeight={'400'}
           >
-            {`Time: ${result.expireDate}`}
+            {`Time: ${calculateLeftDays(result.expiration.hex).expireDate}`}
           </Box>
         </Box>
       )}
@@ -141,12 +151,12 @@ const SearchItem = ({ result, networkId, addOrRemoveCart }) => {
         }}
       >
         <img
-          src={result.available ? whiteBookmarkImage : blackBookmarkImage}
+          src={!result.registered ? whiteBookmarkImage : blackBookmarkImage}
           alt="bookmark"
           width={'20px'}
           height={'25px'}
         />
-        {result.available ? (
+        {!result.registered ? (
           <img
             src={result.cart ? shoppingCartFull : shoppingCart}
             alt="shopping cart"

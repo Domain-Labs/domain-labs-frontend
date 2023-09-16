@@ -1,13 +1,12 @@
-import { createContext } from "react";
+import { createContext } from 'react';
 
 const initialState = {
   address: '0x0',
+  networkType: 'Solana' | 'Ethereum',
   isConnected: false,
   provider: undefined,
   signer: undefined,
   networkId: 1,
-  setNetworkId: () => {}
-}
+};
 
 export const DappContext = createContext(initialState);
-
