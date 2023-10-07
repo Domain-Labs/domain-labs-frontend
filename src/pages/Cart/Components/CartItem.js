@@ -10,20 +10,13 @@ import { timer, whiteBookmarkImage, whiteOffShoppingImage } from 'utils/images';
 
 import { useMemo } from 'react';
 
-const CartItem = ({
-  networkId,
-  name,
-  domain,
-  _removeCart,
-  timeSelect,
-  idx,
-  results,
-}) => {
+const CartItem = ({ name, domain, _removeCart, timeSelect, idx, results }) => {
+  const networkId = domain === 'BNB' ? 56 : 1;
   const options = useMemo(
     () => [
-      { label: '1 Year', value: 365 },
-      { label: '3 Years', value: 1095 },
-      { label: '5 Years', value: 1825 },
+      { label: '1 Year', value: 1 },
+      { label: '3 Years', value: 3 },
+      { label: '5 Years', value: 5 },
     ],
     [],
   );
@@ -95,7 +88,9 @@ const CartItem = ({
       >
         <Box>
           <Select
-            value={results[idx] && results[idx].year ? results[idx].year : ''}
+            value={
+              results[idx] && results[idx].duration ? results[idx].duration : 1
+            }
             onChange={(event) => timeSelect(idx, event.target.value)}
             input={<OutlinedInput />}
             inputProps={{ 'aria-label': 'Without label' }}

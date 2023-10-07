@@ -6,7 +6,6 @@ import * as React from 'react';
 import {
   AppBar,
   Box,
-  Button,
   Divider,
   Drawer,
   IconButton,
@@ -14,26 +13,22 @@ import {
   Typography,
   useScrollTrigger,
 } from '@mui/material';
-import { ConnectButton, useConnectModal } from '@rainbow-me/rainbowkit';
-import {
-  WalletModalProvider,
-  WalletMultiButton,
-} from '@solana/wallet-adapter-react-ui';
 import { useAccount, useNetwork } from 'wagmi';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { AiOutlineMenu } from 'react-icons/ai';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import PropTypes from 'prop-types';
 import { RxCross1 } from 'react-icons/rx';
 import SwitchBox from 'components/SwitchBox';
 import WalletConnectButton from 'components/WalletConnectButton';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import WalletSelectModal from 'components/Modal/WalletSelectModal';
 import { colors } from 'config';
 import { domainSuffixes } from 'config';
 import { linkArray } from 'config';
 import { toast } from 'react-toastify';
-import { useDapp } from 'contexts/dapp';
 import { useSelector } from 'react-redux';
 import { useTheme } from 'contexts/theme';
 import { useWallet } from '@solana/wallet-adapter-react';
@@ -69,26 +64,20 @@ ElevationScroll.propTypes = {
 
 const Header = (props) => {
   const { theme, setTheme, bgColor, color } = useTheme();
-  const { chain } = useNetwork();
   const navigate = useNavigate();
   const location = useLocation();
   const [isSwitchOn, setIsSwitchOn] = useState(true);
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [walletModalOpen, setWalletModalOpen] = React.useState(false);
-  const [availableCart, setAvailableCart] = useState([]);
   const headerRef = useRef();
   const menuRef = useRef();
   const { cart } = useSelector((state) => state.cart);
   const { publicKey } = useWallet();
   // const { isConnected, networkId } = useDapp();
-  const networkId = 101;
   const container =
     props.window !== undefined ? () => props.window().document.body : undefined;
-  const { address } = useAccount();
   const toBuyPage = () => {
-    if (publicKey) {
-      navigate('/cart');
-    }
+    navigate('/cart');
   };
 
   const switchTheme = () => {
@@ -113,50 +102,13 @@ const Header = (props) => {
     [bgColor],
   );
 
-  useEffect(() => {
-    const chainId = chain?.id;
-    const pathname = location.pathname;
-
-    // if (
-    //   !chainIds[process.env.REACT_APP_NET_TYPE].includes(chainId) &&
-    //   pathname !== '/home' &&
-    //   pathname !== '/team'
-    // ) {
-    //   toast.error('Please switch your chain');
-    //   setTimeout(() => {
-    //     navigate('/home');
-    //   });
-    //   return;
-    // }
-
-    if (
-      address === process.env.REACT_APP_ADMIN_WALLET_1 ||
-      address === process.env.REACT_APP_ADMIN_WALLET_2 ||
-      address === process.env.REACT_APP_DEV_WALLET_1 ||
-      address === process.env.REACT_APP_DEV_WALLET_2
-    ) {
-      console.log('you can access');
-      console.log('address: ', address);
-      console.log('dev wallet: ', process.env.REACT_APP_DEV_WALLET_1);
-    } else if (pathname === '/admin') {
-      console.log('address: ', address);
-      console.log('dev wallet: ', process.env.REACT_APP_DEV_WALLET_1);
-      console.log('dev wallet: ', process.env.REACT_APP_DEV_WALLET_2);
-
-      toast.warn("You can't access to this page");
-      setTimeout(() => {
-        navigate('/');
-      }, 1000);
-    }
-  }, [location, address, chain?.id, navigate]);
-
-  useEffect(() => {
-    const domainSuffix = domainSuffixes[networkId];
-    const _availableCart = cart.filter(
-      (_item) => _item.domain === domainSuffix,
-    );
-    setAvailableCart(_availableCart);
-  }, [cart, networkId]);
+  // useEffect(() => {
+  //   const domainSuffix = domainSuffixes[networkId];
+  //   const _availableCart = cart.filter(
+  //     (_item) => _item.domain === domainSuffix,
+  //   );
+  //   setAvailableCart(_availableCart);
+  // }, [cart, networkId]);
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
@@ -320,7 +272,7 @@ const Header = (props) => {
             }}
             onClick={location.pathname === '/' ? () => {} : () => toBuyPage()}
           >
-            {publicKey && availableCart && availableCart.length > 0 ? (
+            {cart && cart.length > 0 ? (
               <Box
                 sx={{
                   display: 'flex',
@@ -357,7 +309,7 @@ const Header = (props) => {
                     right: '0',
                   }}
                 >
-                  {availableCart.length}
+                  {cart.length}
                 </span>
               </Box>
             ) : (
@@ -552,18 +504,14 @@ const Header = (props) => {
                       padding: '2px 0px 3px 15px',
                       alignItems: 'center',
                       cursor:
-                        publicKey && availableCart && availableCart.length > 0
-                          ? 'pointer'
-                          : 'not-allowed',
+                        cart && cart.length > 0 ? 'pointer' : 'not-allowed',
                     }}
                     onClick={
-                      publicKey && availableCart && availableCart.length > 0
-                        ? () => toBuyPage()
-                        : () => {}
+                      cart && cart.length > 0 ? () => toBuyPage() : () => {}
                     }
                     display={'flex'}
                   >
-                    {publicKey && availableCart && availableCart.length > 0 ? (
+                    {cart && cart.length > 0 ? (
                       <Box
                         sx={{
                           display: 'flex',
@@ -600,7 +548,7 @@ const Header = (props) => {
                             right: '0',
                           }}
                         >
-                          {availableCart.length}
+                          {cart.length}
                         </span>
                       </Box>
                     ) : (

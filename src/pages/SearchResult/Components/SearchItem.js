@@ -31,6 +31,7 @@ const SearchItem = ({ result, addOrRemoveCart }) => {
             ? '#D2EBFF'
             : 'linear-gradient(79.42deg, #4BD8D8 -28.43%, #146EB4 125.83%)'
         }`,
+        zIndex: 22,
       }}
     >
       {result.registered && (
@@ -162,7 +163,7 @@ const SearchItem = ({ result, addOrRemoveCart }) => {
             alt="shopping cart"
             width={'25px'}
             height={'25px'}
-            onClick={() => addOrRemoveCart(result.name)}
+            onClick={() => addOrRemoveCart(result.name, type)}
           />
         ) : (
           <img

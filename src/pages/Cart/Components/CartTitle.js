@@ -5,7 +5,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useNavigate } from 'react-router';
 import { useTheme } from 'contexts/theme';
 
-const CartTitle = ({ publicKey }) => {
+const CartTitle = () => {
   const { theme } = useTheme();
   const navigate = useNavigate();
   const backHome = () => {
@@ -126,36 +126,7 @@ const CartTitle = ({ publicKey }) => {
             justifyContent: 'center',
             alignItems: 'center',
           }}
-        >
-          <Typography
-            fontSize={'18px'}
-            lineHeight={'24px'}
-            fontWeight={'600'}
-            color={'black'}
-            display={{ xs: 'none', md: 'flex' }}
-          >
-            {publicKey ? publicKey.toString() : ''}
-          </Typography>
-
-          <CopyToClipboard
-            text={publicKey ? publicKey.toString() : ''}
-            onCopy={() => window.alert('copied')}
-          >
-            <Typography
-              fontSize={'18px'}
-              lineHeight={'24px'}
-              fontWeight={'600'}
-              color={'black'}
-              display={{ xs: 'flex', md: 'none' }}
-            >
-              {publicKey
-                ? publicKey.toString().slice(0, 10) +
-                  '...' +
-                  publicKey.toString().slice(-10, -1)
-                : ''}
-            </Typography>
-          </CopyToClipboard>
-        </Box>
+        ></Box>
       </Box>
     </Box>
   );

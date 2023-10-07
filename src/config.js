@@ -2,7 +2,8 @@ import binanceImage from './assets/image/svgs/binance-logo.svg';
 import ensImage from './assets/image/svgs/ens-logo.svg';
 import { solLogo } from './utils/images';
 
-export const BASE_API_URL = 'http://localhost:8000/api/v1';
+export const BASE_API_URL =
+  process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000/api/v1';
 // 'https://tuy2zvjt24.execute-api.us-east-1.amazonaws.com';
 
 // export const ethereumChain = 5

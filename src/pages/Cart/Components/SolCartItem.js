@@ -3,7 +3,8 @@ import { domainLogoImages, domainNames } from 'config';
 import { whiteBookmarkImage, whiteOffShoppingImage } from 'utils/images';
 
 const SolCartItem = (props) => {
-  const { networkId, name, domain, _removeCart } = props;
+  const { name, domain, _removeCart } = props;
+  const networkId = 101;
   return (
     <Box
       sx={{

@@ -1,12 +1,21 @@
 import { Box, Button, Paper, TextField, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
+import {
+  usePrepareSendTransaction,
+  useSendTransaction,
+  useWaitForTransaction,
+} from 'wagmi';
 
 import { colors } from 'config';
+import { parseEther } from 'viem';
 import { searchImage } from 'utils/images';
 import { setSearchString } from 'redux/actions/domainActions';
+import { useDapp } from 'contexts/dapp';
+import { useDebounce } from 'use-debounce';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
-import { useState } from 'react';
 import { useTheme } from 'contexts/theme';
+import { utils } from 'ethers';
 
 const SearchBox = ({ setIsOpenAdvancedSearch }) => {
   const navigate = useNavigate();
@@ -14,9 +23,30 @@ const SearchBox = ({ setIsOpenAdvancedSearch }) => {
   const dispatch = useDispatch();
   const [searchStr, setSearchStr] = useState('');
 
-  const onKeyPressed = (e) => {
+  // const [debouncedTo] = useDebounce(
+  //   '0x253553366Da8546fC250F225fe3d25d0C782303b',
+  //   500,
+  // );
+
+  // const [amount, setAmount] = useState('0.0001');
+  // const [debouncedAmount] = useDebounce(amount, 500);
+
+  // const { config } = usePrepareSendTransaction({
+  //   to: debouncedTo,
+  //   value: debouncedAmount ? parseEther(debouncedAmount) : undefined,
+  //   onError(error) {
+  //     console.log('Error', error);
+  //   },
+  // });
+  // const { data, sendTransaction, error, status } = useSendTransaction(config);
+  // const { isLoading, isSuccess } = useWaitForTransaction({
+  //   hash: data?.hash,
+  // });
+
+  const onKeyPressed = async (e) => {
     if (e.code === 'Enter') {
       searchClicked();
+      // sendTransaction();
     }
   };
 

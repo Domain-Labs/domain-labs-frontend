@@ -8,8 +8,9 @@ import {
 } from 'utils/images';
 import { domainLogoImages, domainNames, domainSuffixes } from 'config';
 
-const SolanaItem = (props) => {
-  const { name, available, networkId, address, cart, addOrRemoveCart } = props;
+const SolanaItem = ({ result, addOrRemoveCart }) => {
+  const { name, available, address, cart } = result;
+  const networkId = 101;
   return (
     <Box
       sx={{
@@ -18,10 +19,11 @@ const SolanaItem = (props) => {
         borderRadius: '16px',
         marginBottom: '8px',
         background: `${
-          !available
+          available
             ? '#D2EBFF'
             : 'linear-gradient(79.42deg, #4BD8D8 -28.43%, #146EB4 125.83%)'
         }`,
+        zIndex: 22,
       }}
     >
       <Box
@@ -51,7 +53,7 @@ const SolanaItem = (props) => {
             sm: '25px',
           }}
           fontWeight={'700'}
-          color={available ? 'white' : '#868686'}
+          color={!available ? 'white' : '#868686'}
         >
           {name}.{domainSuffixes[networkId]}
           <Box
@@ -73,14 +75,14 @@ const SolanaItem = (props) => {
             md: '1.3vw',
             sm: '18px',
           }}
-          color={!available ? '#C84141' : 'white'}
+          color={available ? '#C84141' : 'white'}
         >
-          {`Domain ${available ? 'is available' : 'not available'}.`}
+          {`Domain ${!available ? 'is available' : 'not available'}.`}
         </Typography>
       </Box>
-      {!available && (
+      {available && (
         <Box
-          color={available ? 'white' : '#868686'}
+          color={!available ? 'white' : '#868686'}
           sx={{ paddingLeft: '5px' }}
         >
           <Box
@@ -116,18 +118,21 @@ const SolanaItem = (props) => {
         }}
       >
         <img
-          src={available ? whiteBookmarkImage : blackBookmarkImage}
+          src={!available ? whiteBookmarkImage : blackBookmarkImage}
           alt="bookmark"
           width={'20px'}
           height={'25px'}
         />
-        {available ? (
+        {!available ? (
           <img
             src={cart ? shoppingCartFull : shoppingCart}
             alt="shopping cart"
             width={'25px'}
             height={'25px'}
-            onClick={() => addOrRemoveCart(name)}
+            onClick={() => {
+              console.log('>>>>>>>>', name);
+              addOrRemoveCart(name, 'SOL');
+            }}
           />
         ) : (
           <img

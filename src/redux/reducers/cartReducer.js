@@ -25,8 +25,7 @@ const cartReducer = (state = initialState, action) => {
     case ADD_CART:
       exist = state.cart.findIndex((item) => {
         return (
-          item.name === action.payload.name &&
-          item.domain === action.payload.domain
+          item.name === action.payload.name && item.type === action.payload.type
         );
       });
       if (exist < 0) {
@@ -43,8 +42,7 @@ const cartReducer = (state = initialState, action) => {
     case REMOVE_CART:
       exist = state.cart.findIndex((item) => {
         return (
-          item.name === action.payload.name &&
-          item.domain === action.payload.domain
+          item.name === action.payload.name && item.type === action.payload.type
         );
       });
       console.log(exist, action.payload, 'item');
@@ -62,7 +60,7 @@ const cartReducer = (state = initialState, action) => {
       }
     case REMOVE_ALL:
       const filtered = state.cart.filter(
-        (item) => item.domain !== action.payload.domain,
+        (item) => item.type !== action.payload.type,
       );
       return {
         ...state,
