@@ -8,9 +8,17 @@ import {
   Select,
   Typography,
 } from '@mui/material';
-import { binanceImage, ensImage, solLogo } from 'utils/images';
+import {
+  binanceIcon,
+  binanceImage,
+  ensImage,
+  ethereumIcon,
+  solLogo,
+  solanaIcon,
+} from 'utils/images';
 
 import { LoadingButton } from '@mui/lab';
+import PaymentItem from './PaymentItem';
 import { useState } from 'react';
 import { useTheme } from 'contexts/theme';
 
@@ -26,9 +34,9 @@ const CostViewer = ({
 }) => {
   const { theme } = useTheme();
   // const [payMethod, setPayMethod] = useState('ETH');
-  const handleChange = (e) => {
+  const handleChange = (val) => {
     // setPayMethod(e.target.value);
-    setPaymentOption(e.target.value);
+    setPaymentOption(val);
   };
 
   return (
@@ -50,19 +58,49 @@ const CostViewer = ({
       >
         <CircularProgress size={30} />
       </Box>
-      <Box display={'flex'} justifyContent={'space-between'}>
+      <Box>
         <Typography
           color={theme === 'dark-theme' ? 'white' : 'black'}
           sx={{
             letterSpacing: '-0.01em',
             fontWeight: '700',
-            fontSize: '28px',
+            fontSize: '32px',
             lineHeight: '34px',
           }}
         >
-          Total Cost
+          Checkout
         </Typography>
-        <FormControl sx={{ minWidth: 120 }} variant="standard" size="small">
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            mt: 5,
+            gap: 1,
+          }}
+        >
+          <PaymentItem
+            type={'ETH'}
+            selected={paymentOption === 'ETH'}
+            icon={ethereumIcon}
+            onClick={() => handleChange('ETH')}
+            backColor={'rgba(97, 128, 231, 0.20)'}
+          />
+          <PaymentItem
+            type={'BNB'}
+            selected={paymentOption === 'BNB'}
+            icon={binanceIcon}
+            onClick={() => handleChange('BNB')}
+            backColor={'rgba(240, 185, 11, 0.20)'}
+          />
+          <PaymentItem
+            type={'SOL'}
+            selected={paymentOption === 'SOL'}
+            icon={solanaIcon}
+            onClick={() => handleChange('SOL')}
+            backColor={'rgba(60, 154, 185, 0.20)'}
+          />
+        </Box>
+        {/* <FormControl sx={{ minWidth: 120 }} variant="standard" size="small">
           <InputLabel id="demo-select-small-label">Payment Method</InputLabel>
           <Select
             labelId="demo-select-small-label"
@@ -108,7 +146,7 @@ const CostViewer = ({
               </Box>
             </MenuItem>
           </Select>
-        </FormControl>
+        </FormControl> */}
       </Box>
       <Box
         display={'flex'}
@@ -121,28 +159,17 @@ const CostViewer = ({
           letterSpacing: '-0.01em',
           color: theme === 'dark-theme' ? 'white' : '#7A7A7A',
           width: '325px',
-          borderBottom: '0.5px solid #D3D3D3',
         }}
       >
-        <Typography>Total {paymentOption}</Typography>
-        <Typography>{price}</Typography>
-      </Box>
-      <Box
-        display={'flex'}
-        justifyContent={'space-between'}
-        py={'8px'}
-        sx={{
-          fontSize: '16px',
-          lineHeight: '19px',
-          letterSpacing: '-0.01em',
-          color: theme === 'dark-theme' ? 'white' : '#7A7A7A',
-          width: '325px',
-          borderBottom: '0.5px solid #D3D3D3',
-        }}
-      >
-        <Typography>Total USD</Typography>
-        <Typography>
-          {Math.ceil(price * priceInUsd * 1000000) / 1000000}
+        <Typography fontFamily={'Murecho'}>Subtotal</Typography>
+        <Typography
+          fontFamily={'Murecho'}
+          sx={{
+            color: 'black',
+            fontWeight: 600,
+          }}
+        >
+          ${Math.ceil((price + gasPrice) * priceInUsd * 10000000) / 10000000}
         </Typography>
       </Box>
       <Box
@@ -155,12 +182,17 @@ const CostViewer = ({
           letterSpacing: '-0.01em',
           color: theme === 'dark-theme' ? 'white' : '#7A7A7A',
           width: '325px',
-          borderBottom: '0.5px solid #D3D3D3',
         }}
       >
-        <Typography>Network Fee</Typography>
-        <Typography>
-          {Math.ceil(gasPrice * priceInUsd * 10000) / 10000}
+        <Typography fontFamily={'Murecho'}>Platform fees</Typography>
+        <Typography
+          fontFamily={'Murecho'}
+          sx={{
+            color: 'black',
+            fontWeight: 600,
+          }}
+        >
+          ${Math.ceil(price * priceInUsd * 1000000) / 1000000}
         </Typography>
       </Box>
       <Box
@@ -168,24 +200,71 @@ const CostViewer = ({
         justifyContent={'space-between'}
         py={'8px'}
         sx={{
-          fontSize: '24px',
+          fontSize: '16px',
           lineHeight: '19px',
           letterSpacing: '-0.01em',
           color: theme === 'dark-theme' ? 'white' : '#7A7A7A',
           width: '325px',
         }}
       >
-        <Typography fontSize={'24px'} fontWeight={'700'}>
-          Grand total($)
+        <Typography fontFamily={'Murecho'}>Registration fees</Typography>
+        <Typography
+          fontFamily={'Murecho'}
+          sx={{
+            color: 'black',
+            fontWeight: 600,
+          }}
+        >
+          ${Math.ceil(gasPrice * priceInUsd * 10000) / 10000}
         </Typography>
-        <Typography fontSize={'24px'} fontWeight={'700'}>
-          {Math.ceil((price + gasPrice) * priceInUsd * 10000000) / 10000000}
+      </Box>
+      <Box width={'100%'} my={3} height="0.5px" bgcolor={'#BABABA'}></Box>
+      <Box
+        display={'flex'}
+        justifyContent={'space-between'}
+        py={'8px'}
+        sx={{
+          fontSize: '16px',
+          lineHeight: '19px',
+          letterSpacing: '-0.01em',
+          color: theme === 'dark-theme' ? 'white' : '#7A7A7A',
+          // width: '325px',
+        }}
+      >
+        <Typography
+          fontFamily={'Murecho'}
+          fontSize={'16px'}
+          color={'black'}
+          fontWeight={'600'}
+        >
+          Total checkout
         </Typography>
+        <Box>
+          <Typography
+            fontFamily={'Murecho'}
+            fontSize={'16px'}
+            color={'black'}
+            fontWeight={'600'}
+            sx={{
+              float: 'right',
+            }}
+          >
+            {Math.ceil((price + gasPrice) * 1000) / 1000} {paymentOption}
+          </Typography>
+          <Typography
+            fontFamily={'Murecho'}
+            fontSize={'16px'}
+            fontWeight={'600'}
+          >
+            ${Math.ceil((price + gasPrice) * priceInUsd * 10000000) / 10000000}
+          </Typography>
+        </Box>
       </Box>
       <Box>
         <LoadingButton
-          loading={loading}
+          // loading={loading}
           disabled={!cart || !cart.length}
+          fontFamily={'Murecho'}
           sx={{
             background:
               'linear-gradient(86.23deg, #4BD8D8 -48.31%, #146EB4 114.96%)',
@@ -193,6 +272,7 @@ const CostViewer = ({
             marginTop: '12px',
             color: 'white',
             // float: 'right',
+            width: '100%',
             px: '40px',
           }}
           onClick={() => {
@@ -201,7 +281,7 @@ const CostViewer = ({
           }}
         >
           {/* {buttonText()} */}
-          {'Purchase Domains'}
+          {'Proceed to Payment'}
         </LoadingButton>
       </Box>
     </Box>

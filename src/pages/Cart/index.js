@@ -162,73 +162,78 @@ const Cart = () => {
 
   return (
     <Container>
-      <Box pt={10} px={{ xs: '30px', sm: '40px' }}>
-        <Box
-          display={{ xs: 'block', md: 'flex' }}
-          sx={{
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-          }}
-        >
+      <Box
+        pt={10}
+        px={{ xs: '30px', sm: '40px' }}
+        display={{
+          md: 'flex',
+          xs: 'block',
+        }}
+        sx={{
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+        }}
+      >
+        <Box>
           <CartTitle />
-          <CostViewer
-            price={price}
-            priceInUsd={priceInUsd}
-            gasPrice={fee}
-            cart={cart}
-            setPaymentOption={setPaymentOption}
-            paymentOption={paymentOption}
-            loading={loading}
-            purchaseDomain={_purchaseDomains}
-          />
-        </Box>
-        <Box
-          sx={{
-            marginTop: '40px',
-          }}
-        >
           <Box
-            my={'40px'}
             sx={{
-              width: '100%',
-              gridTemplateColumns: {
-                lg: 'repeat(4, 1fr)',
-                md: 'repeat(3, 1fr)',
-                sm: 'repeat(2, 1fr)',
-                xs: 'repeat(1, 1fr)',
-              },
+              marginTop: '40px',
             }}
-            gap={'20px'}
-            display="grid"
           >
-            {results.length > 0 &&
-              results.map((item, idx) => {
-                console.log(item, 'items');
-                if (item.type !== 'SOL') {
-                  return (
-                    <CartItem
-                      key={idx}
-                      idx={idx}
-                      _removeCart={_removeCart}
-                      name={item.name}
-                      domain={item.type}
-                      timeSelect={timeSelect}
-                      results={results}
-                    />
-                  );
-                } else {
-                  return (
-                    <SolCartItem
-                      key={idx}
-                      _removeCart={_removeCart}
-                      name={item.name}
-                      domain={item.type}
-                    />
-                  );
-                }
-              })}
+            <Box
+              my={'40px'}
+              sx={{
+                width: '100%',
+                gridTemplateColumns: {
+                  lg: 'repeat(4, 1fr)',
+                  md: 'repeat(3, 1fr)',
+                  sm: 'repeat(2, 1fr)',
+                  xs: 'repeat(1, 1fr)',
+                },
+              }}
+              gap={'20px'}
+              display="grid"
+            >
+              {results.length > 0 &&
+                results.map((item, idx) => {
+                  console.log(item, 'items');
+                  if (item.type !== 'SOL') {
+                    return (
+                      <CartItem
+                        key={idx}
+                        idx={idx}
+                        _removeCart={_removeCart}
+                        name={item.name}
+                        domain={item.type}
+                        timeSelect={timeSelect}
+                        results={results}
+                      />
+                    );
+                  } else {
+                    return (
+                      <SolCartItem
+                        key={idx}
+                        _removeCart={_removeCart}
+                        name={item.name}
+                        domain={item.type}
+                      />
+                    );
+                  }
+                })}
+            </Box>
           </Box>
         </Box>
+        <CostViewer
+          price={price}
+          priceInUsd={priceInUsd}
+          gasPrice={fee}
+          cart={cart}
+          setPaymentOption={setPaymentOption}
+          paymentOption={paymentOption}
+          loading={loading}
+          purchaseDomain={_purchaseDomains}
+        />
       </Box>
     </Container>
   );

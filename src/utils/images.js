@@ -1,3 +1,4 @@
+import binanceIcon from 'assets/image/svgs/binance_i.svg';
 import binanceImage from 'assets/image/svgs/binance-logo.svg';
 import blackBookmarkImage from 'assets/image/bookmark_white_mode.png';
 import blackOffshoppingImage from 'assets/image/remove_shopping_cart_white_mode.png';
@@ -16,6 +17,7 @@ import cancelImage from 'assets/image/cancel.png';
 import clioVid from 'assets/clio.MP4';
 import clockLogo from 'assets/image/svgs/clio-page/clock-logo.svg';
 import ensImage from 'assets/image/svgs/ens-logo.svg';
+import ethereumIcon from 'assets/image/svgs/ethereum_i.svg';
 import footer_side_1 from 'assets/image/footer_side_1.png';
 import footer_side_2 from 'assets/image/footer_side_2.png';
 import home_top from 'assets/image/svgs/home-page/top.svg';
@@ -30,6 +32,7 @@ import searchImage from 'assets/image/svgs/search.svg';
 import shoppingCart from 'assets/image/shopping_cart_white.png';
 import shoppingCartFull from 'assets/image/shopping_cart_full.png';
 import solLogo from 'assets/image/svgs/sol-logo.svg';
+import solanaIcon from 'assets/image/svgs/solana_i.svg';
 import teamBryan from 'assets/image/team/bryan_big.png';
 import teamBryan_sm from 'assets/image/team/bryan_small.png';
 import teamKrik from 'assets/image/team/krik.png';
@@ -98,4 +101,7 @@ export {
   resource2,
   footer_side_1,
   footer_side_2,
+  ethereumIcon,
+  binanceIcon,
+  solanaIcon,
 };

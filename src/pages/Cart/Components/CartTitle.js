@@ -121,7 +121,7 @@ const CartTitle = () => {
             borderRadius: '40px',
             height: '51px',
             marginTop: '22px',
-            maxWidth: '670px',
+            maxWidth: '640px',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',

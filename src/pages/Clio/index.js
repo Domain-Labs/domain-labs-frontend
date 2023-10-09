@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 
 import ClioSearchBox from './Components/ClioSearchBox';
 import Container from 'components/Container';
-import ProsBox from './Components/ProxBox';
+import ProsBox from './Components/ProsBox';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../contexts/theme';
